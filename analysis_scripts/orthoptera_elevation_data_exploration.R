@@ -10,11 +10,11 @@
 # Latest Git commits and updates
 system("ls")
 setwd <- 'orthoptera-elevational-range-community-composition'
-latest_commit <- system("git show -s --pretty='%H on %ci' HEAD", intern=TRUE)
+latest_commit <- system("git show -s --pretty='%h on %ci' HEAD", intern=TRUE)
 print(latest_commit)
 
 this_file_latest_commits <- system("git log --pretty='format:%h <<%s>> on %ci' analysis_scripts/orthoptera_elevation_data_exploration.R", intern=TRUE)
-print(this_file_latest_commits)
+print(paste("Recent changes to this file: ", this_file_latest_commits))
 
 # Test output as HTML
 
