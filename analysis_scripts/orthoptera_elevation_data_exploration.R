@@ -7,7 +7,7 @@
 #'     theme: yeti
 #' ---
 
-# Latest Git commit
+# Latest Git commits and updates
 system("ls")
 setwd <- 'orthoptera-elevational-range-community-composition'
 latest_commit <- system("git show -s --pretty='%H on %ci' HEAD", intern=TRUE)
