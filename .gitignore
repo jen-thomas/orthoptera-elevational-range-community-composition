@@ -1,0 +1,10 @@
+.Rprofile
+.Rproj.user
+.Rhistory
+*.Rproj
+.RData
+.Ruserdata
+
+renv/
+
+analysis_outputs/
