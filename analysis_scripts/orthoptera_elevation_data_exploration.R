@@ -21,8 +21,10 @@ this_file_latest_commits <- paste("<ul>", this_file_latest_commits, "</ul>")
 
 {{ this_file_latest_commits }}
 
-#'
 #' ## Set up
+
+install.packages("fossil")
+library(fossil)
 
 # Read in data files
 
@@ -43,6 +45,7 @@ observations$presence <- presence
 site_species_abundance <- setNames(aggregate(observations$presence, list(observations$site_name, observations$species), FUN=sum),
                                    c("site_name", "species", "abundance"))
 
+create.matrix(site_species_abundance, tax.name="species", locality="site_name", abund=TRUE, abund.col="abundance")
 
 
 
