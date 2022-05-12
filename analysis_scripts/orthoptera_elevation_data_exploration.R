@@ -16,7 +16,7 @@ library(stringr, quietly = TRUE)
 
 #' ## Change log
 
-# Latest Git commits and updates
+# Latest Git commits
 
 this_file_latest_commits <- system("git log HEAD --pretty='tformat: %ci commit %h: %s' orthoptera_elevation_data_exploration.R", intern=TRUE)
 this_file_latest_commits_formatted <- paste(this_file_latest_commits, "<br>")
@@ -36,12 +36,11 @@ vegetation_plots <- read.csv("../data/vegetation_plots.csv", header = TRUE, stri
 
 # Aggregate the observations of each species at each site (ignore dates for now).
 
-# Create vector of 1s to act as presence, join the vector with the observations dataframe, then sum over these to calculate abundance of each species at each site.
-presence <- rep(1, nrow(observations))
+presence <- rep(1, nrow(observations)) # create vector of 1s to act as presence
+observations$presence <- presence # join the vector with the observations dataframe
 
-observations$presence <- presence
 site_species_abundance <- setNames(aggregate(observations$presence, list(observations$site_name, observations$species), FUN=sum),
-                                   c("site_name", "species", "abundance"))
+                                   c("site_name", "species", "abundance")) # sum over these to calculate abundance of each species at each site
 
 site_species_abundance_matrix <- t(create.matrix(site_species_abundance, tax.name="species", locality="site_name", abund=TRUE, abund.col="abundance")) # transform it to have species names as columns and sites as rows
 site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name="species", locality="site_name", abund=FALSE, abund.col="abundance")) # transform it to have species names as columns and sites as rows
