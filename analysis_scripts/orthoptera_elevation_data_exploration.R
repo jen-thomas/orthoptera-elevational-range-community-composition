@@ -7,24 +7,22 @@
 #'     code_folding: hide
 #' ---
 
-# Latest Git commits and updates
+# Set up
 
-latest_commit <- system("git show -s --pretty='%h on %ci' HEAD", intern=TRUE)
-
-#' The latest change to this project was **commit **
-{{ latest_commit }}
-
-this_file_latest_commits <- system("git log --pretty='tformat:- %h %s on %ci' orthoptera_elevation_data_exploration.R", intern=TRUE)
-this_file_latest_commits <- paste("<ul>", this_file_latest_commits, "</ul>")
+install.packages("fossil", quiet = TRUE)
+install.packages("stringr", quiet = TRUE)
+library(fossil, quietly = TRUE)
+library(stringr, quietly = TRUE)
 
 #' ## Change log
 
-{{ this_file_latest_commits }}
+# Latest Git commits and updates
 
-#' ## Set up
+this_file_latest_commits <- system("git log HEAD --pretty='tformat: %ci commit %h: %s' orthoptera_elevation_data_exploration.R", intern=TRUE)
+this_file_latest_commits_formatted <- paste(this_file_latest_commits, "<br>")
 
-install.packages("fossil")
-library(fossil)
+#' ### Latest commits to this file:
+{{ str_replace(this_file_latest_commits_formatted[1:5], ", ", "") }}
 
 # Read in data files
 
@@ -38,15 +36,12 @@ vegetation_plots <- read.csv("../data/vegetation_plots.csv", header = TRUE, stri
 
 # Aggregate the observations of each species at each site (ignore dates for now).
 
-# Create vector of 1s to act as presence, join the vector with the observations dataframe, then sum over these to calculate abundance.
+# Create vector of 1s to act as presence, join the vector with the observations dataframe, then sum over these to calculate abundance of each species at each site.
 presence <- rep(1, nrow(observations))
 
 observations$presence <- presence
 site_species_abundance <- setNames(aggregate(observations$presence, list(observations$site_name, observations$species), FUN=sum),
                                    c("site_name", "species", "abundance"))
 
-create.matrix(site_species_abundance, tax.name="species", locality="site_name", abund=TRUE, abund.col="abundance")
-
-
-
-
+site_species_abundance_matrix <- t(create.matrix(site_species_abundance, tax.name="species", locality="site_name", abund=TRUE, abund.col="abundance")) # transform it to have species names as columns and sites as rows
+site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name="species", locality="site_name", abund=FALSE, abund.col="abundance")) # transform it to have species names as columns and sites as rows
