@@ -11,7 +11,8 @@ install_packages <- function(vector_packages) {
   #' Install and load packages from a vector of packages that are needed for the code.
 
   for (required_package in vector_packages) {
-    if(!require(required_package, character.only=TRUE)) {install.packages(required_package); library(required_package, character.only=TRUE)}
+    if (!require(required_package, character.only=TRUE, quietly=TRUE)) install.packages(required_package)
+      library(required_package, character.only=TRUE)
 }
 }
 
@@ -20,7 +21,7 @@ read_csv_data_file <- function(file_path) {
   #' the resulting dataframe.
   #' Return a dataframe of the input data.
 
-    read.csv(file, header = TRUE, stringsAsFactors = TRUE)
+    read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
 }
 
 rename_site_with_altitude <- function(observations_df) {
@@ -47,15 +48,15 @@ rename_site_with_altitude(observations)
 
 print_latest_git_commits <- function(file_path) {
   #' Get and print the latest five commits for a file.
-
-  this_file_latest_commits <- system(paste("git log HEAD --pretty='tformat: %ci commit %h: %s " + file_path),
-                                     intern=TRUE)
+  command <- paste("git log HEAD --pretty='tformat: %ci commit %h: %s", file_path)
+  # print(command)
+  this_file_latest_commits <- system(command, intern=TRUE)
   this_file_latest_commits_formatted <- paste(this_file_latest_commits, "<br>")
-  {{ str_replace(this_file_latest_commits_formatted[1:5], ", ", "") }}
+  # print(str_replace(this_file_latest_commits_formatted[1:5], ", ", ""))
+  print(this_file_latest_commits[1:5])
 }
 
 print_latest_git_commits("orthoptera_elevation_data_exploration.R")
-
 
 get_confirmed_observations_to_species <- function(observations_df) {
   #' Observations that could not be identified to a specific taxa (that has not already been found in the surveys, i.e
