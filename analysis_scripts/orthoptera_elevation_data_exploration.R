@@ -42,7 +42,7 @@ read_csv_data_file <- function(file_path) {
     read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
 }
 
-vector_packages <- c("fossil", "stringr")
+vector_packages <- c("fossil", "stringr", "dplyr")
 install_packages(vector_packages)
 
 observations <- read_csv_data_file("../data/observations.csv")
@@ -50,19 +50,9 @@ sites <- read_csv_data_file("../data/sites.csv")
 surveys <- read_csv_data_file("../data/surveys.csv")
 vegetation_plots <- read_csv_data_file("../data/vegetation_plots.csv")
 
-#' ## Create site-species matrix
-#' Select only observations identified to species. From this, create a presence-absence site-species matrix.
-
-get_confirmed_observations_to_species <- function(observations_df) {
-  #' Observations that have not been identified to species level are removed. Observations that could not be
-  #' identified to a specific taxa (that has not already been found in the surveys, i.e
-  #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
-  #' Return a dataframe with only confirmed observations to species.
-
-  observations_species <- observations_df[!(observations_df$species==""), ]
-  confirmed_observations_species <- observations_species[(observations_species$id_confidence=="Confirmed"), ]
-  return(confirmed_observations_species)
-}
+#' ## Initial data preparation.
+#' Join site data with observations and create new, user-friendly site name. Create a summary of the observations that
+#' have been identified to species.
 
 rename_site_with_altitude <- function(observations_df) {
   #' Create a new site name within the dataframe which includes the altitude so that it is more useful when including
@@ -81,17 +71,88 @@ join_observation_site <- function(observations_df) {
   #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
-    c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species")]
+    c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "id_confidence")]
 
   observations <- rename_site_with_altitude(observations)
 
   return(observations)
 }
 
-create_presence_absence_site_species_matrix <- function(observations_df) {
-  #' Create a site-species matrix from a set of observations at different sites. Each observation is of one individual
-  #' at a particular site.
-  #' Return presence-absence site-species matrix.
+get_site_information <- function(observations_df) {
+  #' Join the altitude of sites with the observations and output a data frame with a user-friendly site name.
+
+  observations_site <- join_observation_site(observations_df)
+  observations_site <- rename_site_with_altitude(observations_site)
+
+  return(observations_site)
+}
+
+get_confirmed_observations_to_species <- function(observations_df) {
+  #' Observations that have not been identified to species level are removed. Observations that could not be
+  #' identified to a specific taxa (that has not already been found in the surveys, i.e
+  #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
+  #' Return a dataframe with only confirmed observations to species.
+
+  observations_species <- observations_df[!(observations_df$species==""), ]
+  confirmed_observations_species <- observations_species[(observations_species$id_confidence=="Confirmed"), ]
+
+  return(confirmed_observations_species)
+}
+
+observations <- get_site_information(observations)
+confirmed_observations_species <- get_confirmed_observations_to_species(observations)
+
+#' # Initial data exploration and summary results.
+#' ## Explore the species observed
+
+get_number_observations <- function(observations) {
+  #' Get the total number of unique observations.
+
+  number_observations <- nrow(observations)
+  print(number_observations)
+}
+
+get_number_species <- function(observations) {
+  #' Get the total number of unique species observed. Use observations identified to species.
+
+  unique_species <- unique(observations[c("species")])
+  number_species <- nrow(unique_species)
+  print(number_species)
+}
+
+get_number_species_suborder <- function(observations) {
+  #' Get the number of species observed within each suborder. Use observations identified to species.
+
+  observations %>%
+    distinct(suborder, species) %>%
+    group_by(suborder) %>%
+    summarise("count" = n())
+}
+
+#' The total number of observations was
+get_number_observations(observations)
+
+#' The total number of observations to species was
+get_number_observations(confirmed_observations_species)
+
+#' The total number of species observed was
+get_number_species(confirmed_observations_species)
+
+#' The total number of species observed within each suborder was
+get_number_species_suborder(confirmed_observations_species)
+
+
+
+#' # Hypothesis 1
+#' ## Species richness decreases with elevation.
+
+#' # Hypothesis 2
+#' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because multiple capture techniques were used). Convert this into a presence-absence site-species matrix.
+
+create_site_species_abundance_df <- function(observations_df) {
+  #' Create a data frame of the species abundance at each site from a set of observations at different sites. Each
+  #' input observation is of one individual at a particular site.
+  #' Return species abundance at each site.
 
   # Add presence to the observation data frame.
   presence <- rep(1, nrow(observations_df)) # create vector of 1s to act as presence
@@ -104,18 +165,20 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
                                    # site
                                    c("site_altitude", "species", "abundance"))
 
-  site_species_abundance_matrix <- t(create.matrix(site_species_abundance, tax.name="species",
-                                                   locality="site_altitude", abund=TRUE, abund.col="abundance"))
+  return(site_species_abundance)
+}
+
+create_presence_absence_site_species_matrix <- function(observations_df) {
+  #' Create a presence-absence site-species matrix. Each value is either 0 (species not observed at a site) or 1
+  #' (species observed at a site).
+
+  site_species_abundance <- create_site_species_abundance_df(observations_df)
   site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name="species",
                                                          locality="site_altitude", abund=FALSE, abund.col="abundance"))
 
   return(site_species_presenceabsence_matrix)
 }
-
-confirmed_observations_species <- get_confirmed_observations_to_species(observations)
-observations_sites <- join_observation_site(confirmed_observations_species)
-site_species_matrix <- create_presence_absence_site_species_matrix(observations_sites)
-
 #' Preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site where the name is an
 #' abbreviation of the study area.
+site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
 head(site_species_matrix)
