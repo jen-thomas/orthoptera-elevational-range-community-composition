@@ -30,6 +30,7 @@ rename_site_with_altitude <- function(observations_df) {
   #' Return dataframe with the additional column.
 
   observations_df$site_altitude <- paste(observations_df$altitude_band_m, observations_df$site_name, sep="_")
+  return(observations_df)
 }
 
 # Set up
@@ -41,8 +42,6 @@ observations <- read_csv_data_file("../data/observations.csv")
 sites <- read_csv_data_file("../data/sites.csv")
 surveys <- read_csv_data_file("../data/surveys.csv")
 vegetation_plots <- read_csv_data_file("../data/vegetation_plots.csv")
-
-rename_site_with_altitude(observations)
 
 #' ## Change log
 
@@ -59,12 +58,14 @@ print_latest_git_commits <- function(file_path) {
 print_latest_git_commits("orthoptera_elevation_data_exploration.R")
 
 get_confirmed_observations_to_species <- function(observations_df) {
-  #' Observations that could not be identified to a specific taxa (that has not already been found in the surveys, i.e
-  #' Chorthippus parallelus / montanus) are removed. Only confirmed observations are used.
+  #' Observations that have not been identified to species level are removed. Observations that could not be
+  #' identified to a specific taxa (that has not already been found in the surveys, i.e
+  #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
   #' Return a dataframe with only confirmed observations to species.
 
   observations_species <- observations_df[!(observations_df$species==""), ]
-  confirmed_observations_species <- observations_species[observations_species$confidence=="Confirmed"]
+  confirmed_observations_species <- observations_species[(observations_species$id_confidence=="Confirmed"), ]
+  return(confirmed_observations_species)
 }
 
 create_presence_absence_site_species_matrix <- function(observations_df) {
@@ -73,10 +74,13 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
   #' Return presence-absence site-species matrix.
 
   # Add presence to the observation data frame.
-  presence <- rep(1, nrow(observations)) # create vector of 1s to act as presence
-  observations$presence <- presence # join the vector with the observations data frame
-  observations_presence <- (merge(x = observations, y = sites, by = "site_name", all.x = TRUE))[,
-    c('site_name', 'altitude_band_m', 'suborder', 'family', 'subfamily', 'genus', 'species', 'presence')]
+  presence <- rep(1, nrow(observations_df)) # create vector of 1s to act as presence
+  observations_df$presence <- presence # join the vector with the observations data frame
+  observations_presence <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
+    c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "presence")]
+
+  # create another site name column with the altitude
+  observations_presence <- rename_site_with_altitude(observations_presence)
 
   # Aggregate the observations of each species at each site (ignore dates for now).
   site_species_abundance <- setNames(aggregate(observations_presence$presence,
@@ -89,9 +93,12 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
                                                    locality="site_altitude", abund=TRUE, abund.col="abundance"))
   site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name="species",
                                                          locality="site_altitude", abund=FALSE, abund.col="abundance"))
+
+  return(site_species_presenceabsence_matrix)
 }
 
 #' ## Create species-site matrix
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations)
 site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
+head(site_species_matrix)
