@@ -7,6 +7,24 @@
 #'     code_folding: hide
 #' ---
 
+#' ## Change log
+#' Display the latest five commits to this file.
+
+print_latest_git_commits <- function(file_path) {
+  #' Get and print the latest five commits for a file.
+  command <- paste("git log HEAD --pretty='tformat: %ci commit %h: %s'", file_path)
+  # print(command)
+  this_file_latest_commits <- system(command, intern=TRUE)
+  this_file_latest_commits_formatted <- paste(this_file_latest_commits, "<br>")
+  # print(str_replace(this_file_latest_commits_formatted[1:5], ", ", ""))
+  print(this_file_latest_commits[1:5])
+}
+
+print_latest_git_commits("orthoptera_elevation_data_exploration.R")
+
+#' ## Set-up
+#' Install packages and read in data files.
+
 install_packages <- function(vector_packages) {
   #' Install and load packages from a vector of packages that are needed for the code.
 
@@ -24,17 +42,6 @@ read_csv_data_file <- function(file_path) {
     read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
 }
 
-rename_site_with_altitude <- function(observations_df) {
-  #' Create a new site name within the dataframe which includes the altitude so that it is more useful when including
-  #' it in analyses and figures.
-  #' Return dataframe with the additional column.
-
-  observations_df$site_altitude <- paste(observations_df$altitude_band_m, observations_df$site_name, sep="_")
-  return(observations_df)
-}
-
-# Set up
-
 vector_packages <- c("fossil", "stringr")
 install_packages(vector_packages)
 
@@ -43,19 +50,8 @@ sites <- read_csv_data_file("../data/sites.csv")
 surveys <- read_csv_data_file("../data/surveys.csv")
 vegetation_plots <- read_csv_data_file("../data/vegetation_plots.csv")
 
-#' ## Change log
-
-print_latest_git_commits <- function(file_path) {
-  #' Get and print the latest five commits for a file.
-  command <- paste("git log HEAD --pretty='tformat: %ci commit %h: %s", file_path)
-  # print(command)
-  this_file_latest_commits <- system(command, intern=TRUE)
-  this_file_latest_commits_formatted <- paste(this_file_latest_commits, "<br>")
-  # print(str_replace(this_file_latest_commits_formatted[1:5], ", ", ""))
-  print(this_file_latest_commits[1:5])
-}
-
-print_latest_git_commits("orthoptera_elevation_data_exploration.R")
+#' ## Create site-species matrix
+#' Select only observations identified to species. From this, create a presence-absence site-species matrix.
 
 get_confirmed_observations_to_species <- function(observations_df) {
   #' Observations that have not been identified to species level are removed. Observations that could not be
@@ -66,6 +62,15 @@ get_confirmed_observations_to_species <- function(observations_df) {
   observations_species <- observations_df[!(observations_df$species==""), ]
   confirmed_observations_species <- observations_species[(observations_species$id_confidence=="Confirmed"), ]
   return(confirmed_observations_species)
+}
+
+rename_site_with_altitude <- function(observations_df) {
+  #' Create a new site name within the dataframe which includes the altitude so that it is more useful when including
+  #' it in analyses and figures.
+  #' Return dataframe with the additional column.
+
+  observations_df$site_altitude <- paste(observations_df$altitude_band_m, observations_df$site_name, sep="_")
+  return(observations_df)
 }
 
 create_presence_absence_site_species_matrix <- function(observations_df) {
@@ -79,7 +84,6 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
   observations_presence <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
     c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "presence")]
 
-  # create another site name column with the altitude
   observations_presence <- rename_site_with_altitude(observations_presence)
 
   # Aggregate the observations of each species at each site (ignore dates for now).
@@ -97,8 +101,9 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
   return(site_species_presenceabsence_matrix)
 }
 
-#' ## Create species-site matrix
-
 confirmed_observations_species <- get_confirmed_observations_to_species(observations)
 site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
+
+#' Preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site where the name is an
+#' abbreviation of the study area.
 head(site_species_matrix)
