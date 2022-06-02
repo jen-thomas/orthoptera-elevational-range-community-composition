@@ -73,6 +73,21 @@ rename_site_with_altitude <- function(observations_df) {
   return(observations_df)
 }
 
+join_observation_site <- function(observations_df) {
+  #' Join the observation and site data frames using a left join, to have the altitude of the sites with the other
+  #' data.
+  #' Create a new column with a new site name in the format altitude_sitename, which will be more user-friendly
+  #' in any outputs.
+  #' Return data frame with the merged data and new site name column.
+
+  observations <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
+    c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species")]
+
+  observations <- rename_site_with_altitude(observations)
+
+  return(observations)
+}
+
 create_presence_absence_site_species_matrix <- function(observations_df) {
   #' Create a site-species matrix from a set of observations at different sites. Each observation is of one individual
   #' at a particular site.
@@ -81,14 +96,10 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
   # Add presence to the observation data frame.
   presence <- rep(1, nrow(observations_df)) # create vector of 1s to act as presence
   observations_df$presence <- presence # join the vector with the observations data frame
-  observations_presence <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
-    c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "presence")]
-
-  observations_presence <- rename_site_with_altitude(observations_presence)
 
   # Aggregate the observations of each species at each site (ignore dates for now).
-  site_species_abundance <- setNames(aggregate(observations_presence$presence,
-                                             list(observations_presence$site_altitude, observations_presence$species),
+  site_species_abundance <- setNames(aggregate(observations_df$presence,
+                                             list(observations_df$site_altitude, observations_df$species),
                                              FUN=sum), # sum over these to calculate abundance of each species at each
                                    # site
                                    c("site_altitude", "species", "abundance"))
@@ -102,7 +113,8 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
 }
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations)
-site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
+observations_sites <- join_observation_site(confirmed_observations_species)
+site_species_matrix <- create_presence_absence_site_species_matrix(observations_sites)
 
 #' Preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site where the name is an
 #' abbreviation of the study area.
