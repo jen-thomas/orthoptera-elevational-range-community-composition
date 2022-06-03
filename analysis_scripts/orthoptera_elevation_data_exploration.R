@@ -159,6 +159,19 @@ get_number_observations_suborder(observations)
 #' ## Hypothesis 1
 #' ### Species richness decreases with elevation.
 
+calculate_species_richness_alt_bands <- function(observations) {
+  #' Aggregate over the species observed within each altitude band and count how many there were.
+
+    observations %>%
+    distinct(altitude_band_m, species) %>%
+    group_by(altitude_band_m) %>%
+    summarise("count" = n())
+}
+
+#' For now, only consider identifications that are to species (there were none that were to a higher taxonomic level which have not been otherwise identified).
+
+calculate_species_richness_alt_bands(confirmed_observations_species)
+
 #' ## Hypothesis 2
 #' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because multiple capture techniques were used). Convert this into a presence-absence site-species matrix.
 
