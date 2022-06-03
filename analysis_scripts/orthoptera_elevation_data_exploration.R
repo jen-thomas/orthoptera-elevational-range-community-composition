@@ -71,7 +71,7 @@ join_observation_site <- function(observations_df) {
   #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
-    c("site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "id_confidence")]
+    c("specimen_label", "site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
 
   observations <- rename_site_with_altitude(observations)
 
@@ -108,7 +108,8 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 get_number_observations <- function(observations) {
   #' Get the total number of unique observations.
 
-  number_observations <- nrow(observations)
+  unique_observations <- unique(observations[c("specimen_label")])
+  number_observations <- nrow(unique_observations)
   print(number_observations)
 }
 
@@ -141,6 +142,8 @@ get_number_species(confirmed_observations_species)
 #' <br>The total number of species observed within each suborder was
 get_number_species_suborder(confirmed_observations_species)
 
+#' <br>The total number of individuals observed for each suborder was
+#' TODO
 
 
 #' ## Hypothesis 1
