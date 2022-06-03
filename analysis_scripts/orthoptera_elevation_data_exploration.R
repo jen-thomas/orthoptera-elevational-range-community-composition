@@ -102,8 +102,8 @@ get_confirmed_observations_to_species <- function(observations_df) {
 observations <- get_site_information(observations)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations)
 
-#' # Initial data exploration and summary results.
-#' ## Explore the species observed
+#' ## Initial data exploration and summary results.
+#' ### Explore the species observed
 
 get_number_observations <- function(observations) {
   #' Get the total number of unique observations.
@@ -129,24 +129,24 @@ get_number_species_suborder <- function(observations) {
     summarise("count" = n())
 }
 
-#' The total number of observations was
+#' <br>The total number of observations was
 get_number_observations(observations)
 
-#' The total number of observations to species was
+#' <br>The total number of observations to species was
 get_number_observations(confirmed_observations_species)
 
-#' The total number of species observed was
+#' <br>The total number of species observed was
 get_number_species(confirmed_observations_species)
 
-#' The total number of species observed within each suborder was
+#' <br>The total number of species observed within each suborder was
 get_number_species_suborder(confirmed_observations_species)
 
 
 
-#' # Hypothesis 1
-#' ## Species richness decreases with elevation.
+#' ## Hypothesis 1
+#' ### Species richness decreases with elevation.
 
-#' # Hypothesis 2
+#' ## Hypothesis 2
 #' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because multiple capture techniques were used). Convert this into a presence-absence site-species matrix.
 
 create_site_species_abundance_df <- function(observations_df) {
