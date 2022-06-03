@@ -71,7 +71,8 @@ join_observation_site <- function(observations_df) {
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites, by = "site_name", all.x = TRUE))[,
-    c("specimen_label", "site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
+    c("specimen_label", "site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species",
+      "id_confidence", "sex", "stage")]
 
   observations <- rename_site_with_altitude(observations)
 
@@ -159,21 +160,33 @@ get_number_observations_suborder(observations)
 #' ## Hypothesis 1
 #' ### Species richness decreases with elevation.
 
-calculate_species_richness_alt_bands <- function(observations) {
-  #' Aggregate over the species observed within each altitude band and count how many there were.
+calculate_species_richness_elevation_bands <- function(observations) {
+  #' Aggregate over the species observed within each elevation band and count how many there were.
 
-    observations %>%
+  summary <- observations %>%
     distinct(altitude_band_m, species) %>%
     group_by(altitude_band_m) %>%
     summarise("count" = n())
+
+  return(summary)
 }
 
-#' For now, only consider identifications that are to species (there were none that were to a higher taxonomic level which have not been otherwise identified).
+plot_altitude_species_richness <- function(species_richness_elevation) {
+  #' Plot elevation band against species richness.
 
-calculate_species_richness_alt_bands(confirmed_observations_species)
+  plot(species_richness_elevation, xlab = "Elevation band (m a.s.l)", ylab = "Species richness")
+}
+
+#' For now, only consider identifications that are to species (there were none that were to a higher taxonomic level
+#' which have not been otherwise identified).
+
+species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
+print(species_richness_elevation)
+plot_altitude_species_richness(species_richness_elevation)
 
 #' ## Hypothesis 2
-#' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because multiple capture techniques were used). Convert this into a presence-absence site-species matrix.
+#' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because
+#' multiple capture techniques were used). Convert this into a presence-absence site-species matrix.
 
 create_site_species_abundance_df <- function(observations_df) {
     #' Create a data frame of the species abundance at each site from a set of observations at different sites. Each
@@ -187,9 +200,9 @@ create_site_species_abundance_df <- function(observations_df) {
   # Aggregate the observations of each species at each site (ignore dates for now).
   site_species_abundance <- setNames(aggregate(observations_df$presence,
                                                list(observations_df$site_altitude, observations_df$species),
-                                               FUN = sum), # sum over these to calculate abundance of each species at each
-                                     # site
-                                     c("site_altitude", "species", "abundance"))
+                                               FUN = sum), # sum over these to calculate abundance of each species at
+                                                          # each site
+                                               c("site_altitude", "species", "abundance"))
 
   return(site_species_abundance)
 }
@@ -200,7 +213,8 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
 
   site_species_abundance <- create_site_species_abundance_df(observations_df)
   site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name = "species",
-                                                         locality = "site_altitude", abund = FALSE, abund.col = "abundance"))
+                                                         locality = "site_altitude", abund = FALSE,
+                                                         abund.col = "abundance"))
 
   return(site_species_presenceabsence_matrix)
 }
