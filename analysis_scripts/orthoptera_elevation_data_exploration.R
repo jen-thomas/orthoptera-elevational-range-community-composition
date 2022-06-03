@@ -103,8 +103,7 @@ get_confirmed_observations_to_species <- function(observations_df) {
 observations <- get_site_information(observations)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations)
 
-#' ## Initial data exploration and summary results.
-#' ### Explore the species observed
+#' ## <strong>Species composition and initial results.</strong>
 
 get_number_observations <- function(observations) {
     #' Get the total number of unique observations.
@@ -157,8 +156,8 @@ get_number_species_suborder(confirmed_observations_species)
 get_number_observations_suborder(observations)
 
 
-#' ## Hypothesis 1
-#' ### Species richness decreases with elevation.
+#' ## <strong>Hypothesis 1</strong>
+#' ### <em>Species richness decreases with elevation.</em>
 
 calculate_species_richness_elevation_bands <- function(observations) {
   #' Aggregate over the species observed within each elevation band and count how many there were.
@@ -171,17 +170,28 @@ calculate_species_richness_elevation_bands <- function(observations) {
   return(summary)
 }
 
+calculate_spearman_rank_correlation <- function(dataframe, parameter_a, parameter_b) {
+  #' Calculate the Spearman's rank correlation for two parameters, a and b, in a data frame.
+
+  spearman_corr <- cor(dataframe, method = "spearman")
+
+  return(spearman_corr)
+}
+
 plot_altitude_species_richness <- function(species_richness_elevation) {
   #' Plot elevation band against species richness.
 
   plot(species_richness_elevation, xlab = "Elevation band (m a.s.l)", ylab = "Species richness")
 }
 
-#' For now, only consider identifications that are to species (there were none that were to a higher taxonomic level
-#' which have not been otherwise identified).
-
+#' Calculate species richness for each elevation band. For now, only consider identifications that are to species (there
+#' were none that were to a higher taxonomic level which could be considered a separate species unless we consider each
+#' site or elevation band separately).
 species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
 print(species_richness_elevation)
+
+#' <br>Calculate Spearman rank correlation for species richness and elevation.
+calculate_spearman_rank_correlation(species_richness_elevation, altitude_band_m, count)
 plot_altitude_species_richness(species_richness_elevation)
 
 #' ## Hypothesis 2
