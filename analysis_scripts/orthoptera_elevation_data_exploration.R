@@ -59,8 +59,8 @@ get_number_observations_suborder <- function(observations) {
 #' ### Summarise all observations.
 #'
 #' Import all observation data.
-observations_file = "../data/observations.csv"
-sites_file = "../data/sites.csv"
+observations_file <- "../data/observations.csv"
+sites_file <- "../data/sites.csv"
 
 observations <- import_all_observations(observations_file, sites_file)
 
