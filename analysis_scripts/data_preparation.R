@@ -51,7 +51,7 @@ join_observation_site <- function(observations_df, sites_df) {
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
     c("specimen_label", "site_name", "elevation_band_m", "transect_length_m", "date_cest", "method",
-      "repeat.", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
+      "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
 
   observations <- rename_site_with_elevation(observations)
 
