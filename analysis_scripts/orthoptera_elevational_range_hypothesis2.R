@@ -6,6 +6,7 @@
 #'     toc: true
 #'     theme: yeti
 #'     code_folding: hide
+#'     df_print: paged
 #' ---
 
 #' <br>Import functions from other files.
