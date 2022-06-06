@@ -18,25 +18,7 @@ print_latest_git_commits("data_preparation.R")
 
 #' ## Set-up
 
-#' Install packages and read in data files.
-
-get_packages <- function(vector_packages) {
-    #' Install and load packages from a vector of packages that are needed for the code.
-
-  for (required_package in vector_packages) {
-    if (!require(required_package, character.only = TRUE, quietly = TRUE)) install.packages(required_package)
-    library(required_package, character.only = TRUE)
-  }
-}
-
-read_csv_data_file <- function(file_path) {
-    #' Read in a CSV data file using the first line as the header. Strings in different columns can be set as factors in
-    #' the resulting dataframe.
-    #' Return a dataframe of the input data.
-
-  read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
-}
-
+#' Install packages.
 
 vector_packages <- c("fossil", "stringr", "dplyr")
 get_packages(vector_packages)
