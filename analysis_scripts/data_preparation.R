@@ -46,7 +46,7 @@ join_observation_site <- function(observations_df, sites_df) {
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-    c("specimen_label", "site_name", "altitude_band_m", "suborder", "family", "subfamily", "genus", "species",
+    c("specimen_label", "site_name", "altitude_band_m", "transect_length_m", "suborder", "family", "subfamily", "genus", "species",
       "id_confidence", "sex", "stage")]
 
   observations <- rename_site_with_altitude(observations)
