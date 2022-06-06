@@ -7,21 +7,15 @@
 #'     code_folding: hide
 #' ---
 
+#' <br>Import functions from other files.
+
+source("data_preparation.R")
+source("utils.R")
+
 #' ## Change log
 #' Display the latest five commits to this file.
 
-print_latest_git_commits <- function(file_path) {
-    #' Get and print the latest five commits for a file.
-
-  command <- paste("git log HEAD --pretty='tformat: %ci commit %h: %s'", file_path)
-  this_file_latest_commits <- system(command, intern = TRUE)
-  print(this_file_latest_commits[1:5])
-}
-
 print_latest_git_commits("orthoptera_elevation_data_exploration.R")
-
-#' ## Import functions from other files.
-source("data_preparation.R")
 
 #' ## Summarise species composition.
 #' The following functions calculate and summarise the number of observations and species.

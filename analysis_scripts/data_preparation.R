@@ -7,20 +7,17 @@
 #'     code_folding: hide
 #' ---
 
+#' <br>Import functions from other files.
+
+source("utils.R")
+
 #' ## Change log
 #' Display the latest five commits to this file.
-
-print_latest_git_commits <- function(file_path) {
-    #' Get and print the latest five commits for a file.
-
-  command <- paste("git log HEAD --pretty='tformat: %ci commit %h: %s'", file_path)
-  this_file_latest_commits <- system(command, intern = TRUE)
-  print(this_file_latest_commits[1:5])
-}
 
 print_latest_git_commits("data_preparation.R")
 
 #' ## Set-up
+
 #' Install packages and read in data files.
 
 get_packages <- function(vector_packages) {
@@ -39,6 +36,7 @@ read_csv_data_file <- function(file_path) {
 
   read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
 }
+
 
 vector_packages <- c("fossil", "stringr", "dplyr")
 get_packages(vector_packages)
