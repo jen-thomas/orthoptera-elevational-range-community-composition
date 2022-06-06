@@ -35,7 +35,7 @@ rename_site_with_elevation <- function(observations_df) {
     #' when including it in analyses and figures.
     #' Return dataframe with the additional column.
 
-  observations_df$site_elevation <- paste(observations_df$elevation_band_m,
+  observations_df$site_elevation <- paste(observations_df$elevational_band_m,
                                          observations_df$site_name, sep = "_")
   return(observations_df)
 }
@@ -50,8 +50,9 @@ join_observation_site <- function(observations_df, sites_df) {
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-    c("specimen_label", "site_name", "elevation_band_m", "transect_length_m", "date_cest", "method",
-      "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
+  c("specimen_label", "site_name", "elevational_band_m", "transect_length_m", "date_cest", "method",
+    "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex",
+    "stage")]
 
   observations <- rename_site_with_elevation(observations)
 

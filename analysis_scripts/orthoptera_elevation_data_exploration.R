@@ -83,6 +83,17 @@ get_number_species_site <- function(observations) {
     summarise("count" = n())
 }
 
+get_number_observations_summary <- function(observations) {
+  #' Get the observations data frame and group it by survey.
+  #'
+  #' Return the number of observations found during each survey.
+
+  observations %>%
+    distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
+    group_by(site_elevation, date_cest, method, method_repeat) %>%
+    summarise("count" = n())
+}
+
 #' ### Summarise all observations.
 #'
 #' Import all observation data.
@@ -122,4 +133,9 @@ get_number_observations_site(observations)
 #' <br>The number of species seen at each site was (using only those identified to species)
 get_number_species_site(confirmed_observations_species)
 
+#' ### Summarise the observations by survey
+#' At each site, surveys were undertaken using a sweep net and also hand collection. At sites at 2000m or
+#' above, a sweep net survey was done, followed by a hand collection then another sweep net collection.
+#' <br>Consider all observations to get an overall count of those collected during each survey.
+get_number_observations_summary(observations)
 
