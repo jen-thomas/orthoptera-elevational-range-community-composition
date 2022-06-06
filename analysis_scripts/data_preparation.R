@@ -27,7 +27,7 @@ get_packages(vector_packages)
 #' Prepare the data frames with observations and sites, to be used in the rest of the analysis.
 #'
 #' ### Prepare data frames.
-#' Firstly, join the site data with observations and create new site name which contains the elevation and
+#' Join the site data with observations and create new site name which contains the elevation and
 #' survey area.
 
 rename_site_with_altitude <- function(observations_df) {
@@ -41,16 +41,17 @@ rename_site_with_altitude <- function(observations_df) {
 }
 
 join_observation_site <- function(observations_df, sites_df) {
-    #' Join the observation and site data frames using a left join, to have the altitude of the sites with
-    #' the other data.
+    #' Join the observation, survey (some already with the observations) and site data frames using a left
+    #' join, to have the altitude of the sites with the other data.
+    #'
     #' Create a new column with a new site name in the format altitude_sitename, which will be more
-    #' user-friendly
-    #' in any outputs.
+    #' user-friendly in any outputs.
+    #'
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-    c("specimen_label", "site_name", "altitude_band_m", "transect_length_m", "suborder", "family",
-      "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
+    c("specimen_label", "site_name", "altitude_band_m", "transect_length_m", "date_cest", "method",
+      "repeat.", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
 
   observations <- rename_site_with_altitude(observations)
 
@@ -64,7 +65,7 @@ join_observation_site <- function(observations_df, sites_df) {
 import_all_observations <- function(observations_file, sites_file) {
   #' Import all observations and prepare the data frame with the extra metadata from sites.
   #'
-  #' Return a dataframe of all observations and site metadata.
+  #' Return a dataframe of all observations with site and survey metadata.
 
   observations_df <- read_csv_data_file(observations_file)
   sites_df <- read_csv_data_file(sites_file)
