@@ -66,9 +66,9 @@ get_number_observations_site <- function(observations) {
   #' Return number of observations at each site.
 
   observations %>%
-    distinct(site_altitude, specimen_label) %>% # account for multiple identifications for a finalised
+    distinct(site_elevation, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
-    group_by(site_altitude) %>%
+    group_by(site_elevation) %>%
     summarise("count" = n())
 }
 
@@ -78,8 +78,8 @@ get_number_species_site <- function(observations) {
   #' Return the number of species seen at each site.
 
   observations %>%
-    distinct(site_altitude, species) %>%
-    group_by(site_altitude) %>%
+    distinct(site_elevation, species) %>%
+    group_by(site_elevation) %>%
     summarise("count" = n())
 }
 

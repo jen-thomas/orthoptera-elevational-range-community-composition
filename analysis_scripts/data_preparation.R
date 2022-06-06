@@ -30,30 +30,30 @@ get_packages(vector_packages)
 #' Join the site data with observations and create new site name which contains the elevation and
 #' survey area.
 
-rename_site_with_altitude <- function(observations_df) {
-    #' Create a new site name within the dataframe which includes the altitude so that it is more useful
+rename_site_with_elevation <- function(observations_df) {
+    #' Create a new site name within the dataframe which includes the elevation so that it is more useful
     #' when including it in analyses and figures.
     #' Return dataframe with the additional column.
 
-  observations_df$site_altitude <- paste(observations_df$altitude_band_m,
+  observations_df$site_elevation <- paste(observations_df$elevation_band_m,
                                          observations_df$site_name, sep = "_")
   return(observations_df)
 }
 
 join_observation_site <- function(observations_df, sites_df) {
     #' Join the observation, survey (some already with the observations) and site data frames using a left
-    #' join, to have the altitude of the sites with the other data.
+    #' join, to have the elevation of the sites with the other data.
     #'
-    #' Create a new column with a new site name in the format altitude_sitename, which will be more
+    #' Create a new column with a new site name in the format elevation_sitename, which will be more
     #' user-friendly in any outputs.
     #'
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-    c("specimen_label", "site_name", "altitude_band_m", "transect_length_m", "date_cest", "method",
+    c("specimen_label", "site_name", "elevation_band_m", "transect_length_m", "date_cest", "method",
       "repeat.", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
 
-  observations <- rename_site_with_altitude(observations)
+  observations <- rename_site_with_elevation(observations)
 
   return(observations)
 }
