@@ -1,5 +1,5 @@
 #' ---
-#' title: Initial data exploration.
+#' title: Initial data exploration
 #' output: 
 #'   html_document:
 #'     toc: true
@@ -71,7 +71,7 @@ get_number_observations_suborder(observations)
 
 #' ### Use only observations identified to species.
 #' Subset the observations to get only those that have been identified to species.
-confirmed_observations_species <- get_confirmed_observations_to_species(observations)
+confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
 #' <br>The total number of observations to species was
 get_number_observations(confirmed_observations_species)

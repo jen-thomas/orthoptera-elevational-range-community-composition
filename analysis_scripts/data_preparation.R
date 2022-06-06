@@ -89,13 +89,14 @@ import_all_observations <- function(observations_file, sites_file) {
   return(observations_with_sites)
 }
 
-get_confirmed_observations_to_species <- function(observations_df) {
+get_confirmed_observations_to_species <- function(observations_file, sites_file) {
     #' Observations that have not been identified to species level are removed. Observations that could not be
     #' identified to a specific taxa (that has not already been found in the surveys, i.e
     #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
     #'
     #' Return a dataframe with only confirmed observations to species.
 
+  observations_df <- import_all_observations(observations_file, sites_file)
   observations_species <- observations_df[!(observations_df$species == ""),]
   confirmed_observations_species <- observations_species[(observations_species$id_confidence == "Confirmed"),]
 
