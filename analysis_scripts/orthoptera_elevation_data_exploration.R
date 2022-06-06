@@ -49,6 +49,8 @@ get_number_species_suborder <- function(observations) {
     summarise("count" = n())
 }
 
+g
+
 get_number_observations_suborder <- function(observations) {
     #' Get the number of observations for each suborder. Use confirmed and finalised identifications.
     #' They do not have to be to species level.
@@ -95,9 +97,9 @@ get_number_observations_summary <- function(observations) {
 }
 
 get_species_summary_site <- function(observations) {
-  #' Get a list of the species seen at a level specified by the fields in the vector_summary.
+  #' Get a list of the species seen at each site.
   #'
-  #' Return the species seen.
+  #' Return a dataframe of the species seen at each site.
 
   species_summary <- observations %>%
     distinct(site_elevation, species) %>%
