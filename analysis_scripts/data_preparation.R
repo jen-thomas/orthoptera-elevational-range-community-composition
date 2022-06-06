@@ -20,34 +20,37 @@ print_latest_git_commits("data_preparation.R")
 
 #' Install packages.
 
-vector_packages <- c("fossil", "stringr", "dplyr")
+vector_packages <- c("fossil", "stringr")
 get_packages(vector_packages)
 
 #' ## Initial data preparation.
 #' Prepare the data frames with observations and sites, to be used in the rest of the analysis.
 #'
 #' ### Prepare data frames.
-#' Firstly, join the site data with observations and create new site name which contains the elevation and survey area.
+#' Firstly, join the site data with observations and create new site name which contains the elevation and
+#' survey area.
 
 rename_site_with_altitude <- function(observations_df) {
-    #' Create a new site name within the dataframe which includes the altitude so that it is more useful when including
-    #' it in analyses and figures.
+    #' Create a new site name within the dataframe which includes the altitude so that it is more useful
+    #' when including it in analyses and figures.
     #' Return dataframe with the additional column.
 
-  observations_df$site_altitude <- paste(observations_df$altitude_band_m, observations_df$site_name, sep = "_")
+  observations_df$site_altitude <- paste(observations_df$altitude_band_m,
+                                         observations_df$site_name, sep = "_")
   return(observations_df)
 }
 
 join_observation_site <- function(observations_df, sites_df) {
-    #' Join the observation and site data frames using a left join, to have the altitude of the sites with the other
-    #' data.
-    #' Create a new column with a new site name in the format altitude_sitename, which will be more user-friendly
+    #' Join the observation and site data frames using a left join, to have the altitude of the sites with
+    #' the other data.
+    #' Create a new column with a new site name in the format altitude_sitename, which will be more
+    #' user-friendly
     #' in any outputs.
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-    c("specimen_label", "site_name", "altitude_band_m", "transect_length_m", "suborder", "family", "subfamily", "genus", "species",
-      "id_confidence", "sex", "stage")]
+    c("specimen_label", "site_name", "altitude_band_m", "transect_length_m", "suborder", "family",
+      "subfamily", "genus", "species", "id_confidence", "sex", "stage")]
 
   observations <- rename_site_with_altitude(observations)
 
@@ -55,8 +58,8 @@ join_observation_site <- function(observations_df, sites_df) {
 }
 
 #' ### Create summaries of observation data.
-#' Depending on the analysis, the observations may need to be subsetted to take into account the taxonomic level to
-#' which they have been identified.
+#' Depending on the analysis, the observations may need to be subsetted to take into account the taxonomic
+#' level which they have been identified.
 
 import_all_observations <- function(observations_file, sites_file) {
   #' Import all observations and prepare the data frame with the extra metadata from sites.
@@ -72,15 +75,16 @@ import_all_observations <- function(observations_file, sites_file) {
 }
 
 get_confirmed_observations_to_species <- function(observations_file, sites_file) {
-    #' Observations that have not been identified to species level are removed. Observations that could not be
-    #' identified to a specific taxa (that has not already been found in the surveys, i.e
+    #' Observations that have not been identified to species level are removed. Observations that could
+    #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
     #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
     #'
     #' Return a dataframe with only confirmed observations to species.
 
   observations_df <- import_all_observations(observations_file, sites_file)
   observations_species <- observations_df[!(observations_df$species == ""),]
-  confirmed_observations_species <- observations_species[(observations_species$id_confidence == "Confirmed"),]
+  confirmed_observations_species <- observations_species[(observations_species$id_confidence ==
+                                                        "Confirmed"),]
 
   return(confirmed_observations_species)
 }

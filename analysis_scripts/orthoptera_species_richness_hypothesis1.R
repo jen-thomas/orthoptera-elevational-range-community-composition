@@ -9,7 +9,7 @@
 #'     df_print: paged
 #' ---
 
-#' <br>Import functions from other files.
+#' <br>Import packages functions from other files.
 
 source("utils.R")
 source("orthoptera_elevation_data_exploration.R")
@@ -46,9 +46,9 @@ plot_altitude_species_richness <- function(species_richness_elevation) {
   plot(species_richness_elevation, xlab = "Elevation band (m a.s.l)", ylab = "Species richness")
 }
 
-#' Calculate species richness for each elevation band. For now, only consider identifications that are to species (there
-#' were none that were to a higher taxonomic level which could be considered a separate species unless we consider each
-#' site or elevation band separately).
+#' Calculate species richness for each elevation band. For now, only consider identifications that are to
+#' species (there were none that were to a higher taxonomic level which could be considered a separate
+#' species unless we consider each site or elevation band separately).
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 

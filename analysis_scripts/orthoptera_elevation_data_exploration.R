@@ -8,10 +8,13 @@
 #'     df_print: paged
 #' ---
 
-#' <br>Import functions from other files.
+#' <br>Import packages functions from other files.
 
 source("data_preparation.R")
 source("utils.R")
+
+vector_packages <- c("fossil", "stringr", "dplyr")
+get_packages(vector_packages)
 
 #' ## Change log
 #' Display the latest five commits to this file.
@@ -47,11 +50,12 @@ get_number_species_suborder <- function(observations) {
 }
 
 get_number_observations_suborder <- function(observations) {
-    #' Get the number of observations for each suborder. Use confirmed and finalised identifications. They do not have
-    #' to be to species level.
+    #' Get the number of observations for each suborder. Use confirmed and finalised identifications.
+    #' They do not have to be to species level.
 
   observations %>%
-    distinct(suborder, specimen_label) %>% # account for multiple identifications for a finalised observation
+    distinct(suborder, specimen_label) %>% # account for multiple identifications for a finalised
+    # observation
     group_by(suborder) %>%
     summarise("count" = n())
 }
