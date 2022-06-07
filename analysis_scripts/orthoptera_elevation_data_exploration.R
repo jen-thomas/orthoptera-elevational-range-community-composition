@@ -121,7 +121,19 @@ get_species_summary_overview(confirmed_observations_species)
 #' <em>study sites</em>, which were numbered, but can be identified more easily by the elevational band
 #' in which they are located. Each site name includes the elevation in m.
 #'
-#' The following functions calculate observation and species summary across the <em>sites</em> visited.
+#' The following functions summarise the visits to each site, then calculate observation and species
+#' summary across the <em>sites</em> visited.
+
+get_number_visits_site <- function(observation) {
+  #' Get the observations data frame and group it by site and date.
+  #'
+  #' Return the number of visits to each site.
+
+  observations %>%
+    distinct(site_elevation, date_cest) %>%
+    group_by(site_elevation) %>%
+    summarise("number_visits" = n())
+}
 
 get_number_observations_site <- function(observations) {
   #' Get the observations dataframe and group it by site and observation.
@@ -159,7 +171,10 @@ get_species_summary_site <- function(observations) {
   return(species_summary)
 }
 
-#' <br>Initially, consider all observations that were made and group them by site to get an overview of
+#' <br>Firstly, look at an overview of the number of visits to each site during the season.
+get_number_visits_site(observations)
+
+#' <br>Consider all observations that were made and group them by site to get an overview of
 #' the numbers and species.
 
 #' <br>The number of observations at each site was
