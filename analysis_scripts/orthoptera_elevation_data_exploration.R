@@ -139,7 +139,7 @@ get_species_summary_overview(confirmed_observations_species)
 #' The following functions summarise the visits to each site, then calculate observation and species
 #' summary across the <em>sites</em> visited.
 
-get_number_visits_site <- function(observation) {
+get_number_visits_site <- function(observations) {
   #' Get the observations data frame and group it by site and date.
   #'
   #' Return the number of visits to each site.
@@ -283,9 +283,9 @@ number_species_site <- get_number_species_site(confirmed_observations_species)
 transect_lengths <- get_transect_lengths(observations)
 
 site_survey_summary <- get_site_survey_summary_data(observations)
-joined_visits_observations_species <- join_site_summary_data(number_visits_site, number_observations_site, number_species_site,
+joined_survey_summary_data <- join_site_summary_data(number_visits_site, number_observations_site, number_species_site,
                        transect_lengths, site_survey_summary)
-joined_visits_observations_species[order(joined_visits_observations_species$site_elevation), ]
+joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
 
 
 #' <br>The species seen at each site were
@@ -344,3 +344,56 @@ number_observations_survey <- get_number_observations_survey(observations)
 number_species_survey <- get_number_species_survey(confirmed_observations_species)
 
 join_survey_summary_data(number_observations_survey, number_species_survey)
+
+#' ### Summarise by elevational band
+#'
+#' Given that this study is looking at the patterns of species richness and elevational range with
+#' elevation, this next section summarises the observations and taxa according to elevation band.
+#'
+#' The following functions create the summaries of observations, survey details and taxa within each
+#' elevational band.
+
+get_site_elevation <- function(observations) {
+  #' Get the site and its elevational band from the observations dataframe.
+  #'
+  #' Return dataframe of sites and elevational band.
+
+  site_elevations <- subset(observations, select = c("site_elevation", "elevational_band_m"))
+
+  site_elevations <- site_elevations %>%
+    distinct(site_elevation, elevational_band_m)
+
+  return(site_elevations)
+}
+
+join_site_summary_data_with_elevation <- function(site_elevations, site_summary_data) {
+  #' Join the site summary data with the elevational bands so that the data can be summarised.
+  #'
+  #' Return dataframe with all sites and elevational bands for each one, with the site summary data.
+
+  site_summary_data_elevation <- left_join(site_summary_data, site_elevations, by = "site_elevation")
+
+  return(site_summary_data_elevation)
+}
+
+get_elevation_summary_data <- function(site_elevations, site_summary_data) {
+  #' Summarise the site summary data over the elevational bands to get summary values for each elevational
+  #' band.
+  #'
+  #' Return dataframe of elevational bands and summary data.
+
+  site_summary_data_elevation <- join_site_summary_data_with_elevation(site_elevations, site_summary_data)
+
+  elevation_summary_data <- site_summary_data_elevation %>%
+    group_by(elevational_band_m) %>%
+    summarise("number_sites" = n(),
+              "number_visits" = sum(number_visits),
+              "number_hand_surveys" = sum(number_hand_surveys),
+              "number_net_surveys" = sum(number_net_surveys),
+              "number_observations" = sum(number_observations))
+
+  return(elevation_summary_data)
+}
+
+site_elevations <- get_site_elevation(observations)
+get_elevation_summary_data(site_elevations, joined_survey_summary_data)
