@@ -55,7 +55,8 @@ get_species_summary_overview <- function(observations) {
   #' Return a dataframe of the species seen.
 
   species_summary <- observations %>%
-    distinct(species)
+    distinct(species) %>%
+    arrange(species)
 
   return(species_summary)
 }
@@ -145,11 +146,12 @@ get_number_species(confirmed_observations_species)
 #' <br>The total number of species observed within each suborder was
 get_number_species_suborder(confirmed_observations_species)
 
-#' <br> The following species were observed
-print(get_species_summary_overview(confirmed_observations_species))
+#' <br>The following species were observed
+get_species_summary_overview(confirmed_observations_species)
 
 #' ### Summarise observations by site
-#' Initially, consider all observations that were made and group them by site to get an overview of the numbers and species.
+#' Initially, consider all observations that were made and group them by site to get an overview of the
+#' numbers and species.
 
 #' <br>The number of observations at each site was
 get_number_observations_site(observations)
