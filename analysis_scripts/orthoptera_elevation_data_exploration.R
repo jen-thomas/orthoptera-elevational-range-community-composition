@@ -183,17 +183,27 @@ get_species_summary_site <- function(observations) {
   return(species_summary)
 }
 
-#' <br>Firstly, look at an overview of the number of visits to each site during the season.
-get_number_visits_site(observations)
+join_site_summary_data <- function(number_visits, number_observations, number_species) {
+  #' Get the data which summarise the sites and join it together to present the information in one table.
+  #'
+  #' Return the data frame of the joined data.
 
-#' <br>Consider all observations that were made and group them by site to get an overview of
-#' the numbers and species.
+  joined_visits_observations <- full_join(number_visits, number_observations, by = "site_elevation")
+  joined_visits_observations_species <- full_join(joined_visits_observations, number_species,
+                                                  by = "site_elevation")
 
-#' <br>The number of observations at each site was
-get_number_observations_site(observations)
+  return(joined_visits_observations_species)
+}
 
-#' <br>The number of species seen at each site was (using only those identified to species)
-get_number_species_site(confirmed_observations_species)
+#' <br>Summarise the number of visits to each site and how many observations were seen at each site during
+#' the whole season. Finally, add the number of species observed at each site (note that the number of
+#' species only considers those observations that have been identified to species).
+
+number_visits_site <- get_number_visits_site(observations)
+number_observations_site <- get_number_observations_site(observations)
+number_species_site <- get_number_species_site(confirmed_observations_species)
+
+join_site_summary_data(number_visits_site, number_observations_site,number_species_site )
 
 #' <br>The species seen at each site were
 get_species_summary_site(confirmed_observations_species)
