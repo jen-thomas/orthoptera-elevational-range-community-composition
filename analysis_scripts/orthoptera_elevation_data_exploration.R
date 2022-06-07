@@ -49,7 +49,16 @@ get_number_species_suborder <- function(observations) {
     summarise("count" = n())
 }
 
-g
+get_species_summary_overview <- function(observations) {
+  #' Get a list of the species seen across all the surveys.
+  #'
+  #' Return a dataframe of the species seen.
+
+  species_summary <- observations %>%
+    distinct(species)
+
+  return(species_summary)
+}
 
 get_number_observations_suborder <- function(observations) {
     #' Get the number of observations for each suborder. Use confirmed and finalised identifications.
@@ -104,7 +113,7 @@ get_species_summary_site <- function(observations) {
   species_summary <- observations %>%
     distinct(site_elevation, species) %>%
     group_by(site_elevation) %>%
-    order_by(site_elevation, species)
+    arrange(site_elevation, species)
 
   return(species_summary)
 }
@@ -137,7 +146,7 @@ get_number_species(confirmed_observations_species)
 get_number_species_suborder(confirmed_observations_species)
 
 #' <br> The following species were observed
-# TODO
+print(get_species_summary_overview(confirmed_observations_species))
 
 #' ### Summarise observations by site
 #' Initially, consider all observations that were made and group them by site to get an overview of the numbers and species.
@@ -149,7 +158,7 @@ get_number_observations_site(observations)
 get_number_species_site(confirmed_observations_species)
 
 #' <br>The species seen at each site were
-species_site_df <- get_species_summary_site(confirmed_observations_species)
+get_species_summary_site(confirmed_observations_species)
 
 #' ### Summarise the observations by survey
 #' At each site, surveys were undertaken using a sweep net and also hand collection. At sites at 2000m or
