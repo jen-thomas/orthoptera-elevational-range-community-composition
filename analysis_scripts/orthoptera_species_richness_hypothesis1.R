@@ -74,13 +74,14 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
 print(species_richness_sites)
 
+#' I think this can be deleted
 species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
 print(species_richness_elevation)
 
 #' ### Plot species richness against elevation.
 
 plot_elevation_species_richness(species_richness_sites)
-plot_elevation_species_richness(species_richness_elevation)
+plot_elevation_species_richness(species_richness_elevation) # I think this can be deleted
 
 #' The plot shows a general decreasing trend of species richness with elevation. However, it does not
 #' necessarily look to be linear. Survey effort, which will likely have affected the results, should be
