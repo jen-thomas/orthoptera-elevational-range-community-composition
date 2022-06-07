@@ -179,8 +179,9 @@ get_species_summary_site(confirmed_observations_species)
 #'
 #' The following functions summarise observations and species seen during each survey.
 
-get_number_observations_summary <- function(observations) {
-  #' Get the observations data frame and group it by survey.
+get_number_observations_survey <- function(observations) {
+  #' Get the observations data frame and group it by survey and specimen label. Calculate the number of
+  #' observations found during each survey.
   #'
   #' Return the number of observations found during each survey.
 
@@ -190,5 +191,20 @@ get_number_observations_summary <- function(observations) {
     summarise("count" = n())
 }
 
+get_number_species_survey <- function(observations) {
+  #' Get the observations data frame and group it by survey and species. Count the number of species seen
+  #' during each survey.
+  #'
+  #' Return the number of species seen during each survey.
+
+  observations %>%
+    distinct(site_elevation, date_cest, method, method_repeat, species) %>%
+    group_by(site_elevation, date_cest, method, method_repeat) %>%
+    summarise("count" = n())
+}
+
 #' <br>Consider all observations to get an overall count of those collected during each survey.
-get_number_observations_summary(observations)
+get_number_observations_survey(observations)
+
+#' <br>There were the following number of species seen during each survey
+get_number_species_survey(confirmed_observations_species)
