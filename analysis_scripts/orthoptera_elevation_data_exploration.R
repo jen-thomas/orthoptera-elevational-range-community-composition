@@ -70,7 +70,7 @@ get_number_species_suborder <- function(observations) {
   observations %>%
     distinct(suborder, species) %>%
     group_by(suborder) %>%
-    summarise("count" = n())
+    summarise("number_species" = n())
 }
 
 get_species_summary_overview <- function(observations) {
@@ -93,7 +93,7 @@ get_number_observations_suborder <- function(observations) {
     distinct(suborder, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
     group_by(suborder) %>%
-    summarise("count" = n())
+    summarise("number_observations" = n())
 }
 
 #' <br>The total number of observations was
@@ -144,7 +144,7 @@ get_number_observations_site <- function(observations) {
     distinct(site_elevation, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
     group_by(site_elevation) %>%
-    summarise("count" = n())
+    summarise("number_observations" = n())
 }
 
 get_number_species_site <- function(observations) {
@@ -155,7 +155,7 @@ get_number_species_site <- function(observations) {
   observations %>%
     distinct(site_elevation, species) %>%
     group_by(site_elevation) %>%
-    summarise("count" = n())
+    summarise("number_species" = n())
 }
 
 get_species_summary_site <- function(observations) {
@@ -203,7 +203,7 @@ get_number_observations_survey <- function(observations) {
   observations %>%
     distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
     group_by(site_elevation, date_cest, method, method_repeat) %>%
-    summarise("count" = n())
+    summarise("number_observations" = n())
 }
 
 get_number_species_survey <- function(observations) {
@@ -215,7 +215,7 @@ get_number_species_survey <- function(observations) {
   observations %>%
     distinct(site_elevation, date_cest, method, method_repeat, species) %>%
     group_by(site_elevation, date_cest, method, method_repeat) %>%
-    summarise("count" = n())
+    summarise("number_species" = n())
 }
 
 #' <br>Consider all observations to get an overall count of those collected during each survey.
