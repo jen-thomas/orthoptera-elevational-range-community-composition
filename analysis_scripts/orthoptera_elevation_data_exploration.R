@@ -134,7 +134,12 @@ get_number_observations(observations)
 get_number_observations_suborder(observations)
 
 #' ### Use only observations identified to species.
-#' Subset the observations to get only those that have been identified to species.
+#' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
+#' identified to genus or as far as the key would allow to the choice of two taxa. All individuals were
+#' identified to the lowest taxonomic level possible.
+#'
+#' In some parts of the analysis, only those observations identified to species will be used. Subset the
+#' observations to get only those that have been identified to species.
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
 #' <br>The total number of observations identified to species was
