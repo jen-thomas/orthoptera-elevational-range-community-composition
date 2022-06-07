@@ -21,8 +21,32 @@ get_packages(vector_packages)
 
 print_latest_git_commits("orthoptera_elevation_data_exploration.R")
 
-#' ## Summarise species composition.
-#' The following functions calculate and summarise the number of observations and species.
+#' ## Prepare observation data.
+
+#' Import all observation data.
+
+observations_file <- "../data/observations.csv"
+sites_file <- "../data/sites.csv"
+
+observations <- import_all_observations(observations_file, sites_file)
+
+#' ### Subset observations identified to species.
+#'
+#' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
+#' identified to genus or as far as the key would allow to the choice of two taxa. All individuals were
+#' identified to the lowest taxonomic level possible.
+#'
+#' <br>In some parts of the analysis, only those observations identified to species will be used. Subset
+#' the observations to get only those that have been identified to species.
+
+confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
+
+#' ## Explore observation data.
+
+#' ### Summarise all observations.
+#'
+#' The following functions calculate and summarise the number of observations and species seen across all
+#' surveys.
 
 get_number_observations <- function(observations) {
     #' Get the total number of unique observations.
@@ -72,6 +96,33 @@ get_number_observations_suborder <- function(observations) {
     summarise("count" = n())
 }
 
+#' <br>The total number of observations was
+get_number_observations(observations)
+
+#' <br>The total number of individuals observed for each suborder was
+get_number_observations_suborder(observations)
+
+#' <br>The total number of observations identified to species was
+get_number_observations(confirmed_observations_species)
+
+#' <br>The total number of species observed was
+get_number_species(confirmed_observations_species)
+
+#' <br>The total number of species observed within each suborder was
+get_number_species_suborder(confirmed_observations_species)
+
+#' <br>The following species were observed
+get_species_summary_overview(confirmed_observations_species)
+
+#' ### Summarise observations by site
+#'
+#' Three main <em>study areas</em> were visited (TOR, TAV, MOL). Visits to two smaller areas near to
+#' TOR/MOL (BOR, BES) were used to cover lower elevations. Within each study area, there were numerous
+#' <em>study sites</em>, which were numbered, but can be identified more easily by the elevational band
+#' in which they are located. Each site name includes the elevation in m.
+#'
+#' The following functions calculate observation and species summary across the <em>sites</em> visited.
+
 get_number_observations_site <- function(observations) {
   #' Get the observations dataframe and group it by site and observation.
   #'
@@ -95,17 +146,6 @@ get_number_species_site <- function(observations) {
     summarise("count" = n())
 }
 
-get_number_observations_summary <- function(observations) {
-  #' Get the observations data frame and group it by survey.
-  #'
-  #' Return the number of observations found during each survey.
-
-  observations %>%
-    distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
-    group_by(site_elevation, date_cest, method, method_repeat) %>%
-    summarise("count" = n())
-}
-
 get_species_summary_site <- function(observations) {
   #' Get a list of the species seen at each site.
   #'
@@ -119,44 +159,8 @@ get_species_summary_site <- function(observations) {
   return(species_summary)
 }
 
-#' ### Summarise all observations.
-#'
-#' Import all observation data.
-observations_file <- "../data/observations.csv"
-sites_file <- "../data/sites.csv"
-
-observations <- import_all_observations(observations_file, sites_file)
-
-#' <br>The total number of observations was
-get_number_observations(observations)
-
-#' <br>The total number of individuals observed for each suborder was
-get_number_observations_suborder(observations)
-
-#' ### Use only observations identified to species.
-#' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
-#' identified to genus or as far as the key would allow to the choice of two taxa. All individuals were
-#' identified to the lowest taxonomic level possible.
-#'
-#' In some parts of the analysis, only those observations identified to species will be used. Subset the
-#' observations to get only those that have been identified to species.
-confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
-
-#' <br>The total number of observations identified to species was
-get_number_observations(confirmed_observations_species)
-
-#' <br>The total number of species observed was
-get_number_species(confirmed_observations_species)
-
-#' <br>The total number of species observed within each suborder was
-get_number_species_suborder(confirmed_observations_species)
-
-#' <br>The following species were observed
-get_species_summary_overview(confirmed_observations_species)
-
-#' ### Summarise observations by site
-#' Initially, consider all observations that were made and group them by site to get an overview of the
-#' numbers and species.
+#' <br>Initially, consider all observations that were made and group them by site to get an overview of
+#' the numbers and species.
 
 #' <br>The number of observations at each site was
 get_number_observations_site(observations)
@@ -168,9 +172,23 @@ get_number_species_site(confirmed_observations_species)
 get_species_summary_site(confirmed_observations_species)
 
 #' ### Summarise the observations by survey
-#' At each site, surveys were undertaken using a sweep net and also hand collection. At sites at 2000m or
-#' above, a sweep net survey was done, followed by a hand collection then another sweep net collection.
 #'
+#' Each time a study site was visited, <em>surveys</em> were undertaken using a sweep net and also hand
+#' collection. At sites at 2000m or above, a sweep net survey was done, followed by a hand collection
+#' then another sweep net collection.
+#'
+#' The following functions summarise observations and species seen during each survey.
+
+get_number_observations_summary <- function(observations) {
+  #' Get the observations data frame and group it by survey.
+  #'
+  #' Return the number of observations found during each survey.
+
+  observations %>%
+    distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
+    group_by(site_elevation, date_cest, method, method_repeat) %>%
+    summarise("count" = n())
+}
+
 #' <br>Consider all observations to get an overall count of those collected during each survey.
 get_number_observations_summary(observations)
-
