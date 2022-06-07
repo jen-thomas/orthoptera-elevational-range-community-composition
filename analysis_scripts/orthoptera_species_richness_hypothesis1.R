@@ -25,8 +25,8 @@ calculate_species_richness_elevation_bands <- function(observations) {
   #' Aggregate over the species observed within each elevation band and count how many there were.
 
   summary <- observations %>%
-    distinct(altitude_band_m, species) %>%
-    group_by(altitude_band_m) %>%
+    distinct(elevational_band_m, species) %>%
+    group_by(elevational_band_m) %>%
     summarise("count" = n())
 
   return(summary)
@@ -56,7 +56,7 @@ species_richness_elevation <- calculate_species_richness_elevation_bands(confirm
 print(species_richness_elevation)
 
 #' <br>Calculate Spearman rank correlation for species richness and elevation.
-calculate_spearman_rank_correlation(species_richness_elevation, altitude_band_m, count)
+calculate_spearman_rank_correlation(species_richness_elevation, elevational_band_m, count)
 
 #' <br>Plot species richness against elevation.
 plot_altitude_species_richness(species_richness_elevation)
