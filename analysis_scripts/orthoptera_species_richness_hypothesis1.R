@@ -34,7 +34,20 @@ calculate_species_richness_elevation_bands <- function(observations) {
   return(number_species_elevation)
 }
 
-plot_altitude_species_richness <- function(species_richness_elevation) {
+calculate_species_richness_sites <- function(observations, confirmed_observations_species) {
+  #' Aggregate over the species observed at each site and count how many there were. 
+  #' 
+  #' Return dataframe of the site with elevation band and species richness.
+  
+  site_elevations <- get_site_elevation(observations)
+  species_richness_site <- get_number_species_site(confirmed_observations_species)
+  species_richness_site_elevation <- join_site_summary_data_with_elevation(site_elevations, species_richness_site)
+  names(species_richness_site_elevation) <- c("site_elevation", "elevational_band_m", "species_richness")
+
+  return(species_richness_site_elevation)
+}
+
+plot_elevation_species_richness <- function(species_richness_elevation) {
   #' Plot elevation band against species richness.
 
   plot(species_richness ~ elevational_band_m, data = species_richness_elevation,
@@ -58,12 +71,16 @@ model_species_richness_elevation <- function(species_richness_elevation) {
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
+species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
+print(species_richness_sites)
+
 species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
 print(species_richness_elevation)
 
 #' ### Plot species richness against elevation.
 
-plot_altitude_species_richness(species_richness_elevation)
+plot_elevation_species_richness(species_richness_sites)
+plot_elevation_species_richness(species_richness_elevation)
 
 #' The plot shows a general decreasing trend of species richness with elevation. However, it does not
 #' necessarily look to be linear. Survey effort, which will likely have affected the results, should be
