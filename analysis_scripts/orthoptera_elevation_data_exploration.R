@@ -102,11 +102,16 @@ get_number_observations_suborder <- function(observations) {
   return(all_number_observations_suborder)
 }
 
+join_suborder_summary_data <- function(number_observations, number_species) {
+  #' Join the summary data about suborders to present together in one table.
+
+  joined_data <- full_join(number_observations, number_species, by = "suborder")
+
+  return(joined_data)
+}
+
 #' <br>The total number of observations was
 get_number_observations(observations)
-
-#' <br>The total number of individuals observed for each suborder was
-get_number_observations_suborder(observations)
 
 #' <br>The total number of observations identified to species was
 get_number_observations(confirmed_observations_species)
@@ -114,8 +119,12 @@ get_number_observations(confirmed_observations_species)
 #' <br>The total number of species observed was
 get_number_species(confirmed_observations_species)
 
-#' <br>The total number of species observed within each suborder was
-get_number_species_suborder(confirmed_observations_species)
+#' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
+#' species only takes into account those identified to species.
+number_observations_suborder <- get_number_observations_suborder(observations)
+number_species_suborder <- get_number_species_suborder(confirmed_observations_species)
+
+join_suborder_summary_data(number_observations_suborder, number_species_suborder)
 
 #' <br>The following species were observed
 get_species_summary_overview(confirmed_observations_species)
@@ -183,16 +192,85 @@ get_species_summary_site <- function(observations) {
   return(species_summary)
 }
 
-join_site_summary_data <- function(number_visits, number_observations, number_species) {
+get_transect_lengths <- function(observations) {
+  #' Get the transect length for each site.
+  #'
+  #' Return a data frame with the transect length for each site.
+
+  transect_lengths <- select(observations, site_elevation, transect_length_m)
+  transect_lengths_sites <- transect_lengths %>%
+    distinct(site_elevation, transect_length_m) %>%
+    group_by(site_elevation)
+
+  return(transect_lengths_sites)
+}
+
+get_number_surveys_site <- function(observations) {
+  #' Get observations dataframe and group it by site, date, method and repeat to get the number of surveys
+  #' done at each site.
+  #'
+  #' Return data frame of this summary.
+
+  number_surveys_site <- observations %>%
+    distinct(site_elevation, date_cest, method) %>%
+    group_by(site_elevation, method) %>%
+    summarise("number_surveys" = n())
+
+  return(number_surveys_site)
+}
+
+get_number_hand_surveys <- function(number_surveys_site) {
+  #' Get number of surveys for each site and split it so there is a number for hand surveys only.
+  #'
+  #' Return dataframe with site and number of hand surveys.
+
+  number_hand_surveys_site <- filter(number_surveys_site, method == "Hand")
+  subset_hand_surveys <- subset(number_hand_surveys_site, select = c("site_elevation", "number_surveys"))
+  names(subset_hand_surveys) <- c("site_elevation", "number_hand_surveys")
+
+  return(subset_hand_surveys)
+}
+
+get_number_net_surveys <- function(number_surveys_site) {
+  #' Get number of surveys for each site and split it so there is a number for net surveys only.
+  #'
+  #' Return dataframe with site and number of net surveys.
+
+  number_net_surveys_site <- filter(number_surveys_site, method == "Net")
+  subset_net_surveys <- subset(number_net_surveys_site, select = c("site_elevation", "number_surveys"))
+  names(subset_net_surveys) <- c("site_elevation", "number_net_surveys")
+
+  return(subset_net_surveys)
+}
+
+join_site_summary_data <- function(number_visits, number_observations, number_species, transect_lengths,
+                                   site_survey_summary) {
   #' Get the data which summarise the sites and join it together to present the information in one table.
   #'
   #' Return the data frame of the joined data.
 
-  joined_visits_observations <- full_join(number_visits, number_observations, by = "site_elevation")
+  joined_visits <- full_join(transect_lengths, number_visits, by = "site_elevation")
+  joined_visits_surveys <- full_join(joined_visits, site_survey_summary, by = "site_elevation")
+  joined_visits_observations <- full_join(joined_visits_surveys, number_observations, by = "site_elevation")
   joined_visits_observations_species <- full_join(joined_visits_observations, number_species,
                                                   by = "site_elevation")
 
   return(joined_visits_observations_species)
+}
+
+get_site_survey_summary_data <- function(observations) {
+  #' Get the number of hand and net surveys for each site and join them into a dataframe.
+  #'
+  #' Return a dataframe of the site and number of hand and net surveys.
+
+  number_surveys_site <- get_number_surveys_site(observations)
+  number_hand_surveys_site <- get_number_hand_surveys(number_surveys_site)
+  number_net_surveys_site <- get_number_net_surveys(number_surveys_site)
+
+  joined_survey_data <- full_join(number_hand_surveys_site, number_net_surveys_site,
+                                  by = "site_elevation")
+
+  return(joined_survey_data)
 }
 
 #' <br>Summarise the number of visits to each site and how many observations were seen at each site during
@@ -202,8 +280,13 @@ join_site_summary_data <- function(number_visits, number_observations, number_sp
 number_visits_site <- get_number_visits_site(observations)
 number_observations_site <- get_number_observations_site(observations)
 number_species_site <- get_number_species_site(confirmed_observations_species)
+transect_lengths <- get_transect_lengths(observations)
 
-join_site_summary_data(number_visits_site, number_observations_site,number_species_site )
+site_survey_summary <- get_site_survey_summary_data(observations)
+joined_visits_observations_species <- join_site_summary_data(number_visits_site, number_observations_site, number_species_site,
+                       transect_lengths, site_survey_summary)
+joined_visits_observations_species[order(joined_visits_observations_species$site_elevation), ]
+
 
 #' <br>The species seen at each site were
 get_species_summary_site(confirmed_observations_species)
@@ -244,8 +327,20 @@ get_number_species_survey <- function(observations) {
   return(number_species_survey)
 }
 
-#' <br>Consider all observations to get an overall count of those collected during each survey.
-get_number_observations_survey(observations)
+join_survey_summary_data <- function(number_observations, number_species) {
+  #' Get the summary data from surveys and join it into one to view it in one table. 
+  #' 
+  #' Return data frame of joined data.
+  
+  joined_data <- full_join(number_observations, number_species, by = c("site_elevation", "date_cest",
+                                                                       "method", "method_repeat"))
+  
+  return(joined_data)
+}
 
-#' <br>There were the following number of species seen during each survey
-get_number_species_survey(confirmed_observations_species)
+#' <br>Summarise the observations and species seen during each survey (note that the number of
+#' species only considers those observations that have been identified to species).
+number_observations_survey <- get_number_observations_survey(observations)
+number_species_survey <- get_number_species_survey(confirmed_observations_species)
+
+join_survey_summary_data(number_observations_survey, number_species_survey)
