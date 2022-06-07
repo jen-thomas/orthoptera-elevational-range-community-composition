@@ -43,7 +43,7 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 
 #' ## Explore observation data.
 
-#' ### Summarise all observations.
+#' ### Summarise all observations
 #'
 #' The following functions calculate and summarise the number of observations and species seen across all
 #' surveys.
@@ -53,7 +53,8 @@ get_number_observations <- function(observations) {
 
   unique_observations <- unique(observations[c("specimen_label")])
   number_observations <- nrow(unique_observations)
-  print(number_observations)
+
+  return(number_observations)
 }
 
 get_number_species <- function(observations) {
@@ -61,16 +62,19 @@ get_number_species <- function(observations) {
 
   unique_species <- unique(observations[c("species")])
   number_species <- nrow(unique_species)
-  print(number_species)
+
+  return(number_species)
 }
 
 get_number_species_suborder <- function(observations) {
     #' Get the number of species observed within each suborder. Use observations identified to species.
 
-  observations %>%
+  all_species_suborder <- observations %>%
     distinct(suborder, species) %>%
     group_by(suborder) %>%
     summarise("number_species" = n())
+
+  return(all_species_suborder)
 }
 
 get_species_summary_overview <- function(observations) {
@@ -89,11 +93,13 @@ get_number_observations_suborder <- function(observations) {
     #' Get the number of observations for each suborder. Use confirmed and finalised identifications.
     #' They do not have to be to species level.
 
-  observations %>%
+  all_number_observations_suborder <- observations %>%
     distinct(suborder, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
     group_by(suborder) %>%
     summarise("number_observations" = n())
+
+  return(all_number_observations_suborder)
 }
 
 #' <br>The total number of observations was
@@ -129,10 +135,12 @@ get_number_visits_site <- function(observation) {
   #'
   #' Return the number of visits to each site.
 
-  observations %>%
+  number_visits_site <- observations %>%
     distinct(site_elevation, date_cest) %>%
     group_by(site_elevation) %>%
     summarise("number_visits" = n())
+
+  return(number_visits_site)
 }
 
 get_number_observations_site <- function(observations) {
@@ -140,11 +148,13 @@ get_number_observations_site <- function(observations) {
   #'
   #' Return number of observations at each site.
 
-  observations %>%
+  number_observations_site <- observations %>%
     distinct(site_elevation, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
     group_by(site_elevation) %>%
     summarise("number_observations" = n())
+
+  return(number_observations_site)
 }
 
 get_number_species_site <- function(observations) {
@@ -152,10 +162,12 @@ get_number_species_site <- function(observations) {
   #'
   #' Return the number of species seen at each site.
 
-  observations %>%
+  number_species_site <- observations %>%
     distinct(site_elevation, species) %>%
     group_by(site_elevation) %>%
     summarise("number_species" = n())
+
+  return(number_species_site)
 }
 
 get_species_summary_site <- function(observations) {
@@ -200,10 +212,12 @@ get_number_observations_survey <- function(observations) {
   #'
   #' Return the number of observations found during each survey.
 
-  observations %>%
+  number_observations_survey <- observations %>%
     distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
     group_by(site_elevation, date_cest, method, method_repeat) %>%
     summarise("number_observations" = n())
+
+  return(number_observations_survey)
 }
 
 get_number_species_survey <- function(observations) {
@@ -212,10 +226,12 @@ get_number_species_survey <- function(observations) {
   #'
   #' Return the number of species seen during each survey.
 
-  observations %>%
+  number_species_survey <- observations %>%
     distinct(site_elevation, date_cest, method, method_repeat, species) %>%
     group_by(site_elevation, date_cest, method, method_repeat) %>%
     summarise("number_species" = n())
+
+  return(number_species_survey)
 }
 
 #' <br>Consider all observations to get an overall count of those collected during each survey.
