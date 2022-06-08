@@ -211,5 +211,17 @@ plot(linear_regression_species_richness)
 
 plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
 
-#' ### Test model
-anova(linear_regression_species_richness)
+#' ### Test linear regression using t-test.
+#' Use a one-way t-test to check if there is a statistically significant relationship between the response
+#' and explanatory variables.
+#' <br>H<sub>0</sub>: the slope of the regression is equal to 0.
+#' <br>H<sub>1</sub>: the slope of the regression is not equal to 0.
+#'
+#' Look again at the model output.
+summary(linear_regression_species_richness)
+
+#' ## Results
+#' A simple linear regression was used to investigate the relationship between elevation and species
+#' richness. Species richness and elevation were negatively correlated (Pearson's correlation coefficient
+#' = -0.54). Species richness was shown to decrease by four for an increase in elevation of 1000 m (<em>t</em> = -3.31, <em>p</em> = 0.003).
+#' However, only 29% of the variation in species richness can be explained by elevation (<em>R<sup>2</sup></em> = 0.29, <em>F</em><sub>(1,27)</sub> = 10.95, <em>p</em> = 0.003).
