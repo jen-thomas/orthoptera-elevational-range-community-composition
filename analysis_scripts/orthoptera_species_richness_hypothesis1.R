@@ -14,6 +14,9 @@
 source("utils.R")
 source("orthoptera_elevation_data_exploration.R")
 
+vector_packages <- c("visreg", "ggplot2")
+get_packages(vector_packages)
+
 #' ## Change log
 #' Display the latest five commits to this file.
 
@@ -64,14 +67,21 @@ plot_elevation_species_richness <- function(species_richness_elevation) {
        xlab = "Elevation band (m a.s.l)", ylab = "Species richness")
 }
 
-model_species_richness_elevation <- function(species_richness_elevation) {
-  #' Create a linear model of species richness as a function of elevation.
+linear_regression <- function(dataframe, response_variable, explanatory_variable) {
+  #' Create a linear model (do a linear regression) of the explanatory variable on the response variable.
   #'
   #' Return the model.
 
-  model <- lm(species_richness ~ elevational_band_m, data = species_richness_elevation)
+  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe)
 
-  return(model)
+  return(regression)
+}
+
+plot_model_residuals <- function(model, dataframe, explanatory_variable) {
+  #' Calculate and plot the residuals from the regression as a function of the explanatory variable.
+
+  plot(residuals(model) ~ dataframe[[explanatory_variable]], data = dataframe)
+  abline(h=0)
 }
 
 calculate_correlation_coefficient <- function(dataframe, para1, para2) {
@@ -94,19 +104,47 @@ calculate_coefficient_of_determination <- function(correlation_coefficient) {
   return(coeff_det)
 }
 
+get_predicted_values <- function(linear_regression) {
+  #' Get the predicted values using the linear regression.
+  #'
+  #' Return data frame of predicted values.
+
+  predicted <- predict(linear_regression, interval = "prediction")
+
+  return(predicted)
+}
+
+plot_linear_regression_species_richness <- function(dataframe, linear_regression) {
+  #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
+  #' values.
+
+  predicted_values <- get_predicted_values(linear_regression)
+  df <- cbind.data.frame(dataframe, predicted_values, stringsAsFactors = FALSE)
+
+  ggplot(df, aes(y = species_richness, x = elevational_band_m)) +
+        geom_point(size = 3, col = "blue") +
+        geom_smooth(method = "lm", se = TRUE) +
+        geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+        geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+        labs(x = "Elevation (m a.s.l)", y = "Species richness") +
+        theme_classic()
+}
+
+
 #' ### Calculate species richness.
 #'
 #' Calculate species richness for each elevation band. For now, only consider identifications that are to
 #' species (there were none that were to a higher taxonomic level which could be considered a separate
 #' species unless we consider each site or elevation band separately - TODO).
+#'
+#' Replace NA values of species richness with 0.
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
 species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
-
-#' Replace NA values of species richness with 0.
 species_richness_sites <- replace_na_with_zero(species_richness_sites, "species_richness")
 
+#' ### Correlation
 #' Calculate the correlation coefficient
 corr_coeff <- calculate_correlation_coefficient(species_richness_sites, "elevational_band_m",
                                                 "species_richness")
@@ -118,29 +156,60 @@ print(coeff_det)
 
 #' <br>These values confirm that there is a negative correlation between species richness and elevation,
 #' however only 29% of the variation of species richness is explained by the elevation.
-
-# #' I think this can be deleted
-# species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
-# print(species_richness_elevation)
-
-#' ### Plot species richness against elevation.
+#'
+#' <br>Plot species richness against elevation.
 
 plot_elevation_species_richness(species_richness_sites)
-#plot_elevation_species_richness(species_richness_elevation) # I think this can be deleted
 
-#' The plot shows a general decreasing trend of species richness with elevation. However, it does not
-#' necessarily look to be linear. Survey effort, which will likely have affected the results, should be
-#' taken into account: TODO.
+#' The plot shows a general decreasing trend of species richness with elevation, which was confirmed by
+#' the correlation coefficient above. However, it does not necessarily look to be linear. Survey effort,
+#' which will likely have affected the results, should be taken into account: TODO.
 #'
-#' <em>Low species richness at 1700 m</em>. Only one site was surveyed at this altitude. This site was often hot and
-#' in the Sun; Orthoptera were very active. It is likely Orthoptera were undersampled at this site because
-#' of their ability to avoid the net (a lot were Ensifera) and the long vegetation which made it harder to
-#' catch all individuals present.
+#' <em>Low species richness at 1700 m</em>. Only one site was surveyed at this altitude. This site was
+#' often hot and in the Sun; Orthoptera were very active. It is likely Orthoptera were undersampled at
+#' this site because of their ability to avoid the net (a lot were Ensifera) and the long vegetation which
+#' made it harder to catch all individuals present.
+#'
+#' <em>High species richness at 2000m</em>. TODO
 #'
 #' <em>Higher elevation sites</em>. Only one site was visited at both 2400m and 2500m (there were no other
 #' accessible sites at this elevation) and given the windy conditions at these elevations during the
-#' surveys, only a few individuals were captured.
+#' surveys, only a few individuals were captured. At 2500m, the data currently show that no species were
+#' detected there. Observations were made at this elevation, however because they were not identified to
+#' species (small nymphs), they have not yet been included in the analysis: TODO (include the observations
+#' made to other taxonomic levels when they add to the species richness of a site).
+#'
+#' ### Linear regression
+#' Create linear model of species richness against elevation and look at the model.
+linear_regression_species_richness <- linear_regression(species_richness_sites, "species_richness", "elevational_band_m")
+summary(linear_regression_species_richness)
 
-#' ### Create linear model of species richness against elevation.
-model_species_richness_elevation <- model_species_richness_elevation(species_richness_sites)
-summary(species_richness_sites)
+#' ### Checking the assumptions of linear regression
+
+#' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
+plot_model_residuals(linear_regression_species_richness, species_richness_sites, "elevational_band_m")
+plot(linear_regression_species_richness)
+
+#' <br>Comments about assumptions:
+#' <ul>* <em>linear relationship between elevation band and species richness</em>: according to the
+#' scatterplot above, the relationship does not appear to be strongly linear, although there is not a
+#' strong non-linear relationship either.
+#' * <em>independence</em>: the plot of residuals shows a fairly random pattern indicating that a linear
+#' model could be suitable. TODO: test this formally with a Durbin-Watson test.
+#' * <em>heteroscedasticity</em>: looking at the Residuals vs Fitted plot above, there does not seem to be
+#' any trend of increasing residuals as the fitted values increase, therefore this assumption seems to be
+#' satisfied.
+#' * <em>normally-distributed residuals</em>: the residuals appear to have a normal distribution (Q-Q plot
+#' above) in general, but the point which corresponds to the highest species richness at 2000m, seems to
+#' be a bit of an outlier, skewing the distribution somewhat. TODO: try refitting the model without this
+#' data point.
+#' </ul>
+#'
+#' ### Plot linear regression
+#' Plot the data points with 95% CI, the linear model and the upper and lower bounds of the predicted
+#' values.
+
+plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
+
+#' ### Test model
+anova(linear_regression_species_richness)
