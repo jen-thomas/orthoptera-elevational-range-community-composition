@@ -47,6 +47,16 @@ calculate_species_richness_sites <- function(observations, confirmed_observation
   return(species_richness_site_elevation)
 }
 
+replace_na_with_zero <- function(dataframe, column) {
+  #' Replace all NA values in a column with 0 (to be able to do calculations).
+  #'
+  #' Return dataframe.
+
+  dataframe[[column]] <- replace(dataframe[[column]], is.na(dataframe[[column]]),0)
+
+  return(dataframe)
+}
+
 plot_elevation_species_richness <- function(species_richness_elevation) {
   #' Plot elevation band against species richness.
 
@@ -58,9 +68,30 @@ model_species_richness_elevation <- function(species_richness_elevation) {
   #' Create a linear model of species richness as a function of elevation.
   #'
   #' Return the model.
+
   model <- lm(species_richness ~ elevational_band_m, data = species_richness_elevation)
 
   return(model)
+}
+
+calculate_correlation_coefficient <- function(dataframe, para1, para2) {
+  #' Calculate the correlation coefficient between two variables.
+  #'
+  #' Return the coefficient.
+
+  corr_coeff <- cor(x = dataframe[[para1]], y = dataframe[[para2]])
+
+  return(corr_coeff)
+}
+
+calculate_coefficient_of_determination <- function(correlation_coefficient) {
+  #' Calculate the coefficient of determination (R^2) for a correlation coefficient.
+  #'
+  #' Return the coefficient.
+
+  coeff_det <- correlation_coefficient^2
+
+  return(coeff_det)
 }
 
 #' ### Calculate species richness.
@@ -72,16 +103,30 @@ model_species_richness_elevation <- function(species_richness_elevation) {
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
 species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
-print(species_richness_sites)
 
-#' I think this can be deleted
-species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
-print(species_richness_elevation)
+#' Replace NA values of species richness with 0.
+species_richness_sites <- replace_na_with_zero(species_richness_sites, "species_richness")
+
+#' Calculate the correlation coefficient
+corr_coeff <- calculate_correlation_coefficient(species_richness_sites, "elevational_band_m",
+                                                "species_richness")
+print(corr_coeff)
+
+#' <br>and the coefficient of determination (R<sup>2</sup>).
+coeff_det <- calculate_coefficient_of_determination(corr_coeff)
+print(coeff_det)
+
+#' <br>These values confirm that there is a negative correlation between species richness and elevation,
+#' however only 29% of the variation of species richness is explained by the elevation.
+
+# #' I think this can be deleted
+# species_richness_elevation <- calculate_species_richness_elevation_bands(confirmed_observations_species)
+# print(species_richness_elevation)
 
 #' ### Plot species richness against elevation.
 
 plot_elevation_species_richness(species_richness_sites)
-plot_elevation_species_richness(species_richness_elevation) # I think this can be deleted
+#plot_elevation_species_richness(species_richness_elevation) # I think this can be deleted
 
 #' The plot shows a general decreasing trend of species richness with elevation. However, it does not
 #' necessarily look to be linear. Survey effort, which will likely have affected the results, should be
@@ -97,5 +142,5 @@ plot_elevation_species_richness(species_richness_elevation) # I think this can b
 #' surveys, only a few individuals were captured.
 
 #' ### Create linear model of species richness against elevation.
-model_species_richness_elevation <- model_species_richness_elevation(species_richness_elevation)
-summary(model_species_richness_elevation)
+model_species_richness_elevation <- model_species_richness_elevation(species_richness_sites)
+summary(species_richness_sites)
