@@ -208,13 +208,13 @@ get_transect_lengths <- function(site_survey_df) {
 }
 
 get_number_surveys_site <- function(site_survey_df) {
-  #' Get surveys dataframe and group it by site, date, method and repeat to get the number of surveys
+  #' Get surveys dataframe and group it by site, method and repeat to get the number of surveys
   #' done at each site.
   #'
   #' Return data frame of this summary.
 
   number_surveys_site <- site_survey_df %>%
-    distinct(site_elevation, date_cest, method) %>%
+    distinct(site_elevation, date_cest, method, method_repeat) %>%
     group_by(site_elevation, method, .drop=FALSE) %>%
     summarise("number_surveys" = n())
 

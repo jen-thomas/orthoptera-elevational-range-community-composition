@@ -84,7 +84,7 @@ join_site_survey <- function(sites_df, surveys_df) {
   #' Return a dataframe with both sets of data and new site name column.
 
   sites_surveys <- (merge(x = surveys_df, y = sites_df, by = "site_name", all.x=TRUE))[,
-    c("area", "site_name", "elevational_band_m", "transect_length_m", "date_cest", "method",
+    c("area", "site_name", "elevational_band_m", "transect_length_m", "date_cest", "method", "method_repeat",
       "cloud_coverage_start", "wind_start", "rain_start", "cloud_coverage_end", "wind_end", "rain_end")]
 
   sites_surveys <- rename_site_with_elevation(sites_surveys)
