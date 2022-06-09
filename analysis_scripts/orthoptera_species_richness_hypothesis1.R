@@ -20,9 +20,9 @@ get_packages(vector_packages)
 #' ## Change log
 #' Display the latest five commits to this file.
 
-print_latest_git_commits("orthoptera_species_richness_hypothesis1.R")
+# print_latest_git_commits("orthoptera_species_richness_hypothesis1.R")
 
-#' ## Investigate effects of elevation on species richness.
+#' ## Investigate effects of elevation on species richness
 
 calculate_species_richness_elevation_bands <- function(observations) {
   #' Aggregate over the species observed within each elevation band and count how many there were.
@@ -222,7 +222,7 @@ plot(linear_regression_species_richness)
 
 plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
 
-#' ### Test linear regression using t-test.
+#' ### Test linear regression using t-test
 #' Use a one-way t-test to check if there is a statistically significant relationship between the response
 #' and explanatory variables.
 #' <br>H<sub>0</sub>: the slope of the regression is equal to 0.

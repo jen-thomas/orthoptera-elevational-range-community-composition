@@ -19,9 +19,9 @@ get_packages(vector_packages)
 #' ## Change log
 #' Display the latest five commits to this file.
 
-print_latest_git_commits("orthoptera_elevation_data_exploration.R")
+# print_latest_git_commits("orthoptera_elevation_data_exploration.R")
 
-#' ## Prepare observation data.
+#' ## Prepare observation data
 
 #' Import all observation data.
 
@@ -30,7 +30,7 @@ sites_file <- "../data/sites.csv"
 
 observations <- import_all_observations(observations_file, sites_file)
 
-#' ### Subset observations identified to species.
+#' ### Subset observations identified to species
 #'
 #' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
 #' identified to genus or as far as the key would allow to the choice of two taxa. All individuals were

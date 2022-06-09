@@ -14,7 +14,7 @@ source("utils.R")
 #' ## Change log
 #' Display the latest five commits to this file.
 
-print_latest_git_commits("data_preparation.R")
+# print_latest_git_commits("data_preparation.R")
 
 #' ## Set-up
 
@@ -23,10 +23,10 @@ print_latest_git_commits("data_preparation.R")
 vector_packages <- c("fossil", "stringr")
 get_packages(vector_packages)
 
-#' ## Initial data preparation.
+#' ## Initial data preparation
 #' Prepare the data frames with observations and sites, to be used in the rest of the analysis.
 #'
-#' ### Prepare data frames.
+#' ### Prepare data frames
 #' Join the site data with observations and create new site name which contains the elevation and
 #' survey area.
 
@@ -82,7 +82,7 @@ join_observation_site <- function(observations_df, sites_df) {
   return(observations)
 }
 
-#' ### Create summaries of observation data.
+#' ### Create summaries of observation data
 #' Depending on the analysis, the observations may need to be subsetted to take into account the taxonomic
 #' level which they have been identified.
 
