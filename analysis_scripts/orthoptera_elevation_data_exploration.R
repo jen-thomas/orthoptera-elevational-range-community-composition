@@ -337,7 +337,7 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
   replace_na_with_zero(site_summary_data_elevation, column)
 
   elevation_summary_data <- site_summary_data_elevation %>%
-    group_by(elevational_band_m) %>%
+    group_by(elevational_band_m, .drop=FALSE) %>%
     summarise("number_sites" = n(),
               "number_visits" = sum(number_visits),
               "number_hand_surveys" = sum(number_hand_surveys),
