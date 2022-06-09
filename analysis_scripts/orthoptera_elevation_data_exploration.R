@@ -325,7 +325,7 @@ join_site_summary_data_with_elevation <- function(site_elevations, site_summary_
   #'
   #' Return dataframe with all sites and elevational bands for each one, with the site summary data.
 
-  site_summary_data_elevation <- left_join(site_summary_data, site_elevations, by = "site_elevation")
+  site_summary_data_elevation <- left_join(site_elevations, site_summary_data, by = "site_elevation")
 
   return(site_summary_data_elevation)
 }

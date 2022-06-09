@@ -20,6 +20,7 @@ get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
 #+ message=FALSE, warning=FALSE
+
 calculate_species_richness_elevation_bands <- function(observations) {
   #' Aggregate over the species observed within each elevation band and count how many there were.
   #'
@@ -33,8 +34,6 @@ calculate_species_richness_elevation_bands <- function(observations) {
   return(number_species_elevation)
 }
 
-
-
 calculate_species_richness_sites <- function(observations, confirmed_observations_species) {
   #' Aggregate over the species observed at each site and count how many there were. 
   #' 
@@ -44,6 +43,8 @@ calculate_species_richness_sites <- function(observations, confirmed_observation
   species_richness_site <- get_number_species_site(confirmed_observations_species)
   species_richness_site_elevation <- join_site_summary_data_with_elevation(site_elevations, species_richness_site)
   names(species_richness_site_elevation) <- c("site_elevation", "elevational_band_m", "species_richness")
+
+  species_richness_site_elevation <- replace_na_with_zero(species_richness_site_elevation, "species_richness")
 
   return(species_richness_site_elevation)
 }
@@ -138,7 +139,6 @@ plot_elevation_species_richness_area <- function(dataframe) {
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
 species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
-species_richness_sites <- replace_na_with_zero(species_richness_sites, "species_richness")
 
 #' ### Correlation
 #' Calculate the correlation coefficient
