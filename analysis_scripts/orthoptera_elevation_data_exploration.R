@@ -124,7 +124,7 @@ join_suborder_summary_data(number_observations_suborder, number_species_suborder
 #' <br>The following species were observed
 get_species_summary_overview(confirmed_observations_species)
 
-#' ### Summarise observations by site
+#' ### Summarise by site
 #'
 #' Three main <em>study areas</em> were visited (TOR, TAV, MOL). Visits to two smaller areas near to
 #' TOR/MOL (BOR, BES) were used to cover lower elevations, although these were not part of the main study
