@@ -228,8 +228,8 @@ summary(linear_regression_species_richness)
 sites_df <- read_csv_data_file("../data/sites.csv")
 sites_study_area <- get_study_area(sites_df)
 
-species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation")
-species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation", "area", "species_richness"))
+species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation", suffix = c("_x", "_y"))
+species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation", "area", "species_richness", "elevational_band_m_x"))
 print(species_richness_study_area_details)
 
 #' ## Results
