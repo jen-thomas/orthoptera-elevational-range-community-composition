@@ -290,60 +290,6 @@ joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
 #' <br>The species seen at each site were
 get_species_summary_site(confirmed_observations_species)
 
-#' ### Summarise the observations by survey
-#'
-#' Each time a study site was visited, <em>surveys</em> were undertaken using a sweep net and also hand
-#' collection. At sites at 2000m or above, a sweep net survey was done, followed by a hand collection
-#' then another sweep net collection.
-#'
-#' The following functions summarise observations and species seen during each survey.
-
-get_number_observations_survey <- function(observations) {
-  #' Get the observations data frame and group it by survey and specimen label. Calculate the number of
-  #' observations found during each survey.
-  #'
-  #' Return the number of observations found during each survey.
-
-  number_observations_survey <- observations %>%
-    distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
-    group_by(site_elevation, date_cest, method, method_repeat) %>%
-    summarise("number_observations" = n())
-
-  return(number_observations_survey)
-}
-
-get_number_species_survey <- function(observations) {
-  #' Get the observations data frame and group it by survey and species. Count the number of species seen
-  #' during each survey.
-  #'
-  #' Return the number of species seen during each survey.
-
-  number_species_survey <- observations %>%
-    distinct(site_elevation, date_cest, method, method_repeat, species) %>%
-    group_by(site_elevation, date_cest, method, method_repeat) %>%
-    summarise("number_species" = n())
-
-  return(number_species_survey)
-}
-
-join_survey_summary_data <- function(number_observations, number_species) {
-  #' Get the summary data from surveys and join it into one to view it in one table. 
-  #' 
-  #' Return data frame of joined data.
-  
-  joined_data <- full_join(number_observations, number_species, by = c("site_elevation", "date_cest",
-                                                                       "method", "method_repeat"))
-  
-  return(joined_data)
-}
-
-#' <br>Summarise the observations and species seen during each survey (note that the number of
-#' species only considers those observations that have been identified to species).
-number_observations_survey <- get_number_observations_survey(observations)
-number_species_survey <- get_number_species_survey(confirmed_observations_species)
-
-join_survey_summary_data(number_observations_survey, number_species_survey)
-
 #' ### Summarise by elevational band
 #'
 #' Given that this study is looking at the patterns of species richness and elevational range with
