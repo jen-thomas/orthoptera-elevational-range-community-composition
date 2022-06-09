@@ -14,7 +14,7 @@
 source("utils.R")
 source("orthoptera_elevation_data_exploration.R")
 
-vector_packages <- c("visreg", "ggplot2")
+vector_packages <- c("visreg", "ggplot2", "lme4")
 get_packages(vector_packages)
 
 #' ## Change log
@@ -132,6 +132,23 @@ plot_linear_regression_species_richness <- function(dataframe, linear_regression
         theme_classic()
 }
 
+plot_elevation_species_richness_area <- function(dataframe) {
+  #' Plot the species richness against elevation band. Colour by the study area.
+
+  ggplot(dataframe, aes(x = elevational_band_m_x, y = species_richness, colour = area)) +
+    geom_point(size = 2) +
+    labs(x = "Elevation (m a.s.l)", y = "Species richness") +
+    theme_classic()
+}
+
+fit_linear_mixed_model <- function(dataframe, response_variable, explanatory_variable, factor_variable) {
+  #' Fit a linear model of a function where there is a random variable which should be treated as a
+  #' factor.
+
+  lin_mixed_model <- lmer(response_variable ~ explanatory_variable + (1|factor_variable), data = dataframe)
+
+  return(lin_mixed_model)
+}
 
 #' ### Calculate species richness.
 #'
@@ -230,8 +247,15 @@ sites_study_area <- get_study_area(sites_df)
 
 species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation", suffix = c("_x", "_y"))
 species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation", "area", "species_richness", "elevational_band_m_x"))
-print(species_richness_study_area_details)
+as.factor(species_richness_study_area_details$area)
 
+#' Plot species richness against elevation again, but look to see if there is any difference that could be explained by the sites being in different study areas.
+plot_elevation_species_richness_area(species_richness_study_area_details)
+
+#' Fit a linear mixed model, treating the study area as a factor variable.
+
+#lin_mixed_model <- fit_linear_mixed_model(species_richness_study_area_details, "species_richness", "elevational_band_m_x", "study_area")
+#summary(lin_mixed_model)
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species
 #' richness. Species richness and elevation were negatively correlated (Pearson's correlation coefficient
