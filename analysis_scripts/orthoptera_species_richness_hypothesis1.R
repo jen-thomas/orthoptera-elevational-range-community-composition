@@ -37,6 +37,8 @@ calculate_species_richness_elevation_bands <- function(observations) {
   return(number_species_elevation)
 }
 
+
+
 calculate_species_richness_sites <- function(observations, confirmed_observations_species) {
   #' Aggregate over the species observed at each site and count how many there were. 
   #' 
@@ -170,7 +172,8 @@ plot_elevation_species_richness(species_richness_sites)
 #' this site because of their ability to avoid the net (a lot were Ensifera) and the long vegetation which
 #' made it harder to catch all individuals present.
 #'
-#' <em>High species richness at 2000m</em>. TODO
+#' <em>High species richness at 2000m</em>. TODO: investigate why this is high for one of the sites (only
+#' if this is still the case when the other observations identified to other taxonomic levels are included).
 #'
 #' <em>Higher elevation sites</em>. Only one site was visited at both 2400m and 2500m (there were no other
 #' accessible sites at this elevation) and given the windy conditions at these elevations during the
@@ -195,14 +198,14 @@ plot(linear_regression_species_richness)
 #' scatterplot above, the relationship does not appear to be strongly linear, although there is not a
 #' strong non-linear relationship either.
 #' * <em>independence</em>: the plot of residuals shows a fairly random pattern indicating that a linear
-#' model could be suitable. TODO: test this formally with a Durbin-Watson test.
+#' model could be suitable.
 #' * <em>heteroscedasticity</em>: looking at the Residuals vs Fitted plot above, there does not seem to be
 #' any trend of increasing residuals as the fitted values increase, therefore this assumption seems to be
 #' satisfied.
 #' * <em>normally-distributed residuals</em>: the residuals appear to have a normal distribution (Q-Q plot
 #' above) in general, but the point which corresponds to the highest species richness at 2000m, seems to
 #' be a bit of an outlier, skewing the distribution somewhat. TODO: try refitting the model without this
-#' data point.
+#' data point (only if this is still an outlier when other observations are included).
 #' </ul>
 #'
 #' ### Plot linear regression
@@ -219,6 +222,15 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #'
 #' Look again at the model output.
 summary(linear_regression_species_richness)
+
+#' ### Linear mixed model to check for effect of study area
+#'
+sites_df <- read_csv_data_file("../data/sites.csv")
+sites_study_area <- get_study_area(sites_df)
+
+species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation")
+species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation", "area", "species_richness"))
+print(species_richness_study_area_details)
 
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species
