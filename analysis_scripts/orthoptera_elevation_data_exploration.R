@@ -9,7 +9,7 @@
 #' ---
 
 #' <br>Import packages functions from other files.
-
+#+ message=FALSE, warning=FALSE
 source("data_preparation.R")
 source("utils.R")
 
@@ -138,7 +138,7 @@ get_species_summary_overview(confirmed_observations_species)
 #' the elevation in m.
 #'
 #' The following functions summarise the visits to each site, then calculate observation and species
-#' summary across the <em>sites</em> visited.
+#' summary across the sites visited.
 
 get_number_visits_site <- function(site_survey_df) {
   #' Get the survey data frame and group it by site name and date.

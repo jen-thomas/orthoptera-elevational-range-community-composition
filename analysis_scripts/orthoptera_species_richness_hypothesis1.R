@@ -10,7 +10,7 @@
 #' ---
 
 #' <br>Import packages functions from other files.
-
+#+ message=FALSE, warning=FALSE
 source("utils.R")
 source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")

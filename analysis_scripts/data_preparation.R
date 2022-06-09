@@ -8,13 +8,13 @@
 #' ---
 
 #' <br>Import functions from other files.
-
+#+ message=FALSE, warning=FALSE
 source("utils.R")
 
 #' ## Set-up
 
 #' Install packages.
-
+#+ message=FALSE, warning=FALSE
 vector_packages <- c("fossil", "stringr")
 get_packages(vector_packages)
 
