@@ -16,10 +16,7 @@ source("utils.R")
 vector_packages <- c("fossil", "stringr", "dplyr")
 get_packages(vector_packages)
 
-#' ## Change log
-#' Display the latest five commits to this file.
 
-# print_latest_git_commits("orthoptera_elevation_data_exploration.R")
 
 #' ## Prepare observation data
 
@@ -384,13 +381,21 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
 
   site_summary_data_elevation <- join_site_summary_data_with_elevation(site_elevations, site_summary_data)
 
+  columns_with_na <- c("number_hand_surveys", "number_net_surveys", "number_species")
+
+  for (column in columns_with_na) {
+    replace_na_with_zero(site_summary_data_elevation, column)
+  }
+  replace_na_with_zero(site_summary_data_elevation, column)
+
   elevation_summary_data <- site_summary_data_elevation %>%
     group_by(elevational_band_m) %>%
     summarise("number_sites" = n(),
               "number_visits" = sum(number_visits),
               "number_hand_surveys" = sum(number_hand_surveys),
               "number_net_surveys" = sum(number_net_surveys),
-              "number_observations" = sum(number_observations))
+              "number_observations" = sum(number_observations),
+              "number_species" = sum(number_species))
 
   return(elevation_summary_data)
 }

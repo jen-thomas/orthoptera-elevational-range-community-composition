@@ -12,6 +12,7 @@
 #' <br>Import packages functions from other files.
 
 source("utils.R")
+source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 
 vector_packages <- c("visreg", "ggplot2", "lmerTest")
@@ -50,16 +51,6 @@ calculate_species_richness_sites <- function(observations, confirmed_observation
   names(species_richness_site_elevation) <- c("site_elevation", "elevational_band_m", "species_richness")
 
   return(species_richness_site_elevation)
-}
-
-replace_na_with_zero <- function(dataframe, column) {
-  #' Replace all NA values in a column with 0 (to be able to do calculations).
-  #'
-  #' Return dataframe.
-
-  dataframe[[column]] <- replace(dataframe[[column]], is.na(dataframe[[column]]),0)
-
-  return(dataframe)
 }
 
 plot_elevation_species_richness <- function(species_richness_elevation) {

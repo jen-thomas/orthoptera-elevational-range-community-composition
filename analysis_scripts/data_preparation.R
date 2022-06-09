@@ -113,3 +113,13 @@ get_confirmed_observations_to_species <- function(observations_file, sites_file)
 
   return(confirmed_observations_species)
 }
+
+replace_na_with_zero <- function(dataframe, column) {
+  #' Replace all NA values in a column with 0 (to be able to do calculations).
+  #'
+  #' Return dataframe.
+
+  dataframe[[column]] <- replace(dataframe[[column]], is.na(dataframe[[column]]),0)
+
+  return(dataframe)
+}
