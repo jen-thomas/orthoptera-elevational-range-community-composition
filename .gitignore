@@ -5,6 +5,8 @@
 .RData
 .Ruserdata
 
+analysis_scripts/Rplots.pdf
+
 renv/
 
 analysis_outputs/
