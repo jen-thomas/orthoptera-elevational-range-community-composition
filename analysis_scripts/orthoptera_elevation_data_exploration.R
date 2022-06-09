@@ -16,8 +16,6 @@ source("utils.R")
 vector_packages <- c("fossil", "stringr", "dplyr")
 get_packages(vector_packages)
 
-
-
 #' ## Prepare observation data
 
 #' Import all observation data.

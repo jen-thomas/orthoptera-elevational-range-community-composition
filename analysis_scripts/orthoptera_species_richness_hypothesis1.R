@@ -18,11 +18,6 @@ source("orthoptera_elevation_data_exploration.R")
 vector_packages <- c("visreg", "ggplot2", "lmerTest")
 get_packages(vector_packages)
 
-#' ## Change log
-#' Display the latest five commits to this file.
-
-# print_latest_git_commits("orthoptera_species_richness_hypothesis1.R")
-
 #' ## Investigate effects of elevation on species richness
 
 calculate_species_richness_elevation_bands <- function(observations) {

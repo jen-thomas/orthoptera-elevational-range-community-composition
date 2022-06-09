@@ -11,11 +11,6 @@
 
 source("utils.R")
 
-#' ## Change log
-#' Display the latest five commits to this file.
-
-# print_latest_git_commits("data_preparation.R")
-
 #' ## Set-up
 
 #' Install packages.

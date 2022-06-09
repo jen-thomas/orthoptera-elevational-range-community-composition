@@ -13,11 +13,6 @@
 
 source("utils.R")
 
-#' ## Change log
-#' Display the latest five commits to this file.
-
-print_latest_git_commits("orthoptera_elevational_range_hypothesis2.R")
-
 #' ## Create site-species matrix.
 
 #' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because
