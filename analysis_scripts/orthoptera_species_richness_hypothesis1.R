@@ -245,12 +245,18 @@ summary(linear_regression_species_richness)
 sites_df <- read_csv_data_file("../data/sites.csv")
 sites_study_area <- get_study_area(sites_df)
 
-species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation", suffix = c("_x", "_y"))
-species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation", "area", "species_richness", "elevational_band_m_x"))
-as.factor(species_richness_study_area_details$area)
+species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation",
+                                          suffix = c("_x", "_y"))
+species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation",
+                                       "area", "species_richness", "elevational_band_m_x"))
+as.factor(species_richness_study_area_details$area) # make sure that area is considered as a factor
 
-#' Plot species richness against elevation again, but look to see if there is any difference that could be explained by the sites being in different study areas.
+#' Plot species richness against elevation again, but look to see if there is any difference that could be
+#' explained by the sites being in different study areas.
 plot_elevation_species_richness_area(species_richness_study_area_details)
+
+#' Species richness at Tavascan and La Molinassa both show a general trend of decreasing species richness
+#' with elevation, but at Tor, there does not seem to be such a trend.
 
 #' Fit a linear mixed model, treating the study area as a factor variable.
 
