@@ -19,7 +19,7 @@ vector_packages <- c("visreg", "ggplot2", "lmerTest")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
-
+#+ message=FALSE, warning=FALSE
 calculate_species_richness_elevation_bands <- function(observations) {
   #' Aggregate over the species observed within each elevation band and count how many there were.
   #'

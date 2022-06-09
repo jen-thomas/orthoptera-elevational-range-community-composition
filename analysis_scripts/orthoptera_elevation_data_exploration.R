@@ -284,7 +284,7 @@ get_site_survey_summary_data <- function(site_survey_df) {
 #' the whole season. Finally, add the number of species observed at each site (note that the number of
 #' species only considers those observations that have been identified to species).
 
-
+#+ message=FALSE, warning=FALSE
 number_visits_site <- get_number_visits_site(site_survey_df)
 number_observations_site <- get_number_observations_site(observations)
 number_species_site <- get_number_species_site(confirmed_observations_species)
