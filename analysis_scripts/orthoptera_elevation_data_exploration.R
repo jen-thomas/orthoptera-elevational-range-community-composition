@@ -307,12 +307,12 @@ get_species_summary_site(confirmed_observations_species)
 #' The following functions create the summaries of observations, survey details and taxa within each
 #' elevational band.
 
-get_site_elevation <- function(observations) {
+get_site_elevation <- function(site_survey_df) {
   #' Get the site and its elevational band from the observations dataframe.
   #'
   #' Return dataframe of sites and elevational band.
 
-  site_elevations <- subset(observations, select = c("site_elevation", "elevational_band_m"))
+  site_elevations <- subset(site_survey_df, select = c("site_elevation", "elevational_band_m"))
 
   site_elevations <- site_elevations %>%
     distinct(site_elevation, elevational_band_m)
@@ -325,7 +325,7 @@ join_site_summary_data_with_elevation <- function(site_elevations, site_summary_
   #'
   #' Return dataframe with all sites and elevational bands for each one, with the site summary data.
 
-  site_summary_data_elevation <- left_join(site_elevations, site_summary_data, by = "site_elevation")
+  site_summary_data_elevation <- left_join(site_summary_data, site_elevations, by = "site_elevation")
 
   return(site_summary_data_elevation)
 }
@@ -357,5 +357,5 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
   return(elevation_summary_data)
 }
 
-site_elevations <- get_site_elevation(observations)
+site_elevations <- get_site_elevation(site_survey_df)
 get_elevation_summary_data(site_elevations, joined_survey_summary_data)
