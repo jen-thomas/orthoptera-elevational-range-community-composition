@@ -141,15 +141,6 @@ plot_elevation_species_richness_area <- function(dataframe) {
     theme_classic()
 }
 
-fit_linear_mixed_model <- function(dataframe, response_variable, explanatory_variable, factor_variable) {
-  #' Fit a linear model of a function where there is a random variable which should be treated as a
-  #' factor.
-
-  lin_mixed_model <- lmer(response_variable ~ explanatory_variable + (1|factor_variable), data = dataframe)
-
-  return(lin_mixed_model)
-}
-
 #' ### Calculate species richness.
 #'
 #' Calculate species richness for each elevation band. For now, only consider identifications that are to
@@ -238,6 +229,7 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' <br>H<sub>1</sub>: the slope of the regression is not equal to 0.
 #'
 #' Look again at the model output.
+
 summary(linear_regression_species_richness)
 
 #' ### Linear mixed model to check for effect of study area
@@ -253,6 +245,7 @@ as.factor(species_richness_study_area_details$area) # make sure that area is con
 
 #' Plot species richness against elevation again, but look to see if there is any difference that could be
 #' explained by the sites being in different study areas.
+
 plot_elevation_species_richness_area(species_richness_study_area_details)
 
 #' Species richness at Tavascan and La Molinassa both show a general trend of decreasing species richness
@@ -260,8 +253,9 @@ plot_elevation_species_richness_area(species_richness_study_area_details)
 
 #' Fit a linear mixed model, treating the study area as a factor variable.
 
-#lin_mixed_model <- fit_linear_mixed_model(species_richness_study_area_details, "species_richness", "elevational_band_m_x", "study_area")
-#summary(lin_mixed_model)
+lin_mixed_model <- lmer(species_richness ~ elevational_band_m_x + (1|area), data = species_richness_study_area_details)
+summary(lin_mixed_model)
+
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species
 #' richness. Species richness and elevation were negatively correlated (Pearson's correlation coefficient
