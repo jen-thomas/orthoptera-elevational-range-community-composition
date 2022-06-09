@@ -28,6 +28,7 @@ get_packages(vector_packages)
 rename_site_with_elevation <- function(observations_df) {
     #' Create a new site name within the dataframe which includes the elevation so that it is more useful
     #' when including it in analyses and figures.
+    #' 
     #' Return dataframe with the additional column.
 
   observations_df$site_elevation <- paste(observations_df$elevational_band_m,
