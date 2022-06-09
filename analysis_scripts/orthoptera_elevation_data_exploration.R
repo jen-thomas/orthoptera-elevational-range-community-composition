@@ -41,7 +41,7 @@ site_survey_df <- join_site_survey(sites_df, surveys_df)
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
-#' ## Explore observation data.
+#' ## Explore observation data
 
 #' ### Summarise all observations
 #'
@@ -199,6 +199,10 @@ get_transect_lengths <- function(site_survey_df) {
   #' Return a data frame with the transect length for each site.
 
   transect_lengths_sites <- select(site_survey_df, site_elevation, transect_length_m)
+
+  transect_lengths_sites <- transect_lengths_sites %>%
+    distinct(site_elevation, transect_length_m) %>%
+    group_by(site_elevation)
 
   return(transect_lengths_sites)
 }
