@@ -127,9 +127,10 @@ get_species_summary_overview(confirmed_observations_species)
 #' ### Summarise observations by site
 #'
 #' Three main <em>study areas</em> were visited (TOR, TAV, MOL). Visits to two smaller areas near to
-#' TOR/MOL (BOR, BES) were used to cover lower elevations. Within each study area, there were numerous
-#' <em>study sites</em>, which were numbered, but can be identified more easily by the elevational band
-#' in which they are located. Each site name includes the elevation in m.
+#' TOR/MOL (BOR, BES) were used to cover lower elevations, although these were not part of the main study
+#' areas. Within each study area, there were numerous <em>study sites</em>, which were numbered, but can
+#' be identified more easily by the elevational band in which they are located. Each site name includes
+#' the elevation in m.
 #'
 #' The following functions summarise the visits to each site, then calculate observation and species
 #' summary across the <em>sites</em> visited.
@@ -168,7 +169,7 @@ get_number_species_site <- function(observations) {
 
   number_species_site <- observations %>%
     distinct(site_elevation, species) %>%
-    group_by(site_elevation) %>%
+    group_by(site_elevation, .drop=FALSE) %>%
     summarise("number_species" = n())
 
   return(number_species_site)
@@ -208,7 +209,7 @@ get_number_surveys_site <- function(observations) {
 
   number_surveys_site <- observations %>%
     distinct(site_elevation, date_cest, method) %>%
-    group_by(site_elevation, method) %>%
+    group_by(site_elevation, method, .drop=FALSE) %>%
     summarise("number_surveys" = n())
 
   return(number_surveys_site)
@@ -246,9 +247,12 @@ join_site_summary_data <- function(number_visits, number_observations, number_sp
 
   joined_visits <- full_join(transect_lengths, number_visits, by = "site_elevation")
   joined_visits_surveys <- full_join(joined_visits, site_survey_summary, by = "site_elevation")
-  joined_visits_observations <- full_join(joined_visits_surveys, number_observations, by = "site_elevation")
+  joined_visits_observations <- full_join(joined_visits_surveys, number_observations,
+                                          by = "site_elevation")
   joined_visits_observations_species <- full_join(joined_visits_observations, number_species,
                                                   by = "site_elevation")
+
+  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "number_species")
 
   return(joined_visits_observations_species)
 }
