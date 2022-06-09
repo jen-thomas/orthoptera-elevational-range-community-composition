@@ -25,15 +25,15 @@ get_packages(vector_packages)
 #' Join the site data with observations and create new site name which contains the elevation and
 #' survey area.
 
-rename_site_with_elevation <- function(observations_df) {
+rename_site_with_elevation <- function(dataframe) {
     #' Create a new site name within the dataframe which includes the elevation so that it is more useful
     #' when including it in analyses and figures.
-    #' 
+    #'
     #' Return dataframe with the additional column.
 
-  observations_df$site_elevation <- paste(observations_df$elevational_band_m,
-                                         observations_df$site_name, sep = "_")
-  return(observations_df)
+  dataframe$site_elevation <- paste(dataframe$elevational_band_m,
+                                         dataframe$site_name, sep = "_")
+  return(dataframe)
 }
 
 get_study_area <- function(sites_df) {
@@ -76,6 +76,20 @@ join_observation_site <- function(observations_df, sites_df) {
   observations <- rename_site_with_elevation(observations)
 
   return(observations)
+}
+
+join_site_survey <- function(sites_df, surveys_df) {
+  #' Merge the site data onto the survey dataframe (there are more surveys than sites).
+  #'
+  #' Return a dataframe with both sets of data and new site name column.
+
+  sites_surveys <- (merge(x = surveys_df, y = sites_df, by = "site_name", all.x=TRUE))[,
+    c("area", "site_name", "elevational_band_m", "transect_length_m", "date_cest", "method",
+      "cloud_coverage_start", "wind_start", "rain_start", "cloud_coverage_end", "wind_end", "rain_end")]
+
+  sites_surveys <- rename_site_with_elevation(sites_surveys)
+
+  return(sites_surveys)
 }
 
 #' ### Create summaries of observation data

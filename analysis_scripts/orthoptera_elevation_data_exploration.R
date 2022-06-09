@@ -28,6 +28,8 @@ observations <- import_all_observations(observations_file, sites_file)
 sites_df <- read_csv_data_file(sites_file)
 surveys_df <- read_csv_data_file(surveys_file)
 
+site_survey_df <- join_site_survey(sites_df, surveys_df)
+
 #' ### Subset observations identified to species
 #'
 #' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
@@ -138,14 +140,14 @@ get_species_summary_overview(confirmed_observations_species)
 #' The following functions summarise the visits to each site, then calculate observation and species
 #' summary across the <em>sites</em> visited.
 
-get_number_visits_site <- function(surveys) {
+get_number_visits_site <- function(site_survey_df) {
   #' Get the survey data frame and group it by site name and date.
   #'
   #' Return the number of visits to each site.
 
-  number_visits_site <- surveys %>%
-    distinct(site_name, date_cest) %>%
-    group_by(site_name) %>%
+  number_visits_site <- site_survey_df %>%
+    distinct(site_elevation, date_cest) %>%
+    group_by(site_elevation) %>%
     summarise("number_visits" = n())
 
   return(number_visits_site)
@@ -157,9 +159,9 @@ get_number_observations_site <- function(observations) {
   #' Return number of observations at each site.
 
   number_observations_site <- observations %>%
-    distinct(site_name, site_elevation, specimen_label) %>% # account for multiple identifications for a finalised
+    distinct(site_elevation, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
-    group_by(site_name, site_elevation) %>%
+    group_by(site_elevation) %>%
     summarise("number_observations" = n())
 
   return(number_observations_site)
@@ -171,8 +173,8 @@ get_number_species_site <- function(observations) {
   #' Return the number of species seen at each site.
 
   number_species_site <- observations %>%
-    distinct(site_name, site_elevation, species) %>%
-    group_by(site_name, site_elevation, .drop=FALSE) %>%
+    distinct(site_elevation, species) %>%
+    group_by(site_elevation, .drop=FALSE) %>%
     summarise("number_species" = n())
 
   return(number_species_site)
@@ -191,25 +193,25 @@ get_species_summary_site <- function(observations) {
   return(species_summary)
 }
 
-get_transect_lengths <- function(sites) {
+get_transect_lengths <- function(site_survey_df) {
   #' Get the transect length for each site.
   #'
   #' Return a data frame with the transect length for each site.
 
-  transect_lengths_sites <- select(sites, site_name, transect_length_m)
+  transect_lengths_sites <- select(site_survey_df, site_elevation, transect_length_m)
 
   return(transect_lengths_sites)
 }
 
-get_number_surveys_site <- function(surveys) {
+get_number_surveys_site <- function(site_survey_df) {
   #' Get surveys dataframe and group it by site, date, method and repeat to get the number of surveys
   #' done at each site.
   #'
   #' Return data frame of this summary.
 
-  number_surveys_site <- surveys %>%
-    distinct(site_name, date_cest, method) %>%
-    group_by(site_name, method, .drop=FALSE) %>%
+  number_surveys_site <- site_survey_df %>%
+    distinct(site_elevation, date_cest, method) %>%
+    group_by(site_elevation, method, .drop=FALSE) %>%
     summarise("number_surveys" = n())
 
   return(number_surveys_site)
@@ -221,8 +223,8 @@ get_number_hand_surveys <- function(number_surveys_site) {
   #' Return dataframe with site and number of hand surveys.
 
   number_hand_surveys_site <- filter(number_surveys_site, method == "Hand")
-  subset_hand_surveys <- subset(number_hand_surveys_site, select = c("site_name", "number_surveys"))
-  names(subset_hand_surveys) <- c("site_name", "number_hand_surveys")
+  subset_hand_surveys <- subset(number_hand_surveys_site, select = c("site_elevation", "number_surveys"))
+  names(subset_hand_surveys) <- c("site_elevation", "number_hand_surveys")
 
   return(subset_hand_surveys)
 }
@@ -233,8 +235,8 @@ get_number_net_surveys <- function(number_surveys_site) {
   #' Return dataframe with site and number of net surveys.
 
   number_net_surveys_site <- filter(number_surveys_site, method == "Net")
-  subset_net_surveys <- subset(number_net_surveys_site, select = c("site_name", "number_surveys"))
-  names(subset_net_surveys) <- c("site_name", "number_net_surveys")
+  subset_net_surveys <- subset(number_net_surveys_site, select = c("site_elevation", "number_surveys"))
+  names(subset_net_surveys) <- c("site_elevation", "number_net_surveys")
 
   return(subset_net_surveys)
 }
@@ -245,12 +247,12 @@ join_site_summary_data <- function(number_visits, number_observations, number_sp
   #'
   #' Return the data frame of the joined data.
 
-  joined_visits <- full_join(transect_lengths, number_visits, by = "site_name")
-  joined_visits_surveys <- full_join(joined_visits, site_survey_summary, by = "site_name")
+  joined_visits <- full_join(transect_lengths, number_visits, by = "site_elevation")
+  joined_visits_surveys <- full_join(joined_visits, site_survey_summary, by = "site_elevation")
   joined_visits_observations <- full_join(joined_visits_surveys, number_observations,
-                                          by = "site_name")
+                                          by = "site_elevation")
   joined_visits_observations_species <- full_join(joined_visits_observations, number_species,
-                                                  by = "site_name")
+                                                  by = "site_elevation")
 
   joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "number_species")
   joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "number_observations")
@@ -259,17 +261,17 @@ join_site_summary_data <- function(number_visits, number_observations, number_sp
   return(joined_visits_observations_species)
 }
 
-get_site_survey_summary_data <- function(observations, surveys) {
+get_site_survey_summary_data <- function(site_survey_df) {
   #' Get the number of hand and net surveys for each site and join them into a dataframe.
   #'
   #' Return a dataframe of the site and number of hand and net surveys.
 
-  number_surveys_site <- get_number_surveys_site(surveys)
+  number_surveys_site <- get_number_surveys_site(site_survey_df)
   number_hand_surveys_site <- get_number_hand_surveys(number_surveys_site)
   number_net_surveys_site <- get_number_net_surveys(number_surveys_site)
 
   joined_survey_data <- full_join(number_hand_surveys_site, number_net_surveys_site,
-                                  by = "site_name")
+                                  by = "site_elevation")
 
   return(joined_survey_data)
 }
@@ -279,12 +281,12 @@ get_site_survey_summary_data <- function(observations, surveys) {
 #' species only considers those observations that have been identified to species).
 
 
-number_visits_site <- get_number_visits_site(surveys_df)
+number_visits_site <- get_number_visits_site(site_survey_df)
 number_observations_site <- get_number_observations_site(observations)
 number_species_site <- get_number_species_site(confirmed_observations_species)
-transect_lengths <- get_transect_lengths(sites_df)
+transect_lengths <- get_transect_lengths(site_survey_df)
 
-site_survey_summary <- get_site_survey_summary_data(observations, surveys_df)
+site_survey_summary <- get_site_survey_summary_data(site_survey_df)
 joined_survey_summary_data <- join_site_summary_data(number_visits_site, number_observations_site, number_species_site,
                        transect_lengths, site_survey_summary)
 joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
