@@ -14,7 +14,7 @@
 source("utils.R")
 source("orthoptera_elevation_data_exploration.R")
 
-vector_packages <- c("visreg", "ggplot2", "lme4")
+vector_packages <- c("visreg", "ggplot2", "lmerTest")
 get_packages(vector_packages)
 
 #' ## Change log
@@ -241,7 +241,8 @@ species_richness_study_areas <- left_join(species_richness_sites, sites_study_ar
                                           suffix = c("_x", "_y"))
 species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation",
                                        "area", "species_richness", "elevational_band_m_x"))
-as.factor(species_richness_study_area_details$area) # make sure that area is considered as a factor
+species_richness_study_area_details$area <- as.factor(species_richness_study_area_details$area) # make
+# sure that area is considered as a factor
 
 #' Plot species richness against elevation again, but look to see if there is any difference that could be
 #' explained by the sites being in different study areas.
@@ -253,8 +254,19 @@ plot_elevation_species_richness_area(species_richness_study_area_details)
 
 #' Fit a linear mixed model, treating the study area as a factor variable.
 
-lin_mixed_model <- lmer(species_richness ~ elevational_band_m_x + (1|area), data = species_richness_study_area_details)
-summary(lin_mixed_model)
+lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m_x + (1|area),
+                                       data = species_richness_study_area_details)
+summary(lmm_species_richness_elev_area)
+
+plot(lmm_species_richness_elev_area)
+qqnorm(resid(lmm_species_richness_elev_area))
+qqline(resid(lmm_species_richness_elev_area))
+
+#' The plot of the residuals doesn't show an obvious pattern. It might be possible to discern a slight
+#' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
+#' outlier in both plots.
+
+anova(lmm_species_richness_elev_area)
 
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species
