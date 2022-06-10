@@ -139,7 +139,11 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
 
 #' ### Correlation
-#' Do a correlation test between the species richness at each site and elevation. View the test
+#' Do a correlation test between the species richness at each site and elevation.
+#' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
+#' <br>H<sub>1</sub>: the correlation coefficient is different from 0.
+#'
+#' View the test
 corr_test <- correlation_test(species_richness_sites, "elevational_band_m",
                                                 "species_richness")
 corr_coeff <- corr_test$estimate
@@ -154,7 +158,7 @@ print(coeff_det)
 #' elevation (<em>r</em> = -0.56, <em>t<sub>26</sub></em> = -3.43, <em>p</em> = 0.002), however only
 #' 31% of the variation of species richness is explained by the elevation.
 #'
-#' <br>Plot species richness against elevation.
+#' ### Plot species richness against elevation.
 
 plot_elevation_species_richness(species_richness_sites)
 
@@ -182,6 +186,9 @@ plot_elevation_species_richness(species_richness_sites)
 linear_regression_species_richness <- linear_regression(species_richness_sites, "species_richness", "elevational_band_m")
 summary(linear_regression_species_richness)
 
+#' The linear regression shows that both the intercept and slope are statistically significant. Species
+#' richness decreases by 3.8 with every increase of 1000 m of elevation (<em>t</em> = -3.4, <em>p</em> = 0.002).
+#'
 #' ### Checking the assumptions of linear regression
 
 #' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
@@ -199,13 +206,13 @@ plot(linear_regression_species_richness)
 #' satisfied.
 #' * <em>normally-distributed residuals</em>: the residuals appear to have a normal distribution (Q-Q plot
 #' above) in general, but the point which corresponds to the highest species richness at 2000m, seems to
-#' be a bit of an outlier, skewing the distribution somewhat. TODO: try refitting the model without this
-#' data point (only if this is still an outlier when other observations are included).
+#' be a bit of an outlier, skewing the distribution somewhat.
 #' </ul>
 #'
 #' ### Plot linear regression
 #' Plot the data points with 95% CI, the linear model and the upper and lower bounds of the predicted
 #' values.
+#+ message=FALSE, warning=FALSE
 
 plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
 
@@ -231,21 +238,29 @@ species_richness_study_area_details <- subset_data_frame(species_richness_study_
 species_richness_study_area_details$area <- as.factor(species_richness_study_area_details$area) # make
 # sure that area is considered as a factor
 
-#' Plot species richness against elevation again, but look to see if there is any difference that could be
-#' explained by the sites being in different study areas.
+#' Plot species richness against elevation again with different colours representing the different study
+#' areas to visualise and possible differences in the relationship which could depend on the study area.
 
 plot_elevation_species_richness_area(species_richness_study_area_details)
 
 #' Species richness at Tavascan and La Molinassa both show a general trend of decreasing species richness
 #' with elevation, but at Tor, there does not seem to be such a trend.
 
-#' Fit a linear mixed model, treating the study area as a factor variable.
+#' ### Fit a linear mixed model
+#' A linear mixed model will be fitted, treating study area as a fixed factor.
 
 lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m_x + (1|area),
                                        data = species_richness_study_area_details)
 summary(lmm_species_richness_elev_area)
 
+#'
+#' ### Plot linear mixed model
+
 plot(lmm_species_richness_elev_area)
+
+#'
+#' ### Test the assumptions of the linear mixed model
+
 qqnorm(resid(lmm_species_richness_elev_area))
 qqline(resid(lmm_species_richness_elev_area))
 
