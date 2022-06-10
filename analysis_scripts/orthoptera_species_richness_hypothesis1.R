@@ -187,7 +187,7 @@ linear_regression_species_richness <- linear_regression(species_richness_sites, 
 summary(linear_regression_species_richness)
 
 #' The linear regression shows that both the intercept and slope are statistically significant. Species
-#' richness decreases by 3.8 with every increase of 1000 m of elevation (<em>t</em> = -3.4, <em>p</em> = 0.002).
+#' richness decreases by 3.8 with an increase in elevation of 1000 m (<em>t</em> = -3.4, <em>p</em> = 0.002).
 #'
 #' ### Checking the assumptions of linear regression
 
@@ -248,11 +248,14 @@ plot_elevation_species_richness_area(species_richness_study_area_details)
 
 #' ### Fit a linear mixed model
 #' A linear mixed model will be fitted, treating study area as a fixed factor.
+#+ message=FALSE, warning=FALSE
 
 lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m_x + (1|area),
                                        data = species_richness_study_area_details)
 summary(lmm_species_richness_elev_area)
 
+#' TODO: I'm not sure at the moment why the variance and s.d. for the area (random effects) are 0 in this
+#' model output. I need to check this.
 #'
 #' ### Plot linear mixed model
 
