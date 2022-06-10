@@ -4,6 +4,7 @@
 #' output:
 #'   html_document:
 #'     toc: true
+#'     toc_depth: 3
 #'     theme: yeti
 #'     code_folding: hide
 #'     df_print: paged
@@ -227,7 +228,7 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 
 summary(linear_regression_species_richness)
 
-#' ### Linear mixed model to check for effect of study area
+#' ## Linear mixed model to check for effect of study area
 #'
 sites_df <- read_csv_data_file("../data/sites.csv")
 sites_study_area <- get_study_area(sites_df)
@@ -259,6 +260,9 @@ summary(lmm_species_richness_elev_area)
 
 #' The value of variance for area (random effects section) is 0 (or presumably just very small if only
 #' 3dp are used). I understand this can occur because of sampling error. TODO: check if this is important.
+#'
+#' I realise that I'm not sure how to interpret this output. The parameter estimates are the same as
+#' those in the model above. How does this output tell us that area is important?
 #'
 #' ### Plot linear mixed model
 
@@ -326,10 +330,16 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 
 #'
 #' ## Results
-#' A linear regression was used to investigate the relationship between elevation and species richness.
+#' A simple linear regression was used to investigate the relationship between elevation and species richness.
 #' Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
 #' = -0.56). Species richness was shown to decrease by 3.8 for an increase in elevation of 1000 m (<em>t</em> = -3.43; <em>p</em> = 0.002).
 #' However, only 31% of the variation in species richness can be explained by elevation (<em>F</em> = 11.74; <em>df</em> = 1, 27; <em>p</em> = 0.002).
 #'
-#' A linear mixed model fitting elevation as a fixed effect and study area as a random effect, was used to investigate if there was any
-#' effect of study site location on species richness.
+#' Looking at the plot of the species richness coloured by study area, there seems to be a strong decrease
+#' in species richness with elevation at both La Molinassa and Tavascan, but no change at Tor. A linear
+#' mixed model fitting elevation as a fixed effect and study area as a random effect, was used to
+#' investigate if there was any effect of study area on species richness. [TODO: add interpretation of
+#' this]. Given the effect of area on species richness, simple linear regressions were used to model the
+#' species richness with elevation within each study area separately. Whilst there was no relationship at Tor (<em>F</em> = 0.067; <em>df</em> = 1, 8; <em>p</em> = 0.80),
+#' a clear decrease in species richness with elevation can be seen at La Molinassa (<em>F</em> = 11.1; <em>df</em> = 1, 6; <em>p</em> = 0.02)
+#' and Tavascan (<em>F</em> = 304.5; <em>df</em> = 1, 5; <em>p</em> < 0.01).
