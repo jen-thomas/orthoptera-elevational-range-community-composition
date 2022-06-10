@@ -122,7 +122,7 @@ plot_linear_regression_species_richness <- function(dataframe, linear_regression
 plot_elevation_species_richness_area <- function(dataframe) {
   #' Plot the species richness against elevation band. Colour by the study area.
 
-  ggplot(dataframe, aes(x = elevational_band_m_x, y = species_richness, colour = area)) +
+  ggplot(dataframe, aes(x = elevational_band_m, y = species_richness, colour = area)) +
     geom_point(size = 2) +
     labs(x = "Elevation (m a.s.l)", y = "Species richness") +
     theme_classic()
@@ -235,6 +235,8 @@ species_richness_study_areas <- left_join(species_richness_sites, sites_study_ar
                                           suffix = c("_x", "_y"))
 species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation",
                                        "area", "species_richness", "elevational_band_m_x"))
+colnames(species_richness_study_area_details)[colnames(species_richness_study_area_details) ==
+                                                "elevational_band_m_x"] <- "elevational_band_m"
 species_richness_study_area_details$area <- as.factor(species_richness_study_area_details$area) # make
 # sure that area is considered as a factor
 
@@ -245,17 +247,17 @@ plot_elevation_species_richness_area(species_richness_study_area_details)
 
 #' Species richness at Tavascan and La Molinassa both show a general trend of decreasing species richness
 #' with elevation, but at Tor, there does not seem to be such a trend.
-
+#'
 #' ### Fit a linear mixed model
-#' A linear mixed model will be fitted, treating study area as a fixed factor.
+#' A linear mixed model will be fitted, treating study area as a random factor.
 #+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m_x + (1|area),
+lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m + (1|area),
                                        data = species_richness_study_area_details)
 summary(lmm_species_richness_elev_area)
 
-#' TODO: I'm not sure at the moment why the variance and s.d. for the area (random effects) are 0 in this
-#' model output. I need to check this.
+#' The value of variance for area (random effects section) is 0 (or presumably just very small if only
+#' 3dp are used). I understand this can occur because of sampling error. TODO: check if this is important.
 #'
 #' ### Plot linear mixed model
 
@@ -270,8 +272,13 @@ qqline(resid(lmm_species_richness_elev_area))
 #' The plot of the residuals doesn't show an obvious pattern. It might be possible to discern a slight
 #' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
 #' outlier in both plots.
+#'
+#' ### Test the difference between the fixed effects (elevation)
 
 anova(lmm_species_richness_elev_area)
+
+#' Using ANOVA, a significant difference in species richness was found between the different elevational
+#' bands (<em>F</em>).
 
 #' ## Species richness and elevation within study areas
 #' Given the differences between Tor and the other two study areas, La Molinassa and Tavascan, a linear
@@ -286,11 +293,11 @@ anova(lmm_species_richness_elev_area)
 #' #### Tor
 #+ message=FALSE, warning=FALSE
 
-area_tor <- "TOR"
+species_richness_tor <- species_richness_study_area_details[species_richness_study_area_details$
+                                                              area == "Tor", ]
 
-species_richness_tor <- subset_data_area(species_richness_sites, area_tor)
-
-lin_reg_species_richness_area_tor <- linear_regression(species_richness_tor, "species_richness", "elevational_band_m")
+lin_reg_species_richness_area_tor <- linear_regression(species_richness_tor,
+                                                       "species_richness", "elevational_band_m")
 summary(lin_reg_species_richness_area_tor)
 
 plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_richness_area_tor)
@@ -298,11 +305,11 @@ plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_ri
 #' #### La Molinassa
 #+ message=FALSE, warning=FALSE
 
-area_molinassa <- "MOL"
+species_richness_mol <- species_richness_study_area_details[species_richness_study_area_details$
+                                                              area == "La Molinassa", ]
 
-species_richness_mol <- subset_data_area(species_richness_sites, area_molinassa)
-
-lin_reg_species_richness_area_mol <- linear_regression(species_richness_mol, "species_richness", "elevational_band_m")
+lin_reg_species_richness_area_mol <- linear_regression(species_richness_mol,
+                                                       "species_richness", "elevational_band_m")
 summary(lin_reg_species_richness_area_mol)
 
 plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_richness_area_mol)
@@ -310,11 +317,11 @@ plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_ri
 #' #### Tavascan
 #+ message=FALSE, warning=FALSE
 
-area_tavascan <- "TAV"
+species_richness_tav <- species_richness_study_area_details[species_richness_study_area_details$
+                                                              area == "Tavascan", ]
 
-species_richness_tav <- subset_data_area(species_richness_sites, area_tavascan)
-
-lin_reg_species_richness_area_tav <- linear_regression(species_richness_tav, "species_richness", "elevational_band_m")
+lin_reg_species_richness_area_tav <- linear_regression(species_richness_tav,
+                                                       "species_richness", "elevational_band_m")
 summary(lin_reg_species_richness_area_tav)
 
 plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_richness_area_tav)
@@ -325,6 +332,9 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species
-#' richness. Species richness and elevation were negatively correlated (Pearson's correlation coefficient
-#' = -0.54). Species richness was shown to decrease by four for an increase in elevation of 1000 m (<em>t</em> = -3.31, <em>p</em> = 0.003).
-#' However, only 29% of the variation in species richness can be explained by elevation (<em>R<sup>2</sup></em> = 0.29, <em>F</em><sub>(1,27)</sub> = 10.95, <em>p</em> = 0.003).
+#' richness. Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
+#' = -0.56). Species richness was shown to decrease by 3.8 for an increase in elevation of 1000 m (<em>t</em> = -3.43, <em>p</em> = 0.002).
+#' However, only 31% of the variation in species richness can be explained by elevation (<em>F</em><sub>(1,27)</sub> = 11.74, <em>p</em> = 0.002).
+#'
+#' A linear mixed model with the study area as a random factor, was used to investigate if there was any
+#' effect of study site location on species richness.
