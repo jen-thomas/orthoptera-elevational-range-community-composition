@@ -73,14 +73,14 @@ plot_model_residuals <- function(model, dataframe, explanatory_variable) {
   abline(h=0)
 }
 
-calculate_correlation_coefficient <- function(dataframe, para1, para2) {
+correlation_test <- function(dataframe, para1, para2) {
   #' Calculate the correlation coefficient between two variables.
   #'
   #' Return the coefficient.
 
-  corr_coeff <- cor(x = dataframe[[para1]], y = dataframe[[para2]])
+  corr_test <- cor.test(x = dataframe[[para1]], y = dataframe[[para2]])
 
-  return(corr_coeff)
+  return(corr_test)
 }
 
 calculate_coefficient_of_determination <- function(correlation_coefficient) {
@@ -128,30 +128,31 @@ plot_elevation_species_richness_area <- function(dataframe) {
     theme_classic()
 }
 
-#' ### Calculate species richness.
+#' ### Calculate species richness
 #'
 #' Calculate species richness for each elevation band. For now, only consider identifications that are to
-#' species (there were none that were to a higher taxonomic level which could be considered a separate
-#' species unless we consider each site or elevation band separately - TODO).
-#'
-#' Replace NA values of species richness with 0.
+#' species. TODO: do the same analysis when I have the full set of identifications which will include
+#' those that are to a higher taxnomic level.
 
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
 
 species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
 
 #' ### Correlation
-#' Calculate the correlation coefficient
-corr_coeff <- calculate_correlation_coefficient(species_richness_sites, "elevational_band_m",
+#' Do a correlation test between the species richness at each site and elevation. View the test
+corr_test <- correlation_test(species_richness_sites, "elevational_band_m",
                                                 "species_richness")
-print(corr_coeff)
+corr_coeff <- corr_test$estimate
+print(corr_test)
 
-#' <br>and the coefficient of determination (R<sup>2</sup>).
+#' <br>and calculate the coefficient of determination (R<sup>2</sup>).
 coeff_det <- calculate_coefficient_of_determination(corr_coeff)
 print(coeff_det)
 
-#' <br>These values confirm that there is a negative correlation between species richness and elevation,
-#' however only 29% of the variation of species richness is explained by the elevation.
+#' <br>The relationship between species richness and elevation was tested using a Pearson's correlation.
+#' There was evidence to suggest a significant negative relationship between species richness and
+#' elevation (<em>r</em> = -0.56, <em>t<sub>26</sub></em> = -3.43, <em>p</em> = 0.002), however only
+#' 31% of the variation of species richness is explained by the elevation.
 #'
 #' <br>Plot species richness against elevation.
 
