@@ -193,6 +193,7 @@ summary(linear_regression_species_richness)
 
 #' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
 plot_model_residuals(linear_regression_species_richness, species_richness_sites, "elevational_band_m")
+par(mfrow = c(2,2))
 plot(linear_regression_species_richness)
 
 #' <br>Comments about assumptions:
@@ -323,11 +324,12 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 
 #' TODO: I'll put the above plots on one set of axes.
 
-#' ## Results
-#' A simple linear regression was used to investigate the relationship between elevation and species
-#' richness. Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
-#' = -0.56). Species richness was shown to decrease by 3.8 for an increase in elevation of 1000 m (<em>t</em> = -3.43, <em>p</em> = 0.002).
-#' However, only 31% of the variation in species richness can be explained by elevation (<em>F</em><sub>(1,27)</sub> = 11.74, <em>p</em> = 0.002).
 #'
-#' A linear mixed model with the study area as a random factor, was used to investigate if there was any
+#' ## Results
+#' A linear regression was used to investigate the relationship between elevation and species richness.
+#' Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
+#' = -0.56). Species richness was shown to decrease by 3.8 for an increase in elevation of 1000 m (<em>t</em> = -3.43; <em>p</em> = 0.002).
+#' However, only 31% of the variation in species richness can be explained by elevation (<em>F</em> = 11.74; <em>df</em> = 1, 27; <em>p</em> = 0.002).
+#'
+#' A linear mixed model fitting elevation as a fixed effect and study area as a random effect, was used to investigate if there was any
 #' effect of study site location on species richness.
