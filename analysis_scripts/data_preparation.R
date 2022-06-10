@@ -134,3 +134,14 @@ replace_na_with_zero <- function(dataframe, column) {
   return(dataframe)
 }
 
+subset_data_area <- function(species_richness_sites_df, study_area) {
+  #' Subset the species richness at each site dataframe according to the study area. The study area will
+  #' be extracted from the string in the site_elevation.
+  #'
+  #' Return dataframe of just the sites within the study area.
+
+  species_richness_area <- species_richness_sites_df[str_detect(species_richness_sites_df$site_elevation,
+                                                                study_area), ]
+
+  return(species_richness_area)
+}

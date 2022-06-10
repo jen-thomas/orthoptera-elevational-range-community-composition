@@ -273,6 +273,56 @@ qqline(resid(lmm_species_richness_elev_area))
 
 anova(lmm_species_richness_elev_area)
 
+#' ## Species richness and elevation within study areas
+#' Given the differences between Tor and the other two study areas, La Molinassa and Tavascan, a linear
+#' regression will be used to look at the relationship between species richness and elevation at each of
+#' these sites separately.
+#'
+#' ### Linear regression
+
+#'  Run linear regression for each site separately. Ignore the two small sites which do not have an
+#' elevational gradient.
+#'
+#' #### Tor
+#+ message=FALSE, warning=FALSE
+
+area_tor <- "TOR"
+
+species_richness_tor <- subset_data_area(species_richness_sites, area_tor)
+
+lin_reg_species_richness_area_tor <- linear_regression(species_richness_tor, "species_richness", "elevational_band_m")
+summary(lin_reg_species_richness_area_tor)
+
+plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_richness_area_tor)
+
+#' #### La Molinassa
+#+ message=FALSE, warning=FALSE
+
+area_molinassa <- "MOL"
+
+species_richness_mol <- subset_data_area(species_richness_sites, area_molinassa)
+
+lin_reg_species_richness_area_mol <- linear_regression(species_richness_mol, "species_richness", "elevational_band_m")
+summary(lin_reg_species_richness_area_mol)
+
+plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_richness_area_mol)
+
+#' #### Tavascan
+#+ message=FALSE, warning=FALSE
+
+area_tavascan <- "TAV"
+
+species_richness_tav <- subset_data_area(species_richness_sites, area_tavascan)
+
+lin_reg_species_richness_area_tav <- linear_regression(species_richness_tav, "species_richness", "elevational_band_m")
+summary(lin_reg_species_richness_area_tav)
+
+plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_richness_area_tav)
+
+#' ### Plot linear regression
+
+#' TODO: I'll put the above plots on one set of axes.
+
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species
 #' richness. Species richness and elevation were negatively correlated (Pearson's correlation coefficient
