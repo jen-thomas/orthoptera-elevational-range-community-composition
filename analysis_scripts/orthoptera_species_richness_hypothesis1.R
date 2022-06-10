@@ -272,13 +272,6 @@ qqline(resid(lmm_species_richness_elev_area))
 #' The plot of the residuals doesn't show an obvious pattern. It might be possible to discern a slight
 #' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
 #' outlier in both plots.
-#'
-#' ### Test the difference between the fixed effects (elevation)
-
-anova(lmm_species_richness_elev_area)
-
-#' Using ANOVA, a significant difference in species richness was found between the different elevational
-#' bands (<em>F</em>).
 
 #' ## Species richness and elevation within study areas
 #' Given the differences between Tor and the other two study areas, La Molinassa and Tavascan, a linear
