@@ -340,6 +340,10 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' mixed model fitting elevation as a fixed effect and study area as a random effect, was used to
 #' investigate if there was any effect of study area on species richness. [TODO: add interpretation of
 #' this]. Given the effect of area on species richness, simple linear regressions were used to model the
-#' species richness with elevation within each study area separately. Whilst there was no relationship at Tor (<em>F</em> = 0.067; <em>df</em> = 1, 8; <em>p</em> = 0.80),
-#' a clear decrease in species richness with elevation can be seen at La Molinassa (<em>F</em> = 11.1; <em>df</em> = 1, 6; <em>p</em> = 0.02)
-#' and Tavascan (<em>F</em> = 304.5; <em>df</em> = 1, 5; <em>p</em> < 0.01).
+#' species richness with elevation within each study area separately. Whilst there was no relationship at Tor (<em>F</em> = 0.067; <em>df</em> = 1, 8; <em>R</em> = 0.09; <em>p</em> = 0.80),
+#' a clear decrease in species richness with elevation can be seen at La Molinassa (<em>F</em> = 11.1; <em>df</em> = 1, 6; <em>R</em> = 0.81; <em>p</em> = 0.02)
+#' and Tavascan (<em>F</em> = 304.5; <em>df</em> = 1, 5; <em>R</em> = 0.99; <em>p</em> < 0.01).
+#'
+#' Questions:
+#' 1: I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.
+#' 2: to calculate <em>R</em> which is included in the last part of the results section above where we report the relationships for the areas separately, I have used the multiple R-squared (rather than adjusted R-squared) output because I understand that we are not adjusting for the number of predictors in the model. Is this correct?
