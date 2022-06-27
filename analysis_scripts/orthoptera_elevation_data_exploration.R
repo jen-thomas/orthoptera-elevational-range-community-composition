@@ -140,6 +140,17 @@ get_species_summary_overview(confirmed_observations_species)
 #' The following functions summarise the visits to each site, then calculate observation and species
 #' summary across the sites visited.
 
+get_number_sites_area <- function(site_survey_df) {
+  #' Get the number of sites visited in each survey area.
+  #'
+  #' Return the number of sites within each area.
+
+  number_sites_area <- site_survey_df %>%
+    distinct(area, site_name) %>%
+    group_by(area) %>%
+    summarise("number_visits" = n())
+}
+
 get_number_visits_site <- function(site_survey_df) {
   #' Get the survey data frame and group it by site name and date.
   #'
@@ -279,6 +290,12 @@ get_site_survey_summary_data <- function(site_survey_df) {
 
   return(joined_survey_data)
 }
+
+#' <br>Summarise the number of sites within each study area and get the minimum and maximum elevations
+#' surveyed within each survey area.
+
+number_sites_area <- get_number_sites_area(site_survey_df)
+print(number_sites_area)
 
 #' <br>Summarise the number of visits to each site and how many observations were seen at each site during
 #' the whole season. Finally, add the number of species observed at each site (note that the number of
