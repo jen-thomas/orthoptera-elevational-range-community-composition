@@ -141,14 +141,16 @@ get_species_summary_overview(confirmed_observations_species)
 #' summary across the sites visited.
 
 get_number_sites_area <- function(site_survey_df) {
-  #' Get the number of sites visited in each survey area.
+  #' Get the number of sites visited in each survey area and calculate the minimum and maximum elevations
+  #' surveyed within each area.
   #'
-  #' Return the number of sites within each area.
+  #' Return the number of sites within each area and min and max elevations.
 
   number_sites_area <- site_survey_df %>%
-    distinct(area, site_name) %>%
+    distinct(area, site_name, elevational_band_m) %>%
     group_by(area) %>%
-    summarise("number_visits" = n())
+    summarise("number_visits" = n(), "minimum_elevation" = min(elevational_band_m),
+              "maximum_elevation" = max(elevational_band_m))
 }
 
 get_number_visits_site <- function(site_survey_df) {
@@ -308,8 +310,9 @@ number_species_site <- get_number_species_site(confirmed_observations_species)
 transect_lengths <- get_transect_lengths(site_survey_df)
 
 site_survey_summary <- get_site_survey_summary_data(site_survey_df)
-joined_survey_summary_data <- join_site_summary_data(number_visits_site, number_observations_site, number_species_site,
-                       transect_lengths, site_survey_summary)
+joined_survey_summary_data <- join_site_summary_data(number_visits_site, number_observations_site,
+                                                     number_species_site, transect_lengths,
+                                                     site_survey_summary)
 joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
 
 
