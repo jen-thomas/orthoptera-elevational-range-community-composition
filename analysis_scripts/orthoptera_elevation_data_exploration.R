@@ -31,15 +31,26 @@ site_survey_df <- join_site_survey(sites_df, surveys_df)
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 
 
-#' ### Subset observations identified to species
+#' ### Subset observations
 #'
 #' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
-#' identified to genus or as far as the key would allow to the choice of two taxa. All individuals were
-#' identified to the lowest taxonomic level possible.
+#' identified to genus or a higher taxonomic level due to hard-to-distinguish features or controdictory
+#' features. All specimens identified to one particular taxa had a "confirmed" identification.
 #'
-#' <br>In some parts of the analysis, only those observations identified to species will be used. Subset
-#' the observations to get only those that have been identified to species.
+#' In some cases, specimens could only be identified to one of a set of multiple taxa, for
+#' instance where contradictory features in the keys meant that they could be identified to one of two
+#' particular taxa. An identification was "finalised" when a specimen could be identified to a number of
+#' taxa.
+#'
+#' All specimens were identified to the lowest taxonomic level possible.
+#'
+#' <br>In some parts of the analysis, only those specimens identified to species will be used. The
+#' observations and identifications used will depend on the question being asked.
+#'
+#' In this section, the observations will be subset according to these different types of identification.
 
+confirmed_observations <- get_confirmed_observations(observations_sites_df)
+finalised_observations <- get_finalised_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
 #' ## Explore observation data
