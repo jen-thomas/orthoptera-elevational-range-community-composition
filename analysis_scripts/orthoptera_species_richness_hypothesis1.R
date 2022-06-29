@@ -329,6 +329,13 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' TODO: I'll put the above plots on one set of axes.
 
 #'
+#' ## Investigate effects of elevation on Caelifera species richness
+#' Only five species of Ensifera were detected during the surveys, so species richness relationships will
+#' be explored further just for the Caelifera.
+
+
+
+#'
 #' ## Results
 #' A simple linear regression was used to investigate the relationship between elevation and species richness.
 #' Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
@@ -344,7 +351,7 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' a clear decrease in species richness with elevation can be seen at La Molinassa (<em>F</em> = 11.1; <em>df</em> = 1, 6; <em>R</em> = 0.81; <em>p</em> = 0.02)
 #' and Tavascan (<em>F</em> = 304.5; <em>df</em> = 1, 5; <em>R</em> = 0.99; <em>p</em> < 0.01).
 #'
-#' Questions:
+#' ## Questions:
 #' 1: When reporting the decrease in species richness with elevation and variation explained (first paragraph of results above), should both t and F be reported? Should the p-value only be reported once?
 #' 2: I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.
 #' 3: to calculate <em>R</em> which is included in the last part of the results section above where we report the relationships for the areas separately, I have used the multiple R-squared (rather than adjusted R-squared) output because I understand that we are not adjusting for the number of predictors in the model. Is this correct?
