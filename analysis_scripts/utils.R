@@ -34,3 +34,13 @@ subset_data_frame <- function(dataframe, vector_columns) {
 
   return(subsetted_df)
 }
+
+replace_na_with_zero <- function(dataframe, column) {
+  #' Replace all NA values in a column with 0 (to be able to do calculations).
+  #'
+  #' Return dataframe.
+
+  dataframe[[column]] <- replace(dataframe[[column]], is.na(dataframe[[column]]),0)
+
+  return(dataframe)
+}

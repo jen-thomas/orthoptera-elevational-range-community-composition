@@ -49,11 +49,9 @@ get_study_area <- function(sites_df) {
   return(study_area_details)
 }
 
-
-
 join_observation_site <- function(observations_df, sites_df) {
     #' Join the observation, survey (some already with the observations) and site data frames using a left
-    #' join, to have the elevation of the sites with the other data.
+    #' join.
     #'
     #' Create a new column with a new site name in the format elevation_sitename, which will be more
     #' user-friendly in any outputs.
@@ -61,9 +59,9 @@ join_observation_site <- function(observations_df, sites_df) {
     #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-  c("specimen_label", "site_name", "elevational_band_m", "transect_length_m", "date_cest", "method",
-    "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence", "sex",
-    "stage")]
+  c("specimen_label", "area", "site_name", "elevational_band_m", "transect_length_m", "date_cest",
+    "method", "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence",
+    "sex", "stage")]
 
   observations <- rename_site_with_elevation(observations)
 
@@ -72,6 +70,9 @@ join_observation_site <- function(observations_df, sites_df) {
 
 join_site_survey <- function(sites_df, surveys_df) {
   #' Merge the site data onto the survey dataframe (there are more surveys than sites).
+  #'
+  #' Create a new column with a new site name in the format elevation_sitename, which will be more
+  #' user-friendly in any outputs.
   #'
   #' Return a dataframe with both sets of data and new site name column.
 
@@ -114,16 +115,6 @@ get_confirmed_observations_to_species <- function(observations_file, sites_file)
                                                         "Confirmed"),]
 
   return(confirmed_observations_species)
-}
-
-replace_na_with_zero <- function(dataframe, column) {
-  #' Replace all NA values in a column with 0 (to be able to do calculations).
-  #'
-  #' Return dataframe.
-
-  dataframe[[column]] <- replace(dataframe[[column]], is.na(dataframe[[column]]),0)
-
-  return(dataframe)
 }
 
 subset_data_area <- function(species_richness_sites_df, study_area) {
