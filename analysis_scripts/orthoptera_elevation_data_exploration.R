@@ -13,7 +13,7 @@
 source("data_preparation.R")
 source("utils.R")
 
-vector_packages <- c("fossil", "stringr", "dplyr")
+vector_packages <- c("fossil", "stringr", "dplyr", "plyr")
 get_packages(vector_packages)
 
 #' ## Prepare observation data
@@ -56,7 +56,7 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 
 #' ### Summarise all observations
 #'
-#' The following functions calculate and summarise the number of observations and taxa from all surveys.
+#' The following functions summarise the number of observations and taxa from all surveys.
 
 get_number_observations <- function(observations) {
   #' Get the total number of unique observations.
@@ -67,13 +67,62 @@ get_number_observations <- function(observations) {
   return(number_observations)
 }
 
-get_number_species <- function(observations) {
-  #' Get the total number of unique species observed. Use observations identified to species.
+get_unique_species <- function(observations) {
+  #' Get the unique species observed. Use observations identified to species.
 
   unique_species <- unique(observations[c("species")])
+
+  return(unique_species)
+}
+
+get_number_species <- function(unique_species) {
+  #' Get the number of unique species observed.
+
   number_species <- nrow(unique_species)
 
   return(number_species)
+}
+
+get_unique_taxa <- function(confirmed_observations, finalised_observations) {
+  #' Get the unique taxa observed.
+  #'
+  #' If the taxa is a species from a confirmed identification, these will all be counted separately. If
+  #' the taxa is a higher taxonomic level, then identifications that have already been selected, will be
+  #' checked to see if they will add to the taxa. For the finalised identifications, these will be checked
+  #' for each observation separately: for each observation, if all of the identifications are different to
+  #' those recorded from the confirmed identifications, then we can conclude that a different taxa has
+  #' been recorded. However, if only one of the finalised observation taxa is different, then we cannot
+  #' conclude this and the number of taxa recorded, will be conservative.
+
+  #' Get the number of taxa from the confirmed observations. First, get all of the distinct species and
+  #' create a dataframe from these.
+
+  confirmed_observations_tax_levels <- select(confirmed_observations, suborder, family, subfamily,
+                                              genus, species)
+  observations_species <- filter(confirmed_observations_tax_levels, species != "")
+
+  distinct_species <- distinct(observations_species)
+  taxa_df <- distinct_species
+
+  observations_genus <- filter(confirmed_observations_tax_levels, (genus != "") & (species == ""))
+  # distinct_genus <- distinct(observations_genus)
+  #
+  # matching_rows <- match_df(distinct_genus, distinct_species, c('suborder', 'family', 'subfamily', 'genus'))
+
+  in_genus_not_species <- anti_join(observations_genus, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  taxa_df <- rbind(taxa_df, in_genus_not_species)
+
+  observations_subfamily <- filter(confirmed_observations_tax_levels, (subfamily != "") & (genus == "") & (species == ""))
+  in_subfamily_not_taxa <- anti_join(observations_subfamily, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  taxa_df <- rbind(taxa_df, in_subfamily_not_taxa)
+
+  observations_family <- filter(confirmed_observations_tax_levels, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
+  in_family_not_taxa <- anti_join(observations_family, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  taxa_df <- rbind(taxa_df, in_family_not_taxa)
+
+  #' Check each set of finalised observations against those from the confirmed observations and add them
+  #' to the list.
+  return(taxa_df)
 }
 
 get_number_species_suborder <- function(observations) {
@@ -132,10 +181,12 @@ get_number_observations(observations_sites_df)
 get_number_observations(confirmed_observations_species)
 
 #' <br>The total number of species observed was
-get_number_species(confirmed_observations_species)
+unique_species <- get_unique_species(confirmed_observations_species)
+get_number_species(unique_species)
 
 #' <br>The total number of taxa observed was
-#' TODO
+unique_taxa <- get_unique_taxa(confirmed_observations, finalised_observations)
+print(unique_taxa)
 
 #' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
 #' species only takes into account those identified to species.
