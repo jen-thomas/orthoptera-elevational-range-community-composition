@@ -102,6 +102,17 @@ import_all_observations <- function(observations_file, sites_file) {
   return(observations_with_sites)
 }
 
+get_confirmed_observations <- function(observations_sites_df) {
+    #' Get all observations that have been confirmed, i.e. one identification per observation. Confirmed
+    #' identifications can be to any taxonomic level.
+    #'
+    #' Return a dataframe containing only confirmed observations.
+
+  confirmed_observations <- observations_sites_df[(observations_species$id_confidence == "Confirmed"),]
+
+  return(confirmed_observations)
+}
+
 get_confirmed_observations_to_species <- function(observations_sites_df) {
     #' Observations that have not been identified to species level are removed. Observations that could
     #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
