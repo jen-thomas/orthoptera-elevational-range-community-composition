@@ -59,7 +59,7 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 #' The following functions calculate and summarise the number of observations and taxa from all surveys.
 
 get_number_observations <- function(observations) {
-    #' Get the total number of unique observations.
+  #' Get the total number of unique observations.
 
   unique_observations <- unique(observations[c("specimen_label")])
   number_observations <- nrow(unique_observations)
@@ -68,7 +68,7 @@ get_number_observations <- function(observations) {
 }
 
 get_number_species <- function(observations) {
-    #' Get the total number of unique species observed. Use observations identified to species.
+  #' Get the total number of unique species observed. Use observations identified to species.
 
   unique_species <- unique(observations[c("species")])
   number_species <- nrow(unique_species)
@@ -77,9 +77,9 @@ get_number_species <- function(observations) {
 }
 
 get_number_species_suborder <- function(observations) {
-    #' Get the number of species observed within each suborder. Use observations identified to species.
-    #'
-    #' TODO consider changing this to taxa rather than species
+  #' Get the number of species observed within each suborder. Use observations identified to species.
+  #'
+  #' TODO consider changing this to taxa rather than species
 
   all_species_suborder <- observations %>%
     distinct(suborder, species) %>%
@@ -103,8 +103,8 @@ get_species_summary_overview <- function(observations) {
 }
 
 get_number_observations_suborder <- function(observations) {
-    #' Get the number of observations for each suborder. Use confirmed and finalised identifications.
-    #' They do not have to be to species level.
+  #' Get the number of observations for each suborder. Use confirmed and finalised identifications.
+  #' They do not have to be to species level.
 
   all_number_observations_suborder <- observations %>%
     distinct(suborder, specimen_label) %>% # account for multiple identifications for a finalised
