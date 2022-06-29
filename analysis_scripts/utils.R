@@ -24,3 +24,13 @@ read_csv_data_file <- function(file_path) {
 
   read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
 }
+
+subset_data_frame <- function(dataframe, vector_columns) {
+  #' Get a subset of a dataframe according to a vector of column names.
+  #'
+  #' Return the subsetted dataframe.
+
+  subsetted_df <- dataframe[, vector_columns]
+
+  return(subsetted_df)
+}

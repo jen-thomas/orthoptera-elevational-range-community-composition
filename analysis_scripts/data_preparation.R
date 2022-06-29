@@ -49,15 +49,7 @@ get_study_area <- function(sites_df) {
   return(study_area_details)
 }
 
-subset_data_frame <- function(dataframe, vector_columns) {
-  #' Get a subset of a dataframe according to a vector of column names.
-  #'
-  #' Return the subsetted dataframe.
 
-  subsetted_df <- dataframe[, vector_columns]
-
-  return(subsetted_df)
-}
 
 join_observation_site <- function(observations_df, sites_df) {
     #' Join the observation, survey (some already with the observations) and site data frames using a left
