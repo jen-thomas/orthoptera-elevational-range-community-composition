@@ -43,7 +43,7 @@ observations_sites_df <- import_all_observations(observations_file, sites_file)
 #'
 #' All specimens were identified to the lowest taxonomic level possible.
 #'
-#' <br>In some parts of the analysis, only those specimens identified to species will be used. The
+#' In some parts of the analysis, only those specimens identified to species will be used. The
 #' observations and identifications used will depend on the question being asked.
 #'
 #' In this section, the observations will be subset according to these different types of identification.
@@ -56,8 +56,7 @@ confirmed_observations_species <- get_confirmed_observations_to_species(observat
 
 #' ### Summarise all observations
 #'
-#' The following functions calculate and summarise the number of observations and species seen across all
-#' surveys.
+#' The following functions calculate and summarise the number of observations and taxa from all surveys.
 
 get_number_observations <- function(observations) {
     #' Get the total number of unique observations.

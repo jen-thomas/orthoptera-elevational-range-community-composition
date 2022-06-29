@@ -108,7 +108,7 @@ get_confirmed_observations <- function(observations_sites_df) {
   #'
   #' Return a dataframe containing only confirmed observations.
 
-  confirmed_observations <- observations_sites_df[(observations_species$id_confidence == "Confirmed"),]
+  confirmed_observations <- observations_sites_df[(observations_sites_df$id_confidence == "Confirmed"),]
 
   return(confirmed_observations)
 }
@@ -119,7 +119,7 @@ get_finalised_observations <- function(observations_sites_df) {
   #'
   #' Return a dataframe containing only finalised observations.
 
-  finalised_observations <- observations_sites_df[(observations_species$id_confidence == "Finalised"),]
+  finalised_observations <- observations_sites_df[(observations_sites_df$id_confidence == "Finalised"),]
 
   return(finalised_observations)
 }
@@ -132,7 +132,7 @@ get_confirmed_observations_to_species <- function(observations_sites_df) {
   #' Return a dataframe with only confirmed observations to species.
 
   observations_species <- observations_sites_df[!(observations_sites_df$species == ""),]
-  confirmed_observations_species <- observations_species[(observations_species$id_confidence ==
+  confirmed_observations_species <- observations_sites_df[(observations_sites_df$id_confidence ==
                                                         "Confirmed"),]
 
   return(confirmed_observations_species)
