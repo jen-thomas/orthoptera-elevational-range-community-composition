@@ -53,7 +53,17 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
 #' site-species matrix. Site name is in the format altitude(m)_site where the name is an
 #' abbreviation of the study area.
 
-confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
+observations_file <- "../data/observations.csv"
+sites_file <- "../data/sites.csv"
+surveys_file <- "../data/surveys.csv"
+
+sites_df <- read_csv_data_file(sites_file)
+surveys_df <- read_csv_data_file(surveys_file)
+site_survey_df <- join_site_survey(sites_df, surveys_df)
+
+observations_sites_df <- import_all_observations(observations_file, sites_file)
+
+confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
 site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
 head(site_species_matrix)

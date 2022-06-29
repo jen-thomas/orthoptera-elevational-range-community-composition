@@ -24,11 +24,12 @@ observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
 surveys_file <- "../data/surveys.csv"
 
-observations <- import_all_observations(observations_file, sites_file)
 sites_df <- read_csv_data_file(sites_file)
 surveys_df <- read_csv_data_file(surveys_file)
-
 site_survey_df <- join_site_survey(sites_df, surveys_df)
+
+observations_sites_df <- import_all_observations(observations_file, sites_file)
+
 
 #' ### Subset observations identified to species
 #'
@@ -39,7 +40,7 @@ site_survey_df <- join_site_survey(sites_df, surveys_df)
 #' <br>In some parts of the analysis, only those observations identified to species will be used. Subset
 #' the observations to get only those that have been identified to species.
 
-confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
+confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
 #' ## Explore observation data
 
@@ -111,7 +112,7 @@ join_suborder_summary_data <- function(number_observations, number_species) {
 }
 
 #' <br>The total number of observations was
-get_number_observations(observations)
+get_number_observations(observations_sites_df)
 
 #' <br>The total number of observations identified to species was
 get_number_observations(confirmed_observations_species)
@@ -121,7 +122,7 @@ get_number_species(confirmed_observations_species)
 
 #' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
 #' species only takes into account those identified to species.
-number_observations_suborder <- get_number_observations_suborder(observations)
+number_observations_suborder <- get_number_observations_suborder(observations_sites_df)
 number_species_suborder <- get_number_species_suborder(confirmed_observations_species)
 
 join_suborder_summary_data(number_observations_suborder, number_species_suborder)
@@ -305,7 +306,7 @@ print(number_sites_area)
 
 #+ message=FALSE, warning=FALSE
 number_visits_site <- get_number_visits_site(site_survey_df)
-number_observations_site <- get_number_observations_site(observations)
+number_observations_site <- get_number_observations_site(observations_sites_df)
 number_species_site <- get_number_species_site(confirmed_observations_species)
 transect_lengths <- get_transect_lengths(site_survey_df)
 

@@ -135,9 +135,19 @@ plot_elevation_species_richness_area <- function(dataframe) {
 #' species. TODO: do the same analysis when I have the full set of identifications which will include
 #' those that are to a higher taxnomic level.
 
-confirmed_observations_species <- get_confirmed_observations_to_species(observations_file, sites_file)
+observations_file <- "../data/observations.csv"
+sites_file <- "../data/sites.csv"
+surveys_file <- "../data/surveys.csv"
 
-species_richness_sites <- calculate_species_richness_sites(observations, confirmed_observations_species)
+sites_df <- read_csv_data_file(sites_file)
+surveys_df <- read_csv_data_file(surveys_file)
+site_survey_df <- join_site_survey(sites_df, surveys_df)
+
+observations_sites_df <- import_all_observations(observations_file, sites_file)
+
+confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
+
+species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations_species)
 
 #' ### Correlation
 #' Do a correlation test between the species richness at each site and elevation.

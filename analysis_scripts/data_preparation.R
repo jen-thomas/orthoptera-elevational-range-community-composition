@@ -102,20 +102,21 @@ import_all_observations <- function(observations_file, sites_file) {
   return(observations_with_sites)
 }
 
-get_confirmed_observations_to_species <- function(observations_file, sites_file) {
+get_confirmed_observations_to_species <- function(observations_sites_df) {
     #' Observations that have not been identified to species level are removed. Observations that could
     #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
     #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
     #'
     #' Return a dataframe with only confirmed observations to species.
 
-  observations_df <- import_all_observations(observations_file, sites_file)
-  observations_species <- observations_df[!(observations_df$species == ""),]
+  observations_species <- observations_sites_df[!(observations_sites_df$species == ""),]
   confirmed_observations_species <- observations_species[(observations_species$id_confidence ==
                                                         "Confirmed"),]
 
   return(confirmed_observations_species)
 }
+
+#' ### Create summaries of species richness data
 
 subset_data_area <- function(species_richness_sites_df, study_area) {
   #' Subset the species richness at each site dataframe according to the study area. The study area will
