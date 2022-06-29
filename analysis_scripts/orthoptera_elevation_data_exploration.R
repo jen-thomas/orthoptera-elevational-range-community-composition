@@ -30,7 +30,6 @@ site_survey_df <- join_site_survey(sites_df, surveys_df)
 
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 
-
 #' ### Subset observations
 #'
 #' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
@@ -80,6 +79,8 @@ get_number_species <- function(observations) {
 
 get_number_species_suborder <- function(observations) {
     #' Get the number of species observed within each suborder. Use observations identified to species.
+    #'
+    #' TODO consider changing this to taxa rather than species
 
   all_species_suborder <- observations %>%
     distinct(suborder, species) %>%
@@ -93,6 +94,7 @@ get_species_summary_overview <- function(observations) {
   #' Get a list of the species seen across all the surveys.
   #'
   #' Return a dataframe of the species seen.
+  #' TODO change this to all taxa rather than species
 
   species_summary <- observations %>%
     distinct(species) %>%
@@ -116,6 +118,8 @@ get_number_observations_suborder <- function(observations) {
 
 join_suborder_summary_data <- function(number_observations, number_species) {
   #' Join the summary data about suborders to present together in one table.
+  #'
+  #' TODO if changing the above code, make this taxa rather than species
 
   joined_data <- full_join(number_observations, number_species, by = "suborder")
 
@@ -130,6 +134,9 @@ get_number_observations(confirmed_observations_species)
 
 #' <br>The total number of species observed was
 get_number_species(confirmed_observations_species)
+
+#' <br>The total number of taxa observed was
+#' TODO
 
 #' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
 #' species only takes into account those identified to species.
