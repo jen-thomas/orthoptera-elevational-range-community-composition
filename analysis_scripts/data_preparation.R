@@ -26,10 +26,10 @@ get_packages(vector_packages)
 #' survey area.
 
 rename_site_with_elevation <- function(dataframe) {
-    #' Create a new site name within the dataframe which includes the elevation so that it is more useful
-    #' when including it in analyses and figures.
-    #'
-    #' Return dataframe with the additional column.
+  #' Create a new site name within the dataframe which includes the elevation so that it is more useful
+  #' when including it in analyses and figures.
+  #'
+  #' Return dataframe with the additional column.
 
   dataframe$site_elevation <- paste(dataframe$elevational_band_m,
                                          dataframe$site_name, sep = "_")
@@ -37,10 +37,10 @@ rename_site_with_elevation <- function(dataframe) {
 }
 
 get_study_area <- function(sites_df) {
- #' Get the site name and study area from the sites data. Create the new site name using elevation.
- #' Make the study area a factor. Replace the long study area names with shortened versions.
- #'
- #' Return dataframe with new site name and study area.
+  #' Get the site name and study area from the sites data. Create the new site name using elevation.
+  #' Make the study area a factor. Replace the long study area names with shortened versions.
+  #'
+  #' Return dataframe with new site name and study area.
 
   study_areas <- sites_df[, c("area", "site_name", "elevational_band_m")]
 
@@ -50,13 +50,13 @@ get_study_area <- function(sites_df) {
 }
 
 join_observation_site <- function(observations_df, sites_df) {
-    #' Join the observation, survey (some already with the observations) and site data frames using a left
-    #' join.
-    #'
-    #' Create a new column with a new site name in the format elevation_sitename, which will be more
-    #' user-friendly in any outputs.
-    #'
-    #' Return data frame with the merged data and new site name column.
+  #' Join the observation, survey (some already with the observations) and site data frames using a left
+  #' join.
+  #'
+  #' Create a new column with a new site name in the format elevation_sitename, which will be more
+  #' user-friendly in any outputs.
+  #'
+  #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
   c("specimen_label", "area", "site_name", "elevational_band_m", "transect_length_m", "date_cest",
@@ -103,22 +103,33 @@ import_all_observations <- function(observations_file, sites_file) {
 }
 
 get_confirmed_observations <- function(observations_sites_df) {
-    #' Get all observations that have been confirmed, i.e. one identification per observation. Confirmed
-    #' identifications can be to any taxonomic level.
-    #'
-    #' Return a dataframe containing only confirmed observations.
+  #' Get all observations that have been confirmed, i.e. one identification per observation. Confirmed
+  #' identifications can be to any taxonomic level.
+  #'
+  #' Return a dataframe containing only confirmed observations.
 
   confirmed_observations <- observations_sites_df[(observations_species$id_confidence == "Confirmed"),]
 
   return(confirmed_observations)
 }
 
+get_finalised_observations <- function(observations_sites_df) {
+  #' Get all observations that have been finalised, i.e. multiple identifications per observation.
+  #' Finalised identifications can be to any taxonomic level.
+  #'
+  #' Return a dataframe containing only finalised observations.
+
+  finalised_observations <- observations_sites_df[(observations_species$id_confidence == "Finalised"),]
+
+  return(finalised_observations)
+}
+
 get_confirmed_observations_to_species <- function(observations_sites_df) {
-    #' Observations that have not been identified to species level are removed. Observations that could
-    #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
-    #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
-    #'
-    #' Return a dataframe with only confirmed observations to species.
+  #' Observations that have not been identified to species level are removed. Observations that could
+  #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
+  #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
+  #'
+  #' Return a dataframe with only confirmed observations to species.
 
   observations_species <- observations_sites_df[!(observations_sites_df$species == ""),]
   confirmed_observations_species <- observations_species[(observations_species$id_confidence ==
