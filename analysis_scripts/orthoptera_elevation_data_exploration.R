@@ -122,7 +122,7 @@ get_number_species_suborder <- function(observations) {
   all_species_suborder <- observations %>%
     distinct(suborder, species) %>%
     group_by(suborder) %>%
-    summarise("number_species" = n())
+    dplyr::summarise("number_species" = n())
 
   return(all_species_suborder)
 }
@@ -148,7 +148,7 @@ get_number_observations_suborder <- function(observations) {
     distinct(suborder, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
     group_by(suborder) %>%
-    summarise("number_observations" = n())
+    dplyr::summarise("number_observations" = n())
 
   return(all_number_observations_suborder)
 }
@@ -210,7 +210,7 @@ get_number_sites_area <- function(site_survey_df) {
   number_sites_area <- site_survey_df %>%
     distinct(area, site_name, elevational_band_m) %>%
     group_by(area) %>%
-    summarise("number_visits" = n(), "minimum_elevation" = min(elevational_band_m),
+    dplyr::summarise("number_visits" = n(), "minimum_elevation" = min(elevational_band_m),
               "maximum_elevation" = max(elevational_band_m))
 }
 
@@ -222,7 +222,7 @@ get_number_visits_site <- function(site_survey_df) {
   number_visits_site <- site_survey_df %>%
     distinct(site_elevation, date_cest) %>%
     group_by(site_elevation) %>%
-    summarise("number_visits" = n())
+    dplyr::summarise("number_visits" = n())
 
   return(number_visits_site)
 }
@@ -236,7 +236,7 @@ get_number_observations_site <- function(observations) {
     distinct(site_elevation, specimen_label) %>% # account for multiple identifications for a finalised
     # observation
     group_by(site_elevation) %>%
-    summarise("number_observations" = n())
+    dplyr::summarise("number_observations" = n())
 
   return(number_observations_site)
 }
@@ -249,7 +249,7 @@ get_number_species_site <- function(observations) {
   number_species_site <- observations %>%
     distinct(site_elevation, species) %>%
     group_by(site_elevation, .drop=FALSE) %>%
-    summarise("number_species" = n())
+    dplyr::summarise("number_species" = n())
 
   return(number_species_site)
 }
@@ -290,7 +290,7 @@ get_number_surveys_site <- function(site_survey_df) {
   number_surveys_site <- site_survey_df %>%
     distinct(site_elevation, date_cest, method, method_repeat) %>%
     group_by(site_elevation, method, .drop=FALSE) %>%
-    summarise("number_surveys" = n())
+    dplyr::summarise("number_surveys" = n())
 
   return(number_surveys_site)
 }
@@ -428,7 +428,7 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
 
   elevation_summary_data <- site_summary_data_elevation %>%
     group_by(elevational_band_m, .drop=FALSE) %>%
-    summarise("number_sites" = n(),
+    dplyr::summarise("number_sites" = n(),
               "number_visits" = sum(number_visits),
               "number_hand_surveys" = sum(number_hand_surveys),
               "number_net_surveys" = sum(number_net_surveys),
