@@ -297,7 +297,7 @@ plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_ri
 species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa", ]
 
 lin_reg_species_richness_area_mol <- linear_regression(species_richness_mol,
-                                                       "species_richness", "elevational_band_m")
+                                                                 "species_richness", "elevational_band_m")
 summary(lin_reg_species_richness_area_mol)
 
 plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_richness_area_mol)
@@ -324,10 +324,48 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 
 caelifera_observations <- get_caelifera_only(confirmed_observations)
 
-caelifera_species_richness_sites <- calculate_species_richness_sites(observations_sites_df, caelifera_observations)
+caelifera_species_richness_sites <- calculate_species_richness_sites(observations_sites_df,
+                                                                     caelifera_observations)
+caelifera_species_richness_sites$area <- as.factor(caelifera_species_richness_sites$area) # make sure
+# that area is considered as a factor
 
-plot_elevation_species_richness(caelifera_species_richness_sites)
+plot_elevation_species_richness_area(caelifera_species_richness_sites)
 
+#'  Run linear regression for each site separately. Ignore the two small sites which do not have an
+#' elevational gradient.
+#'
+#' #### Tor
+#+ message=FALSE, warning=FALSE
+
+caelifera_species_richness_tor <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tor", ]
+
+lin_reg_caelifera_species_richness_area_tor <- linear_regression(caelifera_species_richness_tor,
+                                                       "species_richness", "elevational_band_m")
+summary(lin_reg_caelifera_species_richness_area_tor)
+
+plot_linear_regression_species_richness(caelifera_species_richness_tor, lin_reg_caelifera_species_richness_area_tor)
+
+#' #### La Molinassa
+#+ message=FALSE, warning=FALSE
+
+caelifera_species_richness_mol <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "La Molinassa", ]
+
+lin_reg_caelifera_species_richness_area_mol <- linear_regression(caelifera_species_richness_mol,
+                                                                 "species_richness", "elevational_band_m")
+summary(lin_reg_caelifera_species_richness_area_mol)
+
+plot_linear_regression_species_richness(caelifera_species_richness_mol, lin_reg_caelifera_species_richness_area_mol)
+
+#' #### Tavascan
+#+ message=FALSE, warning=FALSE
+
+caelifera_species_richness_tav <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tavascan", ]
+
+lin_reg_caelifera_species_richness_area_tav <- linear_regression(caelifera_species_richness_tav,
+                                                       "species_richness", "elevational_band_m")
+summary(lin_reg_caelifera_species_richness_area_tav)
+
+plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_caelifera_species_richness_area_tav)
 
 #'
 #' ## Results
