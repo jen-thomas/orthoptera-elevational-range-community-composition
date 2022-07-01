@@ -122,9 +122,7 @@ plot_elevation_species_richness_area <- function(dataframe) {
 
 #' ### Calculate species richness
 #'
-#' Calculate species richness for each elevation band. For now, only consider identifications that are to
-#' species. TODO: do the same analysis when I have the full set of identifications which will include
-#' those that are to a higher taxnomic level.
+#' Calculate species richness for each site. TODO: add the taxa from the finalised observations.
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
