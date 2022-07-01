@@ -115,7 +115,7 @@ get_unique_confirmed_taxa <- function(confirmed_observations) {
 }
 
 get_number_species_suborder <- function(observations) {
-  #' Get the number of species observed within each suborder. Use observations identified to species.
+  #' Get the number of species observed within each suborder. Use observations identified to species only.
   #'
   #' TODO consider changing this to taxa rather than species
 
@@ -180,15 +180,15 @@ nrow(unique_confirmed_taxa)
 #' <br>TODO manually extract the number of extra taxa that have been identified from the finalised
 #' observations
 
+#' <br>The following species were observed
+get_species_summary_overview(confirmed_observations_species)
+
 #' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
 #' species only takes into account those identified to species.
 number_observations_suborder <- get_number_observations_suborder(observations_sites_df)
 number_species_suborder <- get_number_species_suborder(confirmed_observations_species)
 
 join_suborder_summary_data(number_observations_suborder, number_species_suborder)
-
-#' <br>The following species were observed
-get_species_summary_overview(confirmed_observations_species)
 
 #' ### Summarise by site
 #'
@@ -200,6 +200,9 @@ get_species_summary_overview(confirmed_observations_species)
 #'
 #' The following functions summarise the visits to each site, then calculate observation and species
 #' summary across the sites visited.
+#'
+#' Numbers of taxa (rather than species) will be considered within each hypothesis separately.
+#' TODO add details about all taxa when worked with the "finalised" observations.
 
 get_number_sites_area <- function(site_survey_df) {
   #' Get the number of sites visited in each survey area and calculate the minimum and maximum elevations
@@ -368,6 +371,7 @@ print(number_sites_area)
 number_visits_site <- get_number_visits_site(site_survey_df)
 number_observations_site <- get_number_observations_site(observations_sites_df)
 number_species_site <- get_number_species_site(confirmed_observations_species)
+#' TODO calculate the number of taxa seen at each site (this could be part of the species richness question)
 transect_lengths <- get_transect_lengths(site_survey_df)
 
 site_survey_summary <- get_site_survey_summary_data(site_survey_df)
@@ -385,8 +389,11 @@ get_species_summary_site(confirmed_observations_species)
 #' Given that this study is looking at the patterns of species richness and elevational range with
 #' elevation, this next section summarises the observations and taxa according to elevation band.
 #'
-#' The following functions create the summaries of observations, survey details and taxa within each
-#' elevational band.
+#' The following functions create the summaries of observations, survey details and species within each
+#' elevational band. Note that summaries of the species are only done with data where the observations
+#' are identified to species. Numbers of taxa (rather than species) will be considered within each
+#' hypothesis.
+#' TODO add details about all taxa when worked with the "finalised" observations.
 
 get_site_elevation <- function(site_survey_df) {
   #' Get the site and its elevational band from the observations dataframe.
