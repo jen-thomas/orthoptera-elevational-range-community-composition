@@ -169,6 +169,16 @@ get_unique_confirmed_taxa <- function(confirmed_observations) {
   return(confirmed_taxa_df)
 }
 
+get_caelifera_only <- function(observations) {
+  #' Select only the observations of Caelifera from a dataframe.
+  #'
+  #' Return only the observations that are a Caelifera in a dataframe.
+
+  caelifera_only <- filter(observations, suborder == "Caelifera")
+
+  return(caelifera_only)
+}
+
 #' ### Create summaries of species richness data
 
 subset_data_area <- function(species_richness_sites_df, study_area) {

@@ -230,22 +230,14 @@ summary(linear_regression_species_richness)
 
 #' ## Linear mixed model to check for effect of study area
 #'
-sites_df <- read_csv_data_file("../data/sites.csv")
-sites_study_area <- get_study_area(sites_df)
 
-species_richness_study_areas <- left_join(species_richness_sites, sites_study_area, by = "site_elevation",
-                                          suffix = c("_x", "_y"))
-species_richness_study_area_details <- subset_data_frame(species_richness_study_areas, c("site_elevation",
-                                       "area", "species_richness", "elevational_band_m_x"))
-colnames(species_richness_study_area_details)[colnames(species_richness_study_area_details) ==
-                                                "elevational_band_m_x"] <- "elevational_band_m"
-species_richness_study_area_details$area <- as.factor(species_richness_study_area_details$area) # make
-# sure that area is considered as a factor
+species_richness_sites$area <- as.factor(species_richness_sites$area) # make sure that area is considered
+# as a factor
 
 #' Plot species richness against elevation again with different colours representing the different study
 #' areas to visualise and possible differences in the relationship which could depend on the study area.
 
-plot_elevation_species_richness_area(species_richness_study_area_details)
+plot_elevation_species_richness_area(species_richness_sites)
 
 #' Species richness at Tavascan and La Molinassa both show a general trend of decreasing species richness
 #' with elevation, but at Tor, there does not seem to be such a trend.
@@ -255,7 +247,7 @@ plot_elevation_species_richness_area(species_richness_study_area_details)
 #+ message=FALSE, warning=FALSE
 
 lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m + (1|area),
-                                       data = species_richness_study_area_details)
+                                       data = species_richness_sites)
 summary(lmm_species_richness_elev_area)
 
 #' The value of variance for area (random effects section) is 0 (or presumably just very small if only
@@ -291,8 +283,7 @@ qqline(resid(lmm_species_richness_elev_area))
 #' #### Tor
 #+ message=FALSE, warning=FALSE
 
-species_richness_tor <- species_richness_study_area_details[species_richness_study_area_details$
-                                                              area == "Tor", ]
+species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor", ]
 
 lin_reg_species_richness_area_tor <- linear_regression(species_richness_tor,
                                                        "species_richness", "elevational_band_m")
@@ -303,8 +294,7 @@ plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_ri
 #' #### La Molinassa
 #+ message=FALSE, warning=FALSE
 
-species_richness_mol <- species_richness_study_area_details[species_richness_study_area_details$
-                                                              area == "La Molinassa", ]
+species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa", ]
 
 lin_reg_species_richness_area_mol <- linear_regression(species_richness_mol,
                                                        "species_richness", "elevational_band_m")
@@ -315,8 +305,7 @@ plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_ri
 #' #### Tavascan
 #+ message=FALSE, warning=FALSE
 
-species_richness_tav <- species_richness_study_area_details[species_richness_study_area_details$
-                                                              area == "Tavascan", ]
+species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan", ]
 
 lin_reg_species_richness_area_tav <- linear_regression(species_richness_tav,
                                                        "species_richness", "elevational_band_m")
@@ -333,6 +322,11 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' Only five species of Ensifera were detected during the surveys, so species richness relationships will
 #' be explored further just for the Caelifera.
 
+caelifera_observations <- get_caelifera_only(confirmed_observations)
+
+caelifera_species_richness_sites <- calculate_species_richness_sites(observations_sites_df, caelifera_observations)
+
+plot_elevation_species_richness(caelifera_species_richness_sites)
 
 
 #'

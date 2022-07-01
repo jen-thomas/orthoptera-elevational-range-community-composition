@@ -368,10 +368,10 @@ get_site_elevation <- function(site_survey_df) {
   #'
   #' Return dataframe of sites and elevational band.
 
-  site_elevations <- subset(site_survey_df, select = c("site_elevation", "elevational_band_m"))
+  site_elevations <- subset(site_survey_df, select = c("site_elevation", "area", "elevational_band_m"))
 
   site_elevations <- site_elevations %>%
-    distinct(site_elevation, elevational_band_m)
+    distinct(site_elevation, area, elevational_band_m)
 
   return(site_elevations)
 }
