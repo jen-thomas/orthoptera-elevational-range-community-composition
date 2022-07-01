@@ -88,19 +88,14 @@ get_unique_confirmed_taxa <- function(confirmed_observations) {
   #'
   #' If the taxa is a species from a confirmed identification, these will all be counted separately. If
   #' the taxa is a higher taxonomic level, then identifications that have already been selected, will be
-  #' checked to see if they will add to the taxa. For the finalised identifications, these will be checked
-  #' for each observation separately: for each observation, if all of the identifications are different to
-  #' those recorded from the confirmed identifications, then we can conclude that a different taxa has
-  #' been recorded. However, if only one of the finalised observation taxa is different, then we cannot
-  #' conclude this and the number of taxa recorded, will be conservative.
+  #' checked to see if they will add to the taxa.
 
-  #' Get the number of taxa from the confirmed observations. First, get all of the distinct species and
-  #' create a dataframe from these.
+  #' Get the number of taxa from the confirmed observations. Return a dataframe of the confirmed, unique
+  #' taxa.
 
   confirmed_observations_tax_levels <- select(confirmed_observations, suborder, family, subfamily,
                                               genus, species)
   observations_species <- filter(confirmed_observations_tax_levels, species != "")
-
   distinct_species <- distinct(observations_species)
   confirmed_taxa_df <- distinct_species
 
@@ -178,9 +173,12 @@ get_number_observations(confirmed_observations_species)
 unique_species <- get_unique_species(confirmed_observations_species)
 get_number_species(unique_species)
 
-#' <br>The total number of taxa observed was
+#' <br>The total number of taxa observed from confirmed observations was
 unique_confirmed_taxa <- get_unique_confirmed_taxa(confirmed_observations)
 print(unique_confirmed_taxa)
+
+#' TODO manually extract the number of extra taxa that have been identified from the finalised
+#' observations
 
 #' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
 #' species only takes into account those identified to species.
