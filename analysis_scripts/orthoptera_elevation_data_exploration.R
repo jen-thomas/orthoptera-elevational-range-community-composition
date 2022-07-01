@@ -33,7 +33,7 @@ observations_sites_df <- import_all_observations(observations_file, sites_file)
 #' ### Subset observations
 #'
 #' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
-#' identified to genus or a higher taxonomic level due to hard-to-distinguish features or controdictory
+#' identified to genus or a higher taxonomic level due to hard-to-distinguish features or contradictory
 #' features. All specimens identified to one particular taxa had a "confirmed" identification.
 #'
 #' In some cases, specimens could only be identified to one of a set of multiple taxa, for
@@ -43,8 +43,8 @@ observations_sites_df <- import_all_observations(observations_file, sites_file)
 #'
 #' All specimens were identified to the lowest taxonomic level possible.
 #'
-#' In some parts of the analysis, only those specimens identified to species will be used. The
-#' observations and identifications used will depend on the question being asked.
+#' In some parts of the analysis, only those specimens identified to a particular taxa will be used. The
+#' observations used will depend on the question being asked.
 #'
 #' In this section, the observations will be subset according to these different types of identification.
 
