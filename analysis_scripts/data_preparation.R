@@ -26,21 +26,21 @@ get_packages(vector_packages)
 #' survey area.
 
 rename_site_with_elevation <- function(dataframe) {
-  #' Create a new site name within the dataframe which includes the elevation so that it is more useful
-  #' when including it in analyses and figures.
-  #'
-  #' Return dataframe with the additional column.
+    #' Create a new site name within the dataframe which includes the elevation so that it is more useful
+    #' when including it in analyses and figures.
+    #'
+    #' Return dataframe with the additional column.
 
   dataframe$site_elevation <- paste(dataframe$elevational_band_m,
-                                         dataframe$site_name, sep = "_")
+                                    dataframe$site_name, sep = "_")
   return(dataframe)
 }
 
 get_study_area <- function(sites_df) {
-  #' Get the site name and study area from the sites data. Create the new site name using elevation.
-  #' Make the study area a factor. Replace the long study area names with shortened versions.
-  #'
-  #' Return dataframe with new site name and study area.
+    #' Get the site name and study area from the sites data. Create the new site name using elevation.
+    #' Make the study area a factor. Replace the long study area names with shortened versions.
+    #'
+    #' Return dataframe with new site name and study area.
 
   study_areas <- sites_df[, c("area", "site_name", "elevational_band_m")]
 
@@ -50,18 +50,18 @@ get_study_area <- function(sites_df) {
 }
 
 join_observation_site <- function(observations_df, sites_df) {
-  #' Join the observation, survey (some already with the observations) and site data frames using a left
-  #' join.
-  #'
-  #' Create a new column with a new site name in the format elevation_sitename, which will be more
-  #' user-friendly in any outputs.
-  #'
-  #' Return data frame with the merged data and new site name column.
+    #' Join the observation, survey (some already with the observations) and site data frames using a left
+    #' join.
+    #'
+    #' Create a new column with a new site name in the format elevation_sitename, which will be more
+    #' user-friendly in any outputs.
+    #'
+    #' Return data frame with the merged data and new site name column.
 
   observations <- (merge(x = observations_df, y = sites_df, by = "site_name", all.x = TRUE))[,
-  c("specimen_label", "area", "site_name", "elevational_band_m", "transect_length_m", "date_cest",
-    "method", "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence",
-    "sex", "stage")]
+    c("specimen_label", "area", "site_name", "elevational_band_m", "transect_length_m", "date_cest",
+      "method", "method_repeat", "suborder", "family", "subfamily", "genus", "species", "id_confidence",
+      "sex", "stage")]
 
   observations <- rename_site_with_elevation(observations)
 
@@ -69,14 +69,14 @@ join_observation_site <- function(observations_df, sites_df) {
 }
 
 join_site_survey <- function(sites_df, surveys_df) {
-  #' Merge the site data onto the survey dataframe (there are more surveys than sites).
-  #'
-  #' Create a new column with a new site name in the format elevation_sitename, which will be more
-  #' user-friendly in any outputs.
-  #'
-  #' Return a dataframe with both sets of data and new site name column.
+    #' Merge the site data onto the survey dataframe (there are more surveys than sites).
+    #'
+    #' Create a new column with a new site name in the format elevation_sitename, which will be more
+    #' user-friendly in any outputs.
+    #'
+    #' Return a dataframe with both sets of data and new site name column.
 
-  sites_surveys <- (merge(x = surveys_df, y = sites_df, by = "site_name", all.x=TRUE))[,
+  sites_surveys <- (merge(x = surveys_df, y = sites_df, by = "site_name", all.x = TRUE))[,
     c("area", "site_name", "elevational_band_m", "transect_length_m", "date_cest", "method", "method_repeat",
       "cloud_coverage_start", "wind_start", "rain_start", "cloud_coverage_end", "wind_end", "rain_end")]
 
@@ -90,9 +90,9 @@ join_site_survey <- function(sites_df, surveys_df) {
 #' level which they have been identified.
 
 import_all_observations <- function(observations_file, sites_file) {
-  #' Import all observations and prepare the data frame with the extra metadata from sites.
-  #'
-  #' Return a dataframe of all observations with site and survey metadata.
+    #' Import all observations and prepare the data frame with the extra metadata from sites.
+    #'
+    #' Return a dataframe of all observations with site and survey metadata.
 
   observations_df <- read_csv_data_file(observations_file)
   sites_df <- read_csv_data_file(sites_file)
@@ -103,10 +103,10 @@ import_all_observations <- function(observations_file, sites_file) {
 }
 
 get_confirmed_observations <- function(observations_sites_df) {
-  #' Get all observations that have been confirmed, i.e. one identification per observation. Confirmed
-  #' identifications can be to any taxonomic level.
-  #'
-  #' Return a dataframe containing only confirmed observations.
+    #' Get all observations that have been confirmed, i.e. one identification per observation. Confirmed
+    #' identifications can be to any taxonomic level.
+    #'
+    #' Return a dataframe containing only confirmed observations.
 
   confirmed_observations <- observations_sites_df[(observations_sites_df$id_confidence == "Confirmed"),]
 
@@ -114,10 +114,10 @@ get_confirmed_observations <- function(observations_sites_df) {
 }
 
 get_finalised_observations <- function(observations_sites_df) {
-  #' Get all observations that have been finalised, i.e. multiple identifications per observation.
-  #' Finalised identifications can be to any taxonomic level.
-  #'
-  #' Return a dataframe containing only finalised observations.
+    #' Get all observations that have been finalised, i.e. multiple identifications per observation.
+    #' Finalised identifications can be to any taxonomic level.
+    #'
+    #' Return a dataframe containing only finalised observations.
 
   finalised_observations <- observations_sites_df[(observations_sites_df$id_confidence == "Finalised"),]
 
@@ -125,15 +125,15 @@ get_finalised_observations <- function(observations_sites_df) {
 }
 
 get_confirmed_observations_to_species <- function(observations_sites_df) {
-  #' Observations that have not been identified to species level are removed. Observations that could
-  #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
-  #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
-  #'
-  #' Return a dataframe with only confirmed observations to species.
+    #' Observations that have not been identified to species level are removed. Observations that could
+    #' not be identified to a specific taxa (that has not already been found in the surveys, i.e
+    #' Chorthippus parallelus / montanus) are removed by considering only the confirmed observations.
+    #'
+    #' Return a dataframe with only confirmed observations to species.
 
-  observations_species <- observations_sites_df[!(observations_sites_df$species == ""),]
-  confirmed_observations_species <- observations_sites_df[(observations_sites_df$id_confidence ==
-                                                        "Confirmed"),]
+  confirmed_observations_species <- observations_sites_df[(observations_sites_df$species != "") &
+                                                            (observations_sites_df$id_confidence ==
+                                                              "Confirmed"),]
 
   return(confirmed_observations_species)
 }
@@ -141,13 +141,13 @@ get_confirmed_observations_to_species <- function(observations_sites_df) {
 #' ### Create summaries of species richness data
 
 subset_data_area <- function(species_richness_sites_df, study_area) {
-  #' Subset the species richness at each site dataframe according to the study area. The study area will
-  #' be extracted from the string in the site_elevation.
-  #'
-  #' Return dataframe of just the sites within the study area.
+    #' Subset the species richness at each site dataframe according to the study area. The study area will
+    #' be extracted from the string in the site_elevation.
+    #'
+    #' Return dataframe of just the sites within the study area.
 
   species_richness_area <- species_richness_sites_df[str_detect(species_richness_sites_df$site_elevation,
-                                                                study_area), ]
+                                                                study_area),]
 
   return(species_richness_area)
 }
