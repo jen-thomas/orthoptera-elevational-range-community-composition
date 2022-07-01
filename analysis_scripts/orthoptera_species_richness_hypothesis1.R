@@ -22,19 +22,6 @@ get_packages(vector_packages)
 #' ## Investigate effects of elevation on species richness
 #+ message=FALSE, warning=FALSE
 
-calculate_species_richness_elevation_bands <- function(observations) {
-  #' Aggregate over the species observed within each elevation band and count how many there were.
-  #'
-  #' Return data frame of elevation band and number of species.
-
-  number_species_elevation <- observations %>%
-    distinct(elevational_band_m, species) %>%
-    group_by(elevational_band_m) %>%
-    summarise("species_richness" = n())
-
-  return(number_species_elevation)
-}
-
 calculate_species_richness_sites <- function(observations, confirmed_observations_species) {
   #' Aggregate over the species observed at each site and count how many there were. 
   #' 
