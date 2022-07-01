@@ -105,19 +105,15 @@ get_unique_taxa <- function(confirmed_observations, finalised_observations) {
   taxa_df <- distinct_species
 
   observations_genus <- filter(confirmed_observations_tax_levels, (genus != "") & (species == ""))
-  # distinct_genus <- distinct(observations_genus)
-  #
-  # matching_rows <- match_df(distinct_genus, distinct_species, c('suborder', 'family', 'subfamily', 'genus'))
-
   in_genus_not_species <- anti_join(observations_genus, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
   taxa_df <- rbind(taxa_df, in_genus_not_species)
 
   observations_subfamily <- filter(confirmed_observations_tax_levels, (subfamily != "") & (genus == "") & (species == ""))
-  in_subfamily_not_taxa <- anti_join(observations_subfamily, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  in_subfamily_not_taxa <- anti_join(observations_subfamily, taxa_df, by = c('suborder', 'family', 'subfamily'))
   taxa_df <- rbind(taxa_df, in_subfamily_not_taxa)
 
   observations_family <- filter(confirmed_observations_tax_levels, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
-  in_family_not_taxa <- anti_join(observations_family, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  in_family_not_taxa <- anti_join(observations_family, taxa_df, by = c('suborder', 'family'))
   taxa_df <- rbind(taxa_df, in_family_not_taxa)
 
   #' Check each set of finalised observations against those from the confirmed observations and add them
