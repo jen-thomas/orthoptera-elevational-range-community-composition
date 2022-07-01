@@ -175,9 +175,9 @@ get_number_species(unique_species)
 
 #' <br>The total number of taxa observed from confirmed observations was
 unique_confirmed_taxa <- get_unique_confirmed_taxa(confirmed_observations)
-print(unique_confirmed_taxa)
+nrow(unique_confirmed_taxa)
 
-#' TODO manually extract the number of extra taxa that have been identified from the finalised
+#' <br>TODO manually extract the number of extra taxa that have been identified from the finalised
 #' observations
 
 #' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
