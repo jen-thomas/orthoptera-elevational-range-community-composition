@@ -22,19 +22,23 @@ get_packages(vector_packages)
 #' ## Investigate effects of elevation on species richness
 #+ message=FALSE, warning=FALSE
 
-calculate_species_richness_sites <- function(observations, confirmed_observations_species) {
-  #' Aggregate over the species observed at each site and count how many there were. 
-  #' 
-  #' Return dataframe of the site with elevation band and species richness.
-  
-  site_elevations <- get_site_elevation(observations)
-  species_richness_site <- get_number_species_site(confirmed_observations_species)
-  species_richness_site_elevation <- join_site_summary_data_with_elevation(site_elevations, species_richness_site)
-  names(species_richness_site_elevation) <- c("site_elevation", "elevational_band_m", "species_richness")
+calculate_species_richness_sites <- function(all_observations, confirmed_observations) {
+  #' For each site in the dataset, go through and get the summary of the taxa. Count the taxa for each
+  #' site to give the species richness for each site.
+  #'
+  #' Return a dataframe with the site, elevation band and species richness.
 
-  species_richness_site_elevation <- replace_na_with_zero(species_richness_site_elevation, "species_richness")
+  site_elevations <- get_site_elevation(all_observations)
+  unique_taxa_site <- site_elevations
 
-  return(species_richness_site_elevation)
+  for (i in rownames(site_elevations)) {
+    site <- (site_elevations[i, "site_elevation"])
+    site_observations <- filter(confirmed_observations, confirmed_observations$site_elevation == site)
+    taxa_site <- get_unique_confirmed_taxa(site_observations)
+    unique_taxa_site$species_richness[unique_taxa_site$site_elevation == site] = nrow(taxa_site)
+  }
+
+  return(unique_taxa_site)
 }
 
 plot_elevation_species_richness <- function(species_richness_elevation) {
@@ -131,10 +135,11 @@ surveys_df <- read_csv_data_file(surveys_file)
 site_survey_df <- join_site_survey(sites_df, surveys_df)
 
 observations_sites_df <- import_all_observations(observations_file, sites_file)
-
+confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
-species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations_species)
+species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations)
+print(species_richness_sites)
 
 #' ### Correlation
 #' Do a correlation test between the species richness at each site and elevation.
