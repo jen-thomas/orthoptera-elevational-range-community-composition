@@ -83,37 +83,6 @@ get_number_species <- function(unique_species) {
   return(number_species)
 }
 
-get_unique_confirmed_taxa <- function(confirmed_observations) {
-  #' Get the unique taxa observed from the confirmed observations.
-  #'
-  #' If the taxa is a species from a confirmed identification, these will all be counted separately. If
-  #' the taxa is a higher taxonomic level, then identifications that have already been selected, will be
-  #' checked to see if they will add to the taxa.
-
-  #' Get the number of taxa from the confirmed observations. Return a dataframe of the confirmed, unique
-  #' taxa.
-
-  confirmed_observations_tax_levels <- select(confirmed_observations, suborder, family, subfamily,
-                                              genus, species)
-  observations_species <- filter(confirmed_observations_tax_levels, species != "")
-  distinct_species <- distinct(observations_species)
-  confirmed_taxa_df <- distinct_species
-
-  observations_genus <- filter(confirmed_observations_tax_levels, (genus != "") & (species == ""))
-  in_genus_not_species <- anti_join(observations_genus, confirmed_taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
-  confirmed_taxa_df <- rbind(confirmed_taxa_df, in_genus_not_species)
-
-  observations_subfamily <- filter(confirmed_observations_tax_levels, (subfamily != "") & (genus == "") & (species == ""))
-  in_subfamily_not_taxa <- anti_join(observations_subfamily, confirmed_taxa_df, by = c('suborder', 'family', 'subfamily'))
-  confirmed_taxa_df <- rbind(confirmed_taxa_df, in_subfamily_not_taxa)
-
-  observations_family <- filter(confirmed_observations_tax_levels, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
-  in_family_not_taxa <- anti_join(observations_family, confirmed_taxa_df, by = c('suborder', 'family'))
-  confirmed_taxa_df <- rbind(confirmed_taxa_df, in_family_not_taxa)
-
-  return(confirmed_taxa_df)
-}
-
 get_number_species_suborder <- function(observations) {
   #' Get the number of species observed within each suborder. Use observations identified to species only.
   #'
@@ -371,7 +340,6 @@ print(number_sites_area)
 number_visits_site <- get_number_visits_site(site_survey_df)
 number_observations_site <- get_number_observations_site(observations_sites_df)
 number_species_site <- get_number_species_site(confirmed_observations_species)
-#' TODO calculate the number of taxa seen at each site (this could be part of the species richness question)
 transect_lengths <- get_transect_lengths(site_survey_df)
 
 site_survey_summary <- get_site_survey_summary_data(site_survey_df)

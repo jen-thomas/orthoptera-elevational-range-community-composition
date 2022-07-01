@@ -138,6 +138,37 @@ get_confirmed_observations_to_species <- function(observations_sites_df) {
   return(confirmed_observations_species)
 }
 
+get_unique_confirmed_taxa <- function(confirmed_observations) {
+  #' Get the unique taxa observed from the confirmed observations.
+  #'
+  #' If the taxa is a species from a confirmed identification, these will all be counted separately. If
+  #' the taxa is a higher taxonomic level, then identifications that have already been selected, will be
+  #' checked to see if they will add to the taxa.
+
+  #' Get the number of taxa from the confirmed observations. Return a dataframe of the confirmed, unique
+  #' taxa.
+
+  confirmed_observations_tax_levels <- select(confirmed_observations, suborder, family, subfamily,
+                                              genus, species)
+  observations_species <- filter(confirmed_observations_tax_levels, species != "")
+  distinct_species <- distinct(observations_species)
+  confirmed_taxa_df <- distinct_species
+
+  observations_genus <- filter(confirmed_observations_tax_levels, (genus != "") & (species == ""))
+  in_genus_not_species <- anti_join(observations_genus, confirmed_taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  confirmed_taxa_df <- rbind(confirmed_taxa_df, in_genus_not_species)
+
+  observations_subfamily <- filter(confirmed_observations_tax_levels, (subfamily != "") & (genus == "") & (species == ""))
+  in_subfamily_not_taxa <- anti_join(observations_subfamily, confirmed_taxa_df, by = c('suborder', 'family', 'subfamily'))
+  confirmed_taxa_df <- rbind(confirmed_taxa_df, in_subfamily_not_taxa)
+
+  observations_family <- filter(confirmed_observations_tax_levels, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
+  in_family_not_taxa <- anti_join(observations_family, confirmed_taxa_df, by = c('suborder', 'family'))
+  confirmed_taxa_df <- rbind(confirmed_taxa_df, in_family_not_taxa)
+
+  return(confirmed_taxa_df)
+}
+
 #' ### Create summaries of species richness data
 
 subset_data_area <- function(species_richness_sites_df, study_area) {
