@@ -4,7 +4,7 @@
 #' output:
 #'   html_document:
 #'     toc: true
-#'     toc_depth: 3
+#'     toc_depth: 4
 #'     theme: yeti
 #'     code_folding: hide
 #'     df_print: paged
@@ -12,9 +12,9 @@
 
 #' **TODO (as of 2022-07-04):**
 #' <ul>
-#'  <li>incorporate sampling effort into models</li>
 #'  <li>incorporate "finalised" observations</li>
 #'  <li>check calculation of species richness for BES01 - 23 seems extremely high</li>
+#'  <li>**all numbers in the text need to be updated to what is in the stats output**.</li>
 #' </ul>
 #' <br>Import packages functions from other files.
 #+ message=FALSE, warning=FALSE
@@ -63,7 +63,8 @@ linear_regression <- function(dataframe, response_variable, explanatory_variable
   #'
   #' Return the model.
 
-  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe)
+  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe,
+                   weights = dataframe$weightings)
 
   return(regression)
 }
@@ -115,8 +116,8 @@ plot_linear_regression_species_richness <- function(dataframe, linear_regression
   ggplot(df, aes(y = species_richness, x = elevational_band_m)) +
         geom_point(size = 3, col = "blue") +
         geom_smooth(method = "lm", se = TRUE) +
-        geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
-        geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+        #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+        #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
         labs(x = "Elevation (m a.s.l)", y = "Species richness") +
         theme_classic()
 }
@@ -147,6 +148,16 @@ confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
 species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations)
+
+#' Given the difference in the number of hand and net surveys undertaken at each site, a weighting of
+#' sampling effort was calculated.
+#'
+#' First, the proportion of all specimens captured by hand ($prop_{hand}$) and by the net ($prop_{net}$)
+#' was calculated. Secondly, the weighting for sampling effort was calculated for each site according
+#' to the following equation: $$weighting = obs_{hand} * prop_{hand} + obs_{net} * prop_{net}$$ where
+#' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
+#' method.
+
 print(species_richness_sites)
 
 #' ### Correlation
@@ -174,23 +185,14 @@ print(coeff_det)
 plot_elevation_species_richness(species_richness_sites)
 
 #' The plot shows a general decreasing trend of species richness with elevation, which was confirmed by
-#' the correlation coefficient above. However, it does not necessarily look to be linear. Survey effort,
-#' which will likely have affected the results, should be taken into account: TODO.
+#' the correlation coefficient above.
 #'
 #' <em>Low species richness at 1700 m</em>. Only one site was surveyed at this altitude. This site was
 #' often hot and in the Sun; Orthoptera were very active. It is likely Orthoptera were undersampled at
 #' this site because of their ability to avoid the net (a lot were Ensifera) and the long vegetation which
 #' made it harder to catch all individuals present.
 #'
-#' <em>High species richness at 2000m</em>. TODO: investigate why this is high for one of the sites (only
-#' if this is still the case when the other observations identified to other taxonomic levels are included).
-#'
-#' <em>Higher elevation sites</em>. Only one site was visited at both 2400m and 2500m (there were no other
-#' accessible sites at this elevation) and given the windy conditions at these elevations during the
-#' surveys, only a few individuals were captured. At 2500m, the data currently show that no species were
-#' detected there. Observations were made at this elevation, however because they were not identified to
-#' species (small nymphs), they have not yet been included in the analysis: TODO (include the observations
-#' made to other taxonomic levels when they add to the species richness of a site).
+#' <em>High species richness at BES01</em>. TODO: investigate why this is high for one of the sites.
 #'
 #' ### Linear regression
 #' Create linear model of species richness against elevation and look at the model.
@@ -279,7 +281,7 @@ qqline(resid(lmm_species_richness_elev_area))
 #' The plot of the residuals doesn't show an obvious pattern. It might be possible to discern a slight
 #' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
 #' outlier in both plots.
-
+#'
 #' ## Species richness and elevation within study areas
 #' Given the differences between Tor and the other two study areas, La Molinassa and Tavascan, a linear
 #' regression will be used to look at the relationship between species richness and elevation at each of
@@ -398,7 +400,10 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #'
 #' ## Questions:
 #' <ol>
+#'  <li>I have included the weightings for sampling effort in the linear model. Now that I have done this, do I need to change anything regarding the models?</li>
 #'  <li>When reporting the decrease in species richness with elevation and variation explained (first paragraph of results above), should both t and F be reported? Should the p-value only be reported once?</li>
 #'  <li>I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.</li>
+#'  <li>In the same output, does it matter that the variance of area is very small (0)?</li>
+#'  <li>When doing the linear model for each area separately, should I recalculate the weightings so they are for each area separately?</li>
 #'  <li>To calculate <em>R</em> which is included in the last part of the results section above where we report the relationships for the areas separately, I have used the multiple R-squared (rather than adjusted R-squared) output because I understand that we are not adjusting for the number of predictors in the model. Is this correct?</li>
 #' </ol>
