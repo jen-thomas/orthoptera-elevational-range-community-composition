@@ -15,7 +15,7 @@ source("utils.R")
 
 #' Install packages.
 #+ message=FALSE, warning=FALSE
-vector_packages <- c("fossil", "stringr")
+vector_packages <- c("fossil", "stringr", "tidyr")
 get_packages(vector_packages)
 
 #' ## Initial data preparation
@@ -191,4 +191,24 @@ subset_data_area <- function(species_richness_sites_df, study_area) {
                                                                 study_area),]
 
   return(species_richness_area)
+}
+
+calculate_sampling_weights <- function(observations) {
+  #' Calculate sampling effort weightings. Sum the total number of observations, the total number caught
+  #' by net and the total caught by hand. Find the proportion of observations caught by net and by hand,
+  #' by dividing each of the totals by the total number of observations.
+  #'
+  #' For each site, multiply the number of specimens caught by hand, by the proportion of the total caught
+  #' by hand. Do the same for those caught by net.
+  #'
+  #' This will result in a weighted number for each site, which takes into account the number of
+  #' observations and how they were caught, which is a proxy for the number of surveys done because
+  #' generally, a higher number of individuals sampled will result in a higher number of species observed.
+
+  weights <- observations %>%
+    distinct(site_elevation, method, specimen_label) %>%
+    group_by(site_elevation) %>%
+    dplyr::summarise("number_observations_by_net" = sum(method == "Net"), "number_observations_by_hand" = sum(method == "Hand"))
+
+  return(weights)
 }

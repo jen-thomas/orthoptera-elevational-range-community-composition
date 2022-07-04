@@ -41,9 +41,13 @@ calculate_species_richness_sites <- function(all_observations, confirmed_observa
     site <- (site_elevations[i, "site_elevation"])
     site_observations <- filter(confirmed_observations, confirmed_observations$site_elevation == site)
     taxa_site <- get_unique_confirmed_taxa(site_observations)
-    unique_taxa_site$species_richness[unique_taxa_site$site_elevation == site] = nrow(taxa_site)
+    unique_taxa_site$species_richness[unique_taxa_site$site_elevation == site] <- nrow(taxa_site)
   }
 
+  sampling_weights <- calculate_sampling_weights(confirmed_observations) # TODO change this to all
+  # observations when including the finalised observations as well
+
+  unique_taxa_site <- left_join(unique_taxa_site, sampling_weights, by = "site_elevation")
   return(unique_taxa_site)
 }
 
