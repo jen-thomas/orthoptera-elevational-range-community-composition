@@ -205,10 +205,20 @@ calculate_sampling_weights <- function(observations) {
   #' observations and how they were caught, which is a proxy for the number of surveys done because
   #' generally, a higher number of individuals sampled will result in a higher number of species observed.
 
-  weights <- observations %>%
+  observations_by_method <- observations %>%
     distinct(site_elevation, method, specimen_label) %>%
     group_by(site_elevation) %>%
     dplyr::summarise("number_observations_by_net" = sum(method == "Net"), "number_observations_by_hand" = sum(method == "Hand"))
+
+  total_obs_hand <- colSums(observations_by_method[ , "number_observations_by_hand"])
+  total_obs_net <- colSums(observations_by_method[ , "number_observations_by_net"])
+  total_obs <- total_obs_hand + total_obs_net
+
+  weighting_hand <- total_obs_hand / total_obs
+  weighting_net <- total_obs_net / total_obs
+
+  weights <- observations_by_method %>%
+    mutate(weightings = (number_observations_by_hand * weighting_hand) + (number_observations_by_net * weighting_net))
 
   return(weights)
 }
