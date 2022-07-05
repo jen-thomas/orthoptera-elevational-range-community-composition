@@ -401,8 +401,8 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' ## Questions:
 #' <ol>
 #'  <li>I have included the weightings for sampling effort in the linear model. Now that I have done this, do I need to change anything regarding the models?</li>
-#'  <li>When reporting the decrease in species richness with elevation and variation explained (first paragraph of results above), should both t and F be reported? Should the p-value only be reported once?</li>
-#'  <li>I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.</li>
+#'  <li>Simon: When reporting the decrease in species richness with elevation and variation explained (first paragraph of results above), should both t and F be reported? Should the p-value only be reported once?</li>
+#'  <li>Simon: I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.</li>
 #'  <li>In the same output, does it matter that the variance of area is very small (0)?</li>
 #'  <li>When doing the linear model for each area separately, should I recalculate the weightings so they are for each area separately?</li>
 #'  <li>To calculate <em>R</em> which is included in the last part of the results section above where we report the relationships for the areas separately, I have used the multiple R-squared (rather than adjusted R-squared) output because I understand that we are not adjusting for the number of predictors in the model. Is this correct?</li>
