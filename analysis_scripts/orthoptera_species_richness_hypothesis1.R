@@ -326,8 +326,7 @@ summary(lmm_species_richness_elev_sampling_effort)
 #' **TODO**: not really sure how to interpret this, because the model is the same as the previous one
 #' without the random factor.
 
-#' ## Linear mixed model to check for effect of study area
-#'
+#' ## Check for effect of study area
 
 species_richness_sites$area <- as.factor(species_richness_sites$area) # make sure that area is considered
 # as a factor
