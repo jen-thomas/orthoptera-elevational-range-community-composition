@@ -337,21 +337,24 @@ species_richness_sites$area <- as.factor(species_richness_sites$area) # make sur
 plot_elevation_species_richness_area(species_richness_sites)
 
 #' Species richness at Tavascan and La Molinassa both show a general trend of decreasing species richness
-#' with elevation, but at Tor, there does not seem to be such a trend.
+#' with elevation, but at Tor, there does not seem to be such a trend. Two additional study areas, Besan
+#' and Bordes de Viros are included in this plot. These sites were located further down the valley to
+#' include lower elevations which were not available within the other study areas.
 #'
 #' ### Fit a linear mixed model
-#' A linear mixed model will be fitted, treating study area and sampling effort as a random factor.
+#' Fit a linear mixed model, treating study area and sampling effort as a random factor.
 #+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|area) + (1|sampling_effort_index),
-                                       data = species_richness_sites)
+lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|area)
+                                                  + (1|sampling_effort_index),
+                                                  data = species_richness_sites)
 summary(lmm_species_richness_elev_area_sampling_effort)
 
 #' The value of variance for area (random effects section) is 0 (or presumably just very small if only
-#' 3dp are used). I understand this can occur because of sampling error. TODO: check if this is important.
+#' 3dp are used). Can this can occur because of sampling error? **TODO**: check if this is important.
 #'
 #' I realise that I'm not sure how to interpret this output. The parameter estimates are the same as
-#' those in the model above. How does this output tell us that area is important?
+#' those in the model above. **TODO**: how does this output tell us that area is important?
 #'
 #' ### Plot linear mixed model
 
