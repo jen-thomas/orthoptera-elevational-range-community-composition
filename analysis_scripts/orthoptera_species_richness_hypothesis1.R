@@ -63,8 +63,9 @@ linear_regression <- function(dataframe, response_variable, explanatory_variable
   #'
   #' Return the model.
 
-  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe,
-                   weights = dataframe$weightings)
+  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe
+                   , weights = dataframe$weightings
+  )
 
   return(regression)
 }
@@ -401,6 +402,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' ## Questions:
 #' <ol>
 #'  <li>I have included the weightings for sampling effort in the linear model. Now that I have done this, do I need to change anything regarding the models?</li>
+#'  <li>There is quite a big difference in the results when using the weightings, e.g. La Molinassa (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#la-molinassa).</li>
 #'  <li>Simon: When reporting the decrease in species richness with elevation and variation explained (first paragraph of results above), should both t and F be reported? Should the p-value only be reported once?</li>
 #'  <li>Simon: I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.</li>
 #'  <li>In the same output, does it matter that the variance of area is very small (0)?</li>
