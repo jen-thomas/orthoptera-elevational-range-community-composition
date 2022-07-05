@@ -268,13 +268,14 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' Looking again at the model output above, we can see that the slope is not equal to 0
 #' (<em>p</em> = 0.0004), therefore we can say there is a significant relationship between the species
 #' richness and elevation.
-
+#'
 #' ## Account for the effects of sampling effort
 #'
-#' Given the difference in the number of hand and net surveys undertaken at each site, an index of
-#' sampling effort was calculated.
+#' Due to logistical reasons and poor weather, the sampling effort varied a lot across the sampling sites.
+#' Additionally, both and hand and net sampling were used. In order to account for the difference in
+#' sampling effort across the sites, an index of sampling effort was calculated.
 #'
-#' First, the proportion of all specimens captured by hand ($prop_{hand}$) and by the net ($prop_{net}$)
+#' First, the proportion of all specimens captured by hand ($prop_{hand}$) and by net ($prop_{net}$)
 #' was calculated. Secondly, the index for sampling effort was calculated for each site according
 #' to the following equation: $$weighting = obs_{hand} * prop_{hand} + obs_{net} * prop_{net}$$ where
 #' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
@@ -285,16 +286,28 @@ sampling_effort <- calculate_sampling_weights(confirmed_observations) # TODO cha
 
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
 
-#' Regress the elevation and species richness against the sampling effort index.
+#' It is likely that the number of species recorded will depend on the number of specimens captured, and
+#' given this varied across sites, it should be accounted for.
+#'
+#' <br>Look at the relationship between species richness and sampling effort,
 #+ message=FALSE, warning=FALSE
 
-lin_reg_species_richness_sampling_effort <- lm(species_richness_sites[["species_richness"]] ~ species_richness_sites[["sampling_effort_index"]], data = species_richness_sites)
+lin_reg_species_richness_sampling_effort <- lm(species_richness_sites[["species_richness"]] ~
+                                                 species_richness_sites[["sampling_effort_index"]],
+                                               data = species_richness_sites)
 summary(lin_reg_species_richness_sampling_effort)
-plot_lin_reg_sampling_effort_species_richness(species_richness_sites, lin_reg_species_richness_sampling_effort)
+plot_lin_reg_sampling_effort_species_richness(species_richness_sites,
+                                              lin_reg_species_richness_sampling_effort)
 
-lin_reg_elevation_sampling_effort <- lm(species_richness_sites[["sampling_effort_index"]] ~ species_richness_sites[["elevational_band_m"]], data = species_richness_sites)
+#' and how the sampling effort varied across the elevational range.
+#+ message=FALSE, warning=FALSE
+
+lin_reg_elevation_sampling_effort <- lm(species_richness_sites[["sampling_effort_index"]] ~
+                                          species_richness_sites[["elevational_band_m"]],
+                                        data = species_richness_sites)
 summary(lin_reg_elevation_sampling_effort)
-plot_lin_reg_sampling_effort_elevation(species_richness_sites, lin_reg_elevation_sampling_effort)
+plot_lin_reg_sampling_effort_elevation(species_richness_sites,
+                                       lin_reg_elevation_sampling_effort)
 
 #' Do the linear regression with sampling effort as a random factor.
 #' #+ message=FALSE, warning=FALSE
