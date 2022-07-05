@@ -266,7 +266,7 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 
 summary(linear_regression_species_richness)
 
-#' ## Effect of sampling effort
+#' ## Account for the effects of sampling effort
 #'
 #' Given the difference in the number of hand and net surveys undertaken at each site, an index of
 #' sampling effort was calculated.
