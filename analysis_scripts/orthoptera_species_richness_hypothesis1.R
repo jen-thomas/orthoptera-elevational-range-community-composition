@@ -251,8 +251,10 @@ plot(linear_regression_species_richness)
 #' </ul>
 #'
 #' ### Plot linear regression
-#' Plot the data points with 95% CI, the linear model and the upper and lower bounds of the predicted
-#' values.
+#' The plot below shows the species richness at each site (blue dots). Upper and lower bounds of the
+#' predicted values are bounded within the grey area. The blue line represents the linear relationship
+#' between species richness ($SR$) and elevation ($E$), which can be represented by the equation,
+#' $SR = 16.90 - 0.006E$.
 #+ message=FALSE, warning=FALSE
 
 plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
