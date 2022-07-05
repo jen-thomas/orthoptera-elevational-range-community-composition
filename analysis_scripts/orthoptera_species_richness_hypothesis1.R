@@ -457,6 +457,8 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' (<em>t</em> = -4.11; <em>p</em> = 0.0004). However, only 39% of the variation in species richness can
 #' be explained by elevation (<em>F</em> = 16.89; <em>df</em> = 1, 26; <em>p</em> = 0.0004).
 #'
+#' **TODO**: add details of effects of sampling effort.
+#'
 #' Looking at the plot of the species richness coloured by study area, there seems to be a strong decrease
 #' in species richness with elevation at both La Molinassa and Tavascan, but no change at Tor. A linear
 #' mixed model fitting elevation as a fixed effect and study area as a random effect, was used to
