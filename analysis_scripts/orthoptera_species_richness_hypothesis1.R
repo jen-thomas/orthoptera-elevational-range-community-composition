@@ -309,12 +309,22 @@ summary(lin_reg_elevation_sampling_effort)
 plot_lin_reg_sampling_effort_elevation(species_richness_sites,
                                        lin_reg_elevation_sampling_effort)
 
+#' As expected, species richness significantly increases with sampling effort (<em>R<sup>2</sup></em> =
+#' 0.40; <em>p</em> = 0.0003). Although sampling effort was lower at higher elevations, it was significantly
+#' so (<em>R<sup>2</sup></em> = 0.13; <em>p</em> = 0.06), suggesting that although this might be a factor
+#' which influences the species richness, it probably is not the main one.
+#'
+#' ### Include sampling effort as a random factor
 #' Do the linear regression with sampling effort as a random factor.
 #' #+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|sampling_effort_index),
-                                       data = species_richness_sites)
+lmm_species_richness_elev_sampling_effort <- lmer(species_richness ~ elevational_band_m +
+                                            (1|sampling_effort_index),
+                                            data = species_richness_sites)
 summary(lmm_species_richness_elev_sampling_effort)
+
+#' **TODO**: not really sure how to interpret this, because the model is the same as the previous one
+#' without the random factor.
 
 #' ## Linear mixed model to check for effect of study area
 #'
