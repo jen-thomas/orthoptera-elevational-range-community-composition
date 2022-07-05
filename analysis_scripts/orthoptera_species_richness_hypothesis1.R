@@ -218,12 +218,14 @@ plot_elevation_species_richness(species_richness_sites)
 #' the correlation coefficient above.
 #'
 #' ### Linear regression
-#' Create linear model of species richness against elevation and look at the model.
-linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites, "species_richness", "elevational_band_m")
+#' Create a linear model of species richness against elevation and look at the model output.
+linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites,
+                       "species_richness", "elevational_band_m")
 summary(linear_regression_species_richness)
 
 #' The linear regression shows that both the intercept and slope are statistically significant. Species
-#' richness decreases by 3.8 with an increase in elevation of 1000 m (<em>t</em> = -3.4, <em>p</em> = 0.002).
+#' richness decreases by 5.7 with an increase in elevation of 1000 m (<em>t</em> = -4.11,
+#' <em>p</em> = 0.0004).
 #'
 #' ### Checking the assumptions of linear regression
 
