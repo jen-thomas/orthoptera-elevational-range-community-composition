@@ -13,7 +13,6 @@
 #' **TODO (as of 2022-07-04):**
 #' <ul>
 #'  <li>incorporate "finalised" observations</li>
-#'  <li>check calculation of species richness for BES01 - 23 seems extremely high</li>
 #'  <li>**all numbers in the text need to be updated to what is in the stats output**.</li>
 #' </ul>
 #' <br>Import packages functions from other files.
@@ -192,8 +191,6 @@ plot_elevation_species_richness(species_richness_sites)
 #' often hot and in the Sun; Orthoptera were very active. It is likely Orthoptera were undersampled at
 #' this site because of their ability to avoid the net (a lot were Ensifera) and the long vegetation which
 #' made it harder to catch all individuals present.
-#'
-#' <em>High species richness at BES01</em>. TODO: investigate why this is high for one of the sites.
 #'
 #' ### Linear regression
 #' Create linear model of species richness against elevation and look at the model.
