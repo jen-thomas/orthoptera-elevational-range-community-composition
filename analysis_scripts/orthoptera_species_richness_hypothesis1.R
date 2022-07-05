@@ -208,7 +208,7 @@ print(coeff_det)
 #' <br>The relationship between species richness and elevation was tested using a Pearson's correlation.
 #' There was evidence to suggest a significant negative relationship between species richness and
 #' elevation (<em>r</em> = -0.63, <em>t<sub>26</sub></em> = -4.12, <em>p</em> = 0.0004), however only
-#' 39% of the variation of species richness is explained by the elevation.
+#' 39% of the variation in species richness is explained by the elevation.
 #'
 #' ### Plot species richness against elevation.
 
@@ -216,11 +216,6 @@ plot_elevation_species_richness(species_richness_sites)
 
 #' The plot shows a general decreasing trend of species richness with elevation, which was confirmed by
 #' the correlation coefficient above.
-#'
-#' <em>Low species richness at 1700 m</em>. Only one site was surveyed at this altitude. This site was
-#' often hot and in the Sun; Orthoptera were very active. It is likely Orthoptera were undersampled at
-#' this site because of their ability to avoid the net (a lot were Ensifera) and the long vegetation which
-#' made it harder to catch all individuals present.
 #'
 #' ### Linear regression
 #' Create linear model of species richness against elevation and look at the model.
