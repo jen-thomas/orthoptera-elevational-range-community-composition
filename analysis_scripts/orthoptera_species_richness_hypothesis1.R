@@ -265,9 +265,9 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' <br>H<sub>0</sub>: the slope of the regression is equal to 0.
 #' <br>H<sub>1</sub>: the slope of the regression is not equal to 0.
 #'
-#' Look again at the model output.
-
-summary(linear_regression_species_richness)
+#' Looking again at the model output above, we can see that the slope is not equal to 0
+#' (<em>p</em> = 0.0004), therefore we can say there is a significant relationship between the species
+#' richness and elevation.
 
 #' ## Account for the effects of sampling effort
 #'
