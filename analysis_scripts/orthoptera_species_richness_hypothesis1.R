@@ -480,7 +480,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' a clear decrease in species richness with elevation can be seen at La Molinassa (<em>F</em> = 11.1; <em>df</em> = 1, 6; <em>R</em> = 0.81; <em>p</em> = 0.02)
 #' and Tavascan (<em>F</em> = 304.5; <em>df</em> = 1, 5; <em>R</em> = 0.99; <em>p</em> < 0.01).
 #'
-#' ## Questions:
+#' ## Questions
 #' <ol>
 #'  <li>I have included the weightings for sampling effort in the linear model. Now that I have done this, do I need to change anything regarding the models?</li>
 #'  <li>There is quite a big difference in the results when using the weightings, e.g. La Molinassa (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#la-molinassa).</li>
