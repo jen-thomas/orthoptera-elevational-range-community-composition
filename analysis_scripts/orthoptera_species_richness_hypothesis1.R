@@ -316,16 +316,15 @@ plot_lin_reg_sampling_effort_elevation(species_richness_sites,
 #'
 #' ### Include sampling effort as a random factor
 #' Do the linear regression with sampling effort as a random factor.
-#' #+ message=FALSE, warning=FALSE
+#+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_sampling_effort <- lmer(species_richness ~ elevational_band_m +
-                                            (1|sampling_effort_index),
+lmm_species_richness_elev_sampling_effort <- lm(species_richness ~ elevational_band_m,
                                             data = species_richness_sites)
 summary(lmm_species_richness_elev_sampling_effort)
 
 #' **TODO**: not really sure how to interpret this, because the model is the same as the previous one
 #' without the random factor.
-
+#'
 #' ## Check for effect of study area
 
 species_richness_sites$area <- as.factor(species_richness_sites$area) # make sure that area is considered
@@ -345,8 +344,7 @@ plot_elevation_species_richness_area(species_richness_sites)
 #' Fit a linear mixed model, treating study area and sampling effort as a random factor.
 #+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|area)
-                                                  + (1|sampling_effort_index),
+lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|area),
                                                   data = species_richness_sites)
 summary(lmm_species_richness_elev_area_sampling_effort)
 
@@ -356,37 +354,33 @@ summary(lmm_species_richness_elev_area_sampling_effort)
 #' I realise that I'm not sure how to interpret this output. The parameter estimates are the same as
 #' those in the model above. **TODO**: how does this output tell us that area is important?
 #'
-#' ### Plot linear mixed model
+#' ### Test the assumptions of the linear mixed model
 
 plot(lmm_species_richness_elev_area_sampling_effort)
-
-#'
-#' ### Test the assumptions of the linear mixed model
 
 qqnorm(resid(lmm_species_richness_elev_area_sampling_effort))
 qqline(resid(lmm_species_richness_elev_area_sampling_effort))
 
-#' The plot of the residuals doesn't show an obvious pattern. It might be possible to discern a slight
-#' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
-#' outlier in both plots.
+#' The plot of the residuals does not show an obvious pattern, although there is one obvious outlier. The
+#' data seem to fit a normal distribution.
 #'
 #' ## Investigate effects of elevation on species richness within different study areas
-#' Given the differences between Tor and the other two study areas, La Molinassa and Tavascan, a linear
-#' regression will be used to look at the relationship between species richness and elevation at each of
-#' these sites separately.
+#'
+#' A linear regression will be used to look at the relationship between species richness and elevation at
+#' each of the study areas separately.
 #'
 #' ### Linear regression
 
-#'  Run linear regression for each site separately. Ignore the two small sites which do not have an
-#' elevational gradient.
+#'  Run linear regression for each study area separately. Ignore the two small areas (Besan and Bordes de
+#' Viros) which do not have an elevational gradient. Sampling effort will be included as a random factor.
 #'
 #' #### Tor
 #+ message=FALSE, warning=FALSE
 
 species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor", ]
 
-lin_reg_species_richness_area_tor <- linear_regression(species_richness_tor,
-                                                       "species_richness", "elevational_band_m")
+lin_reg_species_richness_area_tor <- lm(species_richness ~ elevational_band_m,
+                                            data = species_richness_tor)
 summary(lin_reg_species_richness_area_tor)
 
 plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_richness_area_tor)
@@ -396,8 +390,8 @@ plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_ri
 
 species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa", ]
 
-lin_reg_species_richness_area_mol <- linear_regression(species_richness_mol,
-                                                                 "species_richness", "elevational_band_m")
+lin_reg_species_richness_area_mol <- lm(species_richness ~ elevational_band_m,
+                                            data = species_richness_mol)
 summary(lin_reg_species_richness_area_mol)
 
 plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_richness_area_mol)
@@ -407,37 +401,15 @@ plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_ri
 
 species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan", ]
 
-lin_reg_species_richness_area_tav <- linear_regression(species_richness_tav,
-                                                       "species_richness", "elevational_band_m")
+lin_reg_species_richness_area_tav <- lm(species_richness ~ elevational_band_m,
+                                            data = species_richness_tav)
 summary(lin_reg_species_richness_area_tav)
 
 plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_richness_area_tav)
 
 #' ### Plot linear regression
 
-#' TODO: I'll put the above plots on one set of axes.
-
-#'
-#' ## Compare the models so far
-#'
-#' So far we have used a linear model to investigate the relationship between species richness and
-#' elevation. We have incorportated both study area and sampling effort as random factors, included them individually, and also run the model without any random factors.
-#'
-#' Display the model output for each of these models to compare the results.
-
-#' ### Linear regression of species richness against elevation. No random factors.
-summary(linear_regression_species_richness)
-
-#' ### Linear regression of species richness against elevation. Sampling effort as a random factor.
-summary(lmm_species_richness_elev_sampling_effort)
-
-#' ### Linear regression of species richness against elevation. Study area as a random factor.
-lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m + (1|area),
-                                       data = species_richness_sites)
-summary(lmm_species_richness_elev_area)
-
-#' ### Linear regression of species richness against elevation. Study area and sampling effort as a random factor.
-summary(lmm_species_richness_elev_area_sampling_effort)
+#' **TODO**: I'll put the above plots on one set of axes.
 
 #'
 #' ## Investigate effects of elevation on Caelifera species richness
