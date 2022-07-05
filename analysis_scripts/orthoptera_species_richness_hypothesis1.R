@@ -309,6 +309,9 @@ plot_lin_reg_sampling_effort_elevation(species_richness_sites,
 #' so (<em>R<sup>2</sup></em> = 0.13; <em>p</em> = 0.06), suggesting that although this might be a factor
 #' which influences the species richness, it probably is not the main one.
 #'
+#' **TODO**: I had thought about including sampling effort as a random factor here, but as it is a
+#' continuous variable, I am not sure how to go about this.
+#'
 #' ## Check for effect of study area
 
 species_richness_sites$area <- as.factor(species_richness_sites$area) # make sure that area is considered
@@ -356,7 +359,7 @@ qqline(resid(lmm_species_richness_elev_area_sampling_effort))
 #' ### Linear regression
 
 #'  Run linear regression for each study area separately. Ignore the two small areas (Besan and Bordes de
-#' Viros) which do not have an elevational gradient. Sampling effort will be included as a random factor.
+#' Viros) which do not have an elevational gradient.
 #'
 #' #### Tor
 #+ message=FALSE, warning=FALSE
@@ -447,30 +450,37 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 
 #'
 #' ## Results
-#' **NOTE: As of 2022-07-04**, the results described below have not yet been updated to account for the changes to the code and data above.
-#' The numbers do not reflect the output from R and any changes in trends have not yet been changed.
 #'
 #' <br>A simple linear regression was used to investigate the relationship between elevation and species richness.
 #' Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
-#' = -0.56). Species richness was shown to decrease by 3.8 for an increase in elevation of 1000 m (<em>t</em> = -3.43; <em>p</em> = 0.002).
-#' However, only 31% of the variation in species richness can be explained by elevation (<em>F</em> = 11.74; <em>df</em> = 1, 27; <em>p</em> = 0.002).
+#' = -0.63). Species richness was shown to decrease by 5.7 for an increase in elevation of 1000 m
+#' (<em>t</em> = -4.11; <em>p</em> = 0.0004). However, only 39% of the variation in species richness can
+#' be explained by elevation (<em>F</em> = 16.89; <em>df</em> = 1, 26; <em>p</em> = 0.0004).
 #'
 #' Looking at the plot of the species richness coloured by study area, there seems to be a strong decrease
 #' in species richness with elevation at both La Molinassa and Tavascan, but no change at Tor. A linear
 #' mixed model fitting elevation as a fixed effect and study area as a random effect, was used to
-#' investigate if there was any effect of study area on species richness. [TODO: add interpretation of
+#' investigate if there was any effect of study area on species richness. [**TODO**: add interpretation of
 #' this]. Given the effect of area on species richness, simple linear regressions were used to model the
-#' species richness with elevation within each study area separately. Whilst there was no relationship at Tor (<em>F</em> = 0.067; <em>df</em> = 1, 8; <em>R</em> = 0.09; <em>p</em> = 0.80),
-#' a clear decrease in species richness with elevation can be seen at La Molinassa (<em>F</em> = 11.1; <em>df</em> = 1, 6; <em>R</em> = 0.81; <em>p</em> = 0.02)
-#' and Tavascan (<em>F</em> = 304.5; <em>df</em> = 1, 5; <em>R</em> = 0.99; <em>p</em> < 0.01).
+#' species richness with elevation within each study area separately. Whilst there was no relationship at
+#' Tor (<em>F</em> = 0.77; <em>df</em> = 1, 8; <em>R</em> = 0.09; <em>p</em> = 0.41), a clear decrease
+#' in species richness with elevation can be seen at La Molinassa (<em>F</em> = 10.34; <em>df</em> = 1, 6;
+#' <em>R</em> = 0.63; <em>p</em> = 0.02) and Tavascan (<em>F</em> = 120.4; <em>df</em> = 1, 5; <em>R</em>
+#' = 0.96; <em>p</em> < 0.01).
 #'
 #' ## Questions
 #' <ol>
-#'  <li>I have included the weightings for sampling effort in the linear model. Now that I have done this, do I need to change anything regarding the models?</li>
-#'  <li>There is quite a big difference in the results when using the weightings, e.g. La Molinassa (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#la-molinassa).</li>
-#'  <li>Simon: When reporting the decrease in species richness with elevation and variation explained (first paragraph of results above), should both t and F be reported? Should the p-value only be reported once?</li>
-#'  <li>Simon: I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed effect and study area as a random effect (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model). How can I use this to say that from this result, we decided to look at the relationship for each study area separately? In the output for area there are no p-values.</li>
+#'  <li>When reporting the decrease in species richness with elevation and variation explained (first
+#' paragraph of results above), should both t and F be reported? Should the p-value only be reported
+#' once?</li>
+#'  <li>I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed
+#' effect and study area as a random effect
+#' (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model).
+#' How can I use this to say that from this result, we decided to look at the relationship for each study
+#' area separately? In the output for area there are no p-values.</li>
 #'  <li>In the same output, does it matter that the variance of area is very small (0)?</li>
-#'  <li>When doing the linear model for each area separately, should I recalculate the weightings so they are for each area separately?</li>
-#'  <li>To calculate <em>R</em> which is included in the last part of the results section above where we report the relationships for the areas separately, I have used the multiple R-squared (rather than adjusted R-squared) output because I understand that we are not adjusting for the number of predictors in the model. Is this correct?</li>
+#'  <li>To calculate <em>R</em> which is included in the last part of the results section above where we
+#' report the relationships for modelling species richness separately for each study area, I have used the
+#' multiple R-squared (rather than adjusted R-squared) output because I understand that we are not
+#' adjusting for the number of predictors in the model. Is this correct?</li>
 #' </ol>
