@@ -309,17 +309,6 @@ plot_lin_reg_sampling_effort_elevation(species_richness_sites,
 #' so (<em>R<sup>2</sup></em> = 0.13; <em>p</em> = 0.06), suggesting that although this might be a factor
 #' which influences the species richness, it probably is not the main one.
 #'
-#' ### Include sampling effort as a random factor
-#' Do the linear regression with sampling effort as a random factor.
-#+ message=FALSE, warning=FALSE
-
-lmm_species_richness_elev_sampling_effort <- lm(species_richness ~ elevational_band_m,
-                                            data = species_richness_sites)
-summary(lmm_species_richness_elev_sampling_effort)
-
-#' **TODO**: not really sure how to interpret this, because the model is the same as the previous one
-#' without the random factor.
-#'
 #' ## Check for effect of study area
 
 species_richness_sites$area <- as.factor(species_richness_sites$area) # make sure that area is considered
