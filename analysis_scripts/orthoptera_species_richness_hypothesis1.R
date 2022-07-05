@@ -342,7 +342,7 @@ qqline(resid(lmm_species_richness_elev_area_sampling_effort))
 #' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
 #' outlier in both plots.
 #'
-#' ## Species richness and elevation within study areas
+#' ## Investigate effects of elevation on species richness within different study areas
 #' Given the differences between Tor and the other two study areas, La Molinassa and Tavascan, a linear
 #' regression will be used to look at the relationship between species richness and elevation at each of
 #' these sites separately.
