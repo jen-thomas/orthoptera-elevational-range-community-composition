@@ -197,14 +197,14 @@ subset_data_area <- function(species_richness_sites_df, study_area) {
 }
 
 calculate_sampling_weights <- function(observations) {
-  #' Calculate sampling effort weightings. Sum the total number of observations, the total number caught
+  #' Calculate sampling effort index. Sum the total number of observations, the total number caught
   #' by net and the total caught by hand. Find the proportion of observations caught by net and by hand,
   #' by dividing each of the totals by the total number of observations.
   #'
   #' For each site, multiply the number of specimens caught by hand, by the proportion of the total caught
   #' by hand. Do the same for those caught by net.
   #'
-  #' This will result in a weighted number for each site, which takes into account the number of
+  #' This will result in an index for each site, which takes into account the number of
   #' observations and how they were caught, which is a proxy for the number of surveys done because
   #' generally, a higher number of individuals sampled will result in a higher number of species observed.
 
@@ -220,8 +220,8 @@ calculate_sampling_weights <- function(observations) {
   weighting_hand <- total_obs_hand / total_obs
   weighting_net <- total_obs_net / total_obs
 
-  weights <- observations_by_method %>%
-    mutate(weightings = (number_observations_by_hand * weighting_hand) + (number_observations_by_net * weighting_net))
+  sampling_effort <- observations_by_method %>%
+    mutate(sampling_effort_index = (number_observations_by_hand * weighting_hand) + (number_observations_by_net * weighting_net))
 
-  return(weights)
+  return(sampling_effort)
 }

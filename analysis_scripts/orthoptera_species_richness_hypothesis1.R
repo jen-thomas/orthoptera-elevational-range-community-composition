@@ -43,10 +43,6 @@ calculate_species_richness_sites <- function(all_observations, confirmed_observa
     unique_taxa_site$species_richness[unique_taxa_site$site_elevation == site] <- nrow(taxa_site)
   }
 
-  sampling_weights <- calculate_sampling_weights(confirmed_observations) # TODO change this to all
-  # observations when including the finalised observations as well
-
-  unique_taxa_site <- left_join(unique_taxa_site, sampling_weights, by = "site_elevation")
   return(unique_taxa_site)
 }
 
@@ -62,9 +58,19 @@ linear_regression <- function(dataframe, response_variable, explanatory_variable
   #'
   #' Return the model.
 
-  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe
-  #                 , weights = dataframe$weightings
-  )
+  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe)
+
+  return(regression)
+}
+
+linear_regression_species_richness_elevation <- function(dataframe, species_richness,
+elevational_band_m) {
+  #' Create a linear model (do a linear regression) of the explanatory variable (elevation) on the
+  #' response variable (species richness).
+  #'
+  #' Return the model.
+
+  regression <- lm(dataframe[[species_richness]] ~ dataframe[[elevational_band_m]])
 
   return(regression)
 }
@@ -131,6 +137,38 @@ plot_elevation_species_richness_area <- function(dataframe) {
     theme_classic()
 }
 
+plot_lin_reg_sampling_effort_species_richness <- function(dataframe, linear_regression) {
+  #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
+  #' values.
+
+  predicted_values <- get_predicted_values(linear_regression)
+  df <- cbind.data.frame(dataframe, predicted_values, stringsAsFactors = FALSE)
+
+  ggplot(df, aes(y = species_richness, x = sampling_effort_index)) +
+        geom_point(size = 3, col = "blue") +
+        geom_smooth(method = "lm", se = TRUE) +
+        #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+        #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+        labs(x = "Sampling effort index", y = "Species richness") +
+        theme_classic()
+}
+
+plot_lin_reg_sampling_effort_elevation <- function(dataframe, linear_regression) {
+  #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
+  #' values.
+
+  predicted_values <- get_predicted_values(linear_regression)
+  df <- cbind.data.frame(dataframe, predicted_values, stringsAsFactors = FALSE)
+
+  ggplot(df, aes(y = sampling_effort_index, x = elevational_band_m)) +
+        geom_point(size = 3, col = "blue") +
+        geom_smooth(method = "lm", se = TRUE) +
+        #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+        #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+        labs(x = "Elevation (m a.s.l)", y = "Sampling effort index") +
+        theme_classic()
+}
+
 #' ### Calculate species richness
 #'
 #' Calculate species richness for each site. TODO: add the taxa from the finalised observations.
@@ -148,16 +186,6 @@ confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
 species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations)
-
-#' Given the difference in the number of hand and net surveys undertaken at each site, a weighting of
-#' sampling effort was calculated.
-#'
-#' First, the proportion of all specimens captured by hand ($prop_{hand}$) and by the net ($prop_{net}$)
-#' was calculated. Secondly, the weighting for sampling effort was calculated for each site according
-#' to the following equation: $$weighting = obs_{hand} * prop_{hand} + obs_{net} * prop_{net}$$ where
-#' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
-#' method.
-
 print(species_richness_sites)
 
 #' ### Correlation
@@ -194,7 +222,7 @@ plot_elevation_species_richness(species_richness_sites)
 #'
 #' ### Linear regression
 #' Create linear model of species richness against elevation and look at the model.
-linear_regression_species_richness <- linear_regression(species_richness_sites, "species_richness", "elevational_band_m")
+linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites, "species_richness", "elevational_band_m")
 summary(linear_regression_species_richness)
 
 #' The linear regression shows that both the intercept and slope are statistically significant. Species
@@ -238,6 +266,40 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 
 summary(linear_regression_species_richness)
 
+#' ## Effect of sampling effort
+#'
+#' Given the difference in the number of hand and net surveys undertaken at each site, an index of
+#' sampling effort was calculated.
+#'
+#' First, the proportion of all specimens captured by hand ($prop_{hand}$) and by the net ($prop_{net}$)
+#' was calculated. Secondly, the index for sampling effort was calculated for each site according
+#' to the following equation: $$weighting = obs_{hand} * prop_{hand} + obs_{net} * prop_{net}$$ where
+#' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
+#' method.
+
+sampling_effort <- calculate_sampling_weights(confirmed_observations) # TODO change this to all
+# observations when including the finalised observations as well
+
+species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
+
+#' Regress the elevation and species richness against the sampling effort index.
+#+ message=FALSE, warning=FALSE
+
+lin_reg_species_richness_sampling_effort <- lm(species_richness_sites[["species_richness"]] ~ species_richness_sites[["sampling_effort_index"]], data = species_richness_sites)
+summary(lin_reg_species_richness_sampling_effort)
+plot_lin_reg_sampling_effort_species_richness(species_richness_sites, lin_reg_species_richness_sampling_effort)
+
+lin_reg_elevation_sampling_effort <- lm(species_richness_sites[["sampling_effort_index"]] ~ species_richness_sites[["elevational_band_m"]], data = species_richness_sites)
+summary(lin_reg_elevation_sampling_effort)
+plot_lin_reg_sampling_effort_elevation(species_richness_sites, lin_reg_elevation_sampling_effort)
+
+#' Do the linear regression with sampling effort as a random factor.
+#' #+ message=FALSE, warning=FALSE
+
+lmm_species_richness_elev_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|sampling_effort_index),
+                                       data = species_richness_sites)
+summary(lmm_species_richness_elev_sampling_effort)
+
 #' ## Linear mixed model to check for effect of study area
 #'
 
@@ -253,12 +315,12 @@ plot_elevation_species_richness_area(species_richness_sites)
 #' with elevation, but at Tor, there does not seem to be such a trend.
 #'
 #' ### Fit a linear mixed model
-#' A linear mixed model will be fitted, treating study area as a random factor.
+#' A linear mixed model will be fitted, treating study area and sampling effort as a random factor.
 #+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m + (1|area),
+lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|area) + (1|sampling_effort_index),
                                        data = species_richness_sites)
-summary(lmm_species_richness_elev_area)
+summary(lmm_species_richness_elev_area_sampling_effort)
 
 #' The value of variance for area (random effects section) is 0 (or presumably just very small if only
 #' 3dp are used). I understand this can occur because of sampling error. TODO: check if this is important.
@@ -268,13 +330,13 @@ summary(lmm_species_richness_elev_area)
 #'
 #' ### Plot linear mixed model
 
-plot(lmm_species_richness_elev_area)
+plot(lmm_species_richness_elev_area_sampling_effort)
 
 #'
 #' ### Test the assumptions of the linear mixed model
 
-qqnorm(resid(lmm_species_richness_elev_area))
-qqline(resid(lmm_species_richness_elev_area))
+qqnorm(resid(lmm_species_richness_elev_area_sampling_effort))
+qqline(resid(lmm_species_richness_elev_area_sampling_effort))
 
 #' The plot of the residuals doesn't show an obvious pattern. It might be possible to discern a slight
 #' decrease overall. The residuals seem to have a normal distribution, however there is one obvious
@@ -326,6 +388,28 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' ### Plot linear regression
 
 #' TODO: I'll put the above plots on one set of axes.
+
+#'
+#' ## Compare the models so far
+#'
+#' So far we have used a linear model to investigate the relationship between species richness and
+#' elevation. We have incorportated both study area and sampling effort as random factors, included them individually, and also run the model without any random factors.
+#'
+#' Display the model output for each of these models to compare the results.
+
+#' ### Linear regression of species richness against elevation. No random factors.
+summary(linear_regression_species_richness)
+
+#' ### Linear regression of species richness against elevation. Sampling effort as a random factor.
+summary(lmm_species_richness_elev_sampling_effort)
+
+#' ### Linear regression of species richness against elevation. Study area as a random factor.
+lmm_species_richness_elev_area <- lmer(species_richness ~ elevational_band_m + (1|area),
+                                       data = species_richness_sites)
+summary(lmm_species_richness_elev_area)
+
+#' ### Linear regression of species richness against elevation. Study area and sampling effort as a random factor.
+summary(lmm_species_richness_elev_area_sampling_effort)
 
 #'
 #' ## Investigate effects of elevation on Caelifera species richness
