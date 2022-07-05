@@ -63,7 +63,7 @@ linear_regression <- function(dataframe, response_variable, explanatory_variable
   #' Return the model.
 
   regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe
-                   , weights = dataframe$weightings
+  #                 , weights = dataframe$weightings
   )
 
   return(regression)
