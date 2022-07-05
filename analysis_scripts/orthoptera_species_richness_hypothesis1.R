@@ -10,11 +10,6 @@
 #'     df_print: paged
 #' ---
 
-#' **TODO (as of 2022-07-04):**
-#' <ul>
-#'  <li>incorporate "finalised" observations</li>
-#'  <li>**all numbers in the text need to be updated to what is in the stats output**.</li>
-#' </ul>
 #' <br>Import packages and functions from other files.
 #+ message=FALSE, warning=FALSE
 
