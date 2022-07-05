@@ -76,10 +76,11 @@ elevational_band_m) {
   return(regression)
 }
 
-plot_model_residuals <- function(model, dataframe, explanatory_variable) {
-  #' Calculate and plot the residuals from the regression as a function of the explanatory variable.
+plot_model_residuals_species_richness_elev <- function(model, dataframe, elevational_band_m) {
+  #' Calculate and plot the residuals from the regression as a function of the explanatory variable
+  #' (elevational band).
 
-  plot(residuals(model) ~ dataframe[[explanatory_variable]], data = dataframe)
+  plot(residuals(model) ~ dataframe[[elevational_band_m]])
   abline(h=0)
 }
 
@@ -230,7 +231,8 @@ summary(linear_regression_species_richness)
 #' ### Checking the assumptions of linear regression
 
 #' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
-plot_model_residuals(linear_regression_species_richness, species_richness_sites, "elevational_band_m")
+plot_model_residuals_species_richness_elev(linear_regression_species_richness, species_richness_sites,
+                                           "elevational_band_m")
 par(mfrow = c(2,2))
 plot(linear_regression_species_richness)
 
@@ -244,7 +246,7 @@ plot(linear_regression_species_richness)
 #' any trend of increasing residuals as the fitted values increase, therefore this assumption seems to be
 #' satisfied.
 #' * <em>normally-distributed residuals</em>: the residuals appear to have a normal distribution (Q-Q plot
-#' above) in general, but the point which corresponds to the highest species richness at 2000m, seems to
+#' above) in general, but the point which corresponds to the highest species richness, seems to
 #' be a bit of an outlier, skewing the distribution somewhat.
 #' </ul>
 #'
