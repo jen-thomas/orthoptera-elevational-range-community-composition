@@ -468,6 +468,15 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' <em>R</em> = 0.63; <em>p</em> = 0.02) and Tavascan (<em>F</em> = 120.4; <em>df</em> = 1, 5; <em>R</em>
 #' = 0.96; <em>p</em> < 0.01).
 #'
+#' Out of 37 species observed, 29 were Caelifera. A linear mixed model with elevation as a fixed effect
+#' and study area as a random effect, to investigate if the relationship between species richness and
+#' elevation followed a similar trend when using observations just of the Caelifera. Trends at all three
+#' study areas were similar to those already reported, with no evidence of a relationship between
+#' Caelifera species richness and elevation at Tor (<em>F</em> = 0.09; <em>df</em> = 1, 8; <em>R</em> =
+#' 0.01; <em>p</em> = 0.77), but a clear and significant decrease with elevation at both La Molinassa
+#' (<em>F</em> = 12.35; <em>df</em> = 1, 6; <em>R</em> = 0.67; <em>p</em> = 0.01) and Tavascan
+#' (<em>F</em> = 95.17; <em>df</em> = 1, 5; <em>R</em> = 0.95; <em>p</em> = 0.0002).
+#'
 #' ## Questions
 #' <ol>
 #'  <li>When reporting the decrease in species richness with elevation and variation explained (first
