@@ -15,8 +15,9 @@
 #'  <li>incorporate "finalised" observations</li>
 #'  <li>**all numbers in the text need to be updated to what is in the stats output**.</li>
 #' </ul>
-#' <br>Import packages functions from other files.
+#' <br>Import packages and functions from other files.
 #+ message=FALSE, warning=FALSE
+
 source("utils.R")
 source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
@@ -171,7 +172,8 @@ plot_lin_reg_sampling_effort_elevation <- function(dataframe, linear_regression)
 
 #' ### Calculate species richness
 #'
-#' Calculate species richness for each site. TODO: add the taxa from the finalised observations.
+#' Calculate species richness for each site.
+#' <br>**TODO**: add the taxa from the finalised observations.
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
@@ -205,8 +207,8 @@ print(coeff_det)
 
 #' <br>The relationship between species richness and elevation was tested using a Pearson's correlation.
 #' There was evidence to suggest a significant negative relationship between species richness and
-#' elevation (<em>r</em> = -0.56, <em>t<sub>26</sub></em> = -3.43, <em>p</em> = 0.002), however only
-#' 31% of the variation of species richness is explained by the elevation.
+#' elevation (<em>r</em> = -0.63, <em>t<sub>26</sub></em> = -4.12, <em>p</em> = 0.0004), however only
+#' 39% of the variation of species richness is explained by the elevation.
 #'
 #' ### Plot species richness against elevation.
 
