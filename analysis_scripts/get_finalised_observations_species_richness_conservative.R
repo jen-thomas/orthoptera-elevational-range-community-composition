@@ -301,6 +301,17 @@ TOR0220211004H1C001_notconservative["species"] <- "Chorthippus mollis"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0220211004H1C001_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0220211004H1C001_notconservative)
 
+#' ### TOR03 20210719 H1 C002
+TOR0320210719H1C002 <- finalised_observations[finalised_observations$specimen_label == "TOR03 20210719 H1 C002", ]
+confirmed_obs_tor03 <- get_confirmed_obs_site(confirmed_observations, "TOR03")
+TOR0320210719H1C002_conservative <- TOR0320210719H1C002[1, ]
+TOR0320210719H1C002_conservative["species"] <- ""
+TOR0320210719H1C002_notconservative <- TOR0320210719H1C002[1, ]
+TOR0320210719H1C002_notconservative["species"] <- "Stenobothrus nigromaculatus / Stenobothrus lineatus"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0320210719H1C002_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0320210719H1C002_notconservative)
+
 
 #' ## Checks on finalised observation data
 #'
