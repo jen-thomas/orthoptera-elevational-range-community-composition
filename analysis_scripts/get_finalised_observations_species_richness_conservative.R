@@ -89,6 +89,13 @@ MOL0820210915N1C002_new["species"] <- ""
 
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0820210915N1C002_new)
 
+MOL0920210915H1C014 <- finalised_observations[finalised_observations$specimen_label == "MOL09 20210915 H1 C014", ]
+confirmed_obs_mol09 <- get_confirmed_obs_site(confirmed_observations, "MOL09")
+MOL0920210915H1C014_new <- MOL0920210915H1C014[1, ]
+MOL0920210915H1C014_new["species"] <- ""
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0920210915H1C014_new)
+
 #' ## Checks on finalised observation data
 #' ### Check that all the specimens have a row in the new dataframe
 
