@@ -198,6 +198,18 @@ TAV0820210916H1C008_notconservative["species"] <- "Chorthippus mollis"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TAV0820210916H1C008_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TAV0820210916H1C008_notconservative)
 
+#' ### TAV08 20211006 H1 C007
+TAV0820211006H1C007 <- finalised_observations[finalised_observations$specimen_label == "TAV08 20211006 H1 C007", ]
+TAV0820211006H1C007_conservative <- TAV0820211006H1C007[1, ]
+TAV0820211006H1C007_conservative["species"] <- ""
+TAV0820211006H1C007_notconservative <- TAV0820211006H1C007[1, ]
+TAV0820211006H1C007_notconservative["species"] <- "Chorthippus mollis"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TAV0820211006H1C007_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TAV0820211006H1C007_notconservative)
+
+
+
 #' ## Checks on finalised observation data
 #'
 #' ### Count the number of rows in the finalised set of identifications
