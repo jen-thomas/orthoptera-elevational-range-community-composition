@@ -239,6 +239,17 @@ TAV0920211006N1C008_notconservative["species"] <- "Chorthippus biguttulus / Chor
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TAV0920211006N1C008_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TAV0920211006N1C008_notconservative)
 
+#' ### TOR01 20210629 N1 E007
+TOR0120210629N1E007 <- finalised_observations[finalised_observations$specimen_label == "TOR01 20210629 N1 E007", ]
+confirmed_obs_tor01 <- get_confirmed_obs_site(confirmed_observations, "TOR01")
+TOR0120210629N1E007_conservative <- TOR0120210629N1E007[1, ]
+TOR0120210629N1E007_conservative["genus"] <- "Tettigonia"
+TOR0120210629N1E007_notconservative <- TOR0120210629N1E007[1, ]
+TOR0120210629N1E007_notconservative["genus"] <- "Conocephalus"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0120210629N1E007_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0120210629N1E007_notconservative)
+
 #' ## Checks on finalised observation data
 #'
 #' ### Count the number of rows in the finalised set of identifications
