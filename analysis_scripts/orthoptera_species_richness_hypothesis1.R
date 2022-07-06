@@ -49,16 +49,6 @@ plot_elevation_species_richness <- function(species_richness_elevation) {
        xlab = "Elevation band (m a.s.l)", ylab = "Species richness")
 }
 
-linear_regression <- function(dataframe, response_variable, explanatory_variable) {
-  #' Create a linear model (do a linear regression) of the explanatory variable on the response variable.
-  #'
-  #' Return the model.
-
-  regression <- lm(dataframe[[response_variable]] ~ dataframe[[explanatory_variable]], data = dataframe)
-
-  return(regression)
-}
-
 linear_regression_species_richness_elevation <- function(dataframe, species_richness,
 elevational_band_m) {
   #' Create a linear model (do a linear regression) of the explanatory variable (elevation) on the
@@ -425,7 +415,7 @@ plot_elevation_species_richness_area(caelifera_species_richness_sites)
 
 caelifera_species_richness_tor <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tor", ]
 
-lin_reg_caelifera_species_richness_area_tor <- linear_regression(caelifera_species_richness_tor,
+lin_reg_caelifera_species_richness_area_tor <- linear_regression_species_richness_elevation(caelifera_species_richness_tor,
                                                        "species_richness", "elevational_band_m")
 summary(lin_reg_caelifera_species_richness_area_tor)
 
@@ -436,7 +426,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tor, lin_reg_
 
 caelifera_species_richness_mol <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "La Molinassa", ]
 
-lin_reg_caelifera_species_richness_area_mol <- linear_regression(caelifera_species_richness_mol,
+lin_reg_caelifera_species_richness_area_mol <- linear_regression_species_richness_elevation(caelifera_species_richness_mol,
                                                                  "species_richness", "elevational_band_m")
 summary(lin_reg_caelifera_species_richness_area_mol)
 
@@ -447,7 +437,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_mol, lin_reg_
 
 caelifera_species_richness_tav <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tavascan", ]
 
-lin_reg_caelifera_species_richness_area_tav <- linear_regression(caelifera_species_richness_tav,
+lin_reg_caelifera_species_richness_area_tav <- linear_regression_species_richness_elevation(caelifera_species_richness_tav,
                                                        "species_richness", "elevational_band_m")
 summary(lin_reg_caelifera_species_richness_area_tav)
 
