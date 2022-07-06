@@ -333,6 +333,16 @@ TOR0420210919N2C002_notconservative["species"] <- "Omocestus petraeus"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0420210919N2C002_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0420210919N2C002_notconservative)
 
+#' ### TOR05 20210919 H1 C008
+TOR0520210919H1C008 <- finalised_observations[finalised_observations$specimen_label == "TOR05 20210919 H1 C008", ]
+confirmed_obs_tor05 <- get_confirmed_obs_site(confirmed_observations, "TOR05")
+TOR0520210919H1C008_conservative <- TOR0520210919H1C008[1, ]
+TOR0520210919H1C008_conservative["species"] <- ""
+TOR0520210919H1C008_notconservative <- TOR0520210919H1C008[1, ]
+TOR0520210919H1C008_notconservative["species"] <- ""
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0520210919H1C008_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0520210919H1C008_notconservative)
 
 #' ## Checks on finalised observation data
 #'
