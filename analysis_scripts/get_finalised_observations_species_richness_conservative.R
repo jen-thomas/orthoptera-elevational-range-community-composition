@@ -63,40 +63,68 @@ print(number_finalised_specimens)
 #' specimen should be recorded so that it adds (or not) to the species richness for a particular site, as
 #' required. See below for the logic.
 
+#' ### BES01 20210914 H1 C007
 BES0120210914H1C007 <- finalised_observations[finalised_observations$specimen_label == "BES01 20210914 H1 C007", ]
-BES0120210914H1C007_new <- BES0120210914H1C007[1, ]
-BES0120210914H1C007_new["genus"] <- "Gomphocerus / Gomphoceridius"
+BES0120210914H1C007_conservative <- BES0120210914H1C007[1, ]
+BES0120210914H1C007_conservative["genus"] <- "Gomphocerus / Gomphoceridius"
+BES0120210914H1C007_notconservative <- BES0120210914H1C007[1, ]
+BES0120210914H1C007_notconservative["genus"] <- "Gomphocerus / Gomphoceridius"
 
-finalised_identifications_conservative <- BES0120210914H1C007_new
+finalised_identifications_conservative <- BES0120210914H1C007_conservative
+finalised_identifications_notconservative <- BES0120210914H1C007_notconservative
 
+#' ### BES02 20210720 H1 C002
 BES0220210720H1C002 <- finalised_observations[finalised_observations$specimen_label == "BES02 20210720 H1 C002", ]
 confirmed_obs_bes02 <- get_confirmed_obs_site(confirmed_observations, "BES02")
-BES0220210720H1C002_new <- BES0220210720H1C002[1, ]
-BES0220210720H1C002_new["genus"] <- "Miramella / Podisma"
+BES0220210720H1C002_conservative <- BES0220210720H1C002[1, ]
+BES0220210720H1C002_conservative["genus"] <- "Miramella / Podisma"
+BES0220210720H1C002_notconservative <- BES0220210720H1C002[1, ]
+BES0220210720H1C002_notconservative["genus"] <- "Miramella / Podisma"
 
-finalised_identifications_conservative <- rbind(finalised_identifications_conservative, BES0220210720H1C002_new)
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, BES0220210720H1C002_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, BES0220210720H1C002_notconservative)
 
-MOL0820210915N1C002 <- finalised_observations[finalised_observations$specimen_label == "MOL08 20210915 N1 C002", ]
+#' ### MOL08 20210915 H1 C002
+MOL0820210915H1C002 <- finalised_observations[finalised_observations$specimen_label == "MOL08 20210915 H1 C002", ]
 confirmed_obs_mol08 <- get_confirmed_obs_site(confirmed_observations, "MOL08")
-MOL0820210915N1C002_new <- MOL0820210915N1C002[1, ]
-MOL0820210915N1C002_new["species"] <- ""
+MOL0820210915H1C002_conservative <- MOL0820210915H1C002[1, ]
+MOL0820210915H1C002_conservative["species"] <- ""
+MOL0820210915H1C002_notconservative <- MOL0820210915H1C002[1, ]
+MOL0820210915H1C002_notconservative["species"] <- "Chorthippus mollis"
 
-finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0820210915N1C002_new)
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0820210915H1C002_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, MOL0820210915H1C002_notconservative)
 
+#' ### MOL08 20210915 N1 C002
 MOL0820210915N1C002 <- finalised_observations[finalised_observations$specimen_label == "MOL08 20210915 N1 C002", ]
-MOL0820210915N1C002_new <- MOL0820210915N1C002[1, ]
-MOL0820210915N1C002_new["species"] <- ""
+MOL0820210915N1C002_conservative <- MOL0820210915N1C002[1, ]
+MOL0820210915N1C002_conservative["species"] <- ""
+MOL0820210915N1C002_notconservative <- MOL0820210915N1C002[1, ]
+MOL0820210915N1C002_notconservative["species"] <- "Chorthippus mollis"
 
-finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0820210915N1C002_new)
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0820210915N1C002_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, MOL0820210915N1C002_notconservative)
 
+#' ### MOL09 20210915 H1 C014
 MOL0920210915H1C014 <- finalised_observations[finalised_observations$specimen_label == "MOL09 20210915 H1 C014", ]
 confirmed_obs_mol09 <- get_confirmed_obs_site(confirmed_observations, "MOL09")
-MOL0920210915H1C014_new <- MOL0920210915H1C014[1, ]
-MOL0920210915H1C014_new["species"] <- ""
+MOL0920210915H1C014_conservative <- MOL0920210915H1C014[1, ]
+MOL0920210915H1C014_conservative["species"] <- ""
+MOL0920210915H1C014_notconservative <- MOL0920210915H1C014[1, ]
+MOL0920210915H1C014_notconservative["species"] <- "Chorthippus mollis"
 
-finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0920210915H1C014_new)
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0920210915H1C014_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, MOL0920210915H1C014_notconservative)
+
 
 #' ## Checks on finalised observation data
+#'
+#' ### Count the number of rows in the finalised set of identifications
+number_conservative_specimens <- n_distinct(finalised_identifications_conservative$specimen_label)
+paste("Conservative: ", number_conservative_specimens)
+number_notconservative_specimens <- n_distinct(finalised_identifications_notconservative$specimen_label)
+paste("Not conservative: ", number_notconservative_specimens)
+
 #' ### Check that all the specimens have a row in the new dataframe
 
 
