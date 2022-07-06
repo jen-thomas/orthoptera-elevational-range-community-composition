@@ -394,6 +394,11 @@ summary(lin_reg_species_richness_area_tav)
 
 plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_richness_area_tav)
 
+#' Whilst there was no relationship at Tor (<em>r</em> = -0.30; <em>F</em> = 0.77; <em>df</em> = 1, 8;
+#' <em>p</em> = 0.41), a clear decrease in species richness with elevation can be seen at La Molinassa
+#' (<em>r</em> = -0.80; <em>F</em> = 10.34; <em>df</em> = 1, 6; <em>p</em> = 0.02) and Tavascan
+#' (<em>r</em> = -0.98; <em>F</em> = 120.4; <em>df</em> = 1, 5; <em>p</em> < 0.01).
+#'
 #' ### Plot linear regression
 
 #' **TODO**: I'll put the above plots on one set of axes.
@@ -448,6 +453,11 @@ summary(lin_reg_caelifera_species_richness_area_tav)
 
 plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_caelifera_species_richness_area_tav)
 
+#' There was no evidence of a relationship between Caelifera species richness and elevation at Tor
+#' (<em>r</em> = -0.11; <em>F</em> = 0.09; <em>df</em> = 1, 8; <em>p</em> = 0.77), but a clear and
+#' significant decrease with elevation at both La Molinassa (<em>r</em> = -0.82; <em>F</em> = 12.35;
+#' <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan (<em>r</em> = -0.97; <em>F</em> = 95.17;
+#' <em>df</em> = 1, 5; <em>p</em> = 0.0002).
 #'
 #' ## Results
 #'
