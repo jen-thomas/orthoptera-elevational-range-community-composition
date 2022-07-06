@@ -97,5 +97,3 @@ finalised_identifications_conservative <- rbind(finalised_identifications_conser
 
 
 #' Calculate the species richness (conservative) including the finalised observations
-species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations)
-print(species_richness_sites)
