@@ -261,6 +261,16 @@ TOR0220210629N1E001_notconservative["genus"] <- "" # cannot select just one genu
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0220210629N1E001_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0220210629N1E001_notconservative)
 
+#' ### TOR02 20210919 N1 C005
+TOR0220210919N1C005 <- finalised_observations[finalised_observations$specimen_label == "TOR02 20210919 N1 C005", ]
+TOR0220210919N1C005_conservative <- TOR0220210919N1C005[1, ]
+TOR0220210919N1C005_conservative["species"] <- ""
+TOR0220210919N1C005_notconservative <- TOR0220210919N1C005[1, ]
+TOR0220210919N1C005_notconservative["species"] <- "Chorthippus mollis"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0220210919N1C005_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0220210919N1C005_notconservative)
+
 
 #' ## Checks on finalised observation data
 #'
