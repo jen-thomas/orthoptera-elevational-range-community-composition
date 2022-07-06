@@ -344,6 +344,18 @@ TOR0520210919H1C008_notconservative["species"] <- ""
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0520210919H1C008_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0520210919H1C008_notconservative)
 
+#' ### TOR09 20210616 N1 C004
+TOR0920210616N1C004 <- finalised_observations[finalised_observations$specimen_label == "TOR09 20210616 N1 C004", ]
+confirmed_obs_tor09 <- get_confirmed_obs_site(confirmed_observations, "TOR09")
+TOR0920210616N1C004_conservative <- TOR0920210616N1C004[1, ]
+TOR0920210616N1C004_conservative["genus"] <- ""
+TOR0920210616N1C004_notconservative <- TOR0920210616N1C004[1, ]
+TOR0920210616N1C004_notconservative["genus"] <- "Omocestus"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0920210616N1C004_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0920210616N1C004_notconservative)
+
+
 #' ## Checks on finalised observation data
 #'
 #' ### Count the number of rows in the finalised set of identifications
