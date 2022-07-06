@@ -36,19 +36,6 @@ rename_site_with_elevation <- function(dataframe) {
   return(dataframe)
 }
 
-get_study_area <- function(sites_df) {
-    #' Get the site name and study area from the sites data. Create the new site name using elevation.
-    #' Make the study area a factor. Replace the long study area names with shortened versions.
-    #'
-    #' Return dataframe with new site name and study area.
-
-  study_areas <- sites_df[, c("area", "site_name", "elevational_band_m")]
-
-  study_area_details <- rename_site_with_elevation(study_areas)
-
-  return(study_area_details)
-}
-
 join_observation_site <- function(observations_df, sites_df) {
     #' Join the observation, survey (some already with the observations) and site data frames using a left
     #' join.
@@ -183,18 +170,6 @@ get_caelifera_only <- function(observations) {
 }
 
 #' ### Create summaries of species richness data
-
-subset_data_area <- function(species_richness_sites_df, study_area) {
-    #' Subset the species richness at each site dataframe according to the study area. The study area will
-    #' be extracted from the string in the site_elevation.
-    #'
-    #' Return dataframe of just the sites within the study area.
-
-  species_richness_area <- species_richness_sites_df[str_detect(species_richness_sites_df$site_elevation,
-                                                                study_area),]
-
-  return(species_richness_area)
-}
 
 calculate_sampling_weights <- function(observations) {
   #' Calculate sampling effort index. Sum the total number of observations, the total number caught
