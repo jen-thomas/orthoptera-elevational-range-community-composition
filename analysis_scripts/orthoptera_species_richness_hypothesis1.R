@@ -465,19 +465,19 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' investigate if there was any effect of study area on species richness. [**TODO**: add interpretation of
 #' this]. Given the effect of area on species richness, simple linear regressions were used to model the
 #' species richness with elevation within each study area separately. Whilst there was no relationship at
-#' Tor (<em>F</em> = 0.77; <em>df</em> = 1, 8; <em>R</em> = 0.09; <em>p</em> = 0.41), a clear decrease
-#' in species richness with elevation can be seen at La Molinassa (<em>F</em> = 10.34; <em>df</em> = 1, 6;
-#' <em>R</em> = 0.63; <em>p</em> = 0.02) and Tavascan (<em>F</em> = 120.4; <em>df</em> = 1, 5; <em>R</em>
-#' = 0.96; <em>p</em> < 0.01).
+#' Tor (<em>r</em> = -0.30; <em>F</em> = 0.77; <em>df</em> = 1, 8; <em>p</em> = 0.41), a clear decrease in
+#' species richness with elevation can be seen at La Molinassa (<em>r</em> = -0.80; <em>F</em> = 10.34;
+#' <em>df</em> = 1, 6; <em>p</em> = 0.02) and Tavascan (<em>r</em> = -0.98; <em>F</em> = 120.4;
+#' <em>df</em> = 1, 5; <em>p</em> < 0.01).
 #'
 #' Out of 37 species observed, 29 were Caelifera. A linear mixed model with elevation as a fixed effect
 #' and study area as a random effect, to investigate if the relationship between species richness and
 #' elevation followed a similar trend when using observations just of the Caelifera. Trends at all three
 #' study areas were similar to those already reported, with no evidence of a relationship between
-#' Caelifera species richness and elevation at Tor (<em>F</em> = 0.09; <em>df</em> = 1, 8; <em>R</em> =
-#' 0.01; <em>p</em> = 0.77), but a clear and significant decrease with elevation at both La Molinassa
-#' (<em>F</em> = 12.35; <em>df</em> = 1, 6; <em>R</em> = 0.67; <em>p</em> = 0.01) and Tavascan
-#' (<em>F</em> = 95.17; <em>df</em> = 1, 5; <em>R</em> = 0.95; <em>p</em> = 0.0002).
+#' Caelifera species richness and elevation at Tor (<em>r</em> = -0.11; <em>F</em> = 0.09; <em>df</em> =
+#' 1, 8; <em>p</em> = 0.77), but a clear and significant decrease with elevation at both La Molinassa
+#' (<em>r</em> = -0.82; <em>F</em> = 12.35; <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan
+#' (<em>r</em> = -0.97; <em>F</em> = 95.17; <em>df</em> = 1, 5; <em>p</em> = 0.0002).
 #'
 #' ## Questions
 #' <ol>
@@ -490,8 +490,8 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' How can I use this to say that from this result, we decided to look at the relationship for each study
 #' area separately? In the output for area there are no p-values.</li>
 #'  <li>In the same output, does it matter that the variance of area is very small (0)?</li>
-#'  <li>To calculate <em>R</em> which is included in the last part of the results section above where we
+#'  <li>To calculate <em>r</em> which is included in the last part of the results section above where we
 #' report the relationships for modelling species richness separately for each study area, I have used the
 #' multiple R-squared (rather than adjusted R-squared) output because I understand that we are not
-#' adjusting for the number of predictors in the model. Is this correct?</li>
+#' adjusting for the number of predictors in the model. Is this correct or should I be using something else?</li>
 #' </ol>
