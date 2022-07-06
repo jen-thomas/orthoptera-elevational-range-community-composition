@@ -208,6 +208,16 @@ TAV0820211006H1C007_notconservative["species"] <- "Chorthippus mollis"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TAV0820211006H1C007_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TAV0820211006H1C007_notconservative)
 
+#' ### TAV09 20210630 N1 C023
+TAV0920210630N1C023 <- finalised_observations[finalised_observations$specimen_label == "TAV09 20210630 N1 C023", ]
+confirmed_obs_tav09 <- get_confirmed_obs_site(confirmed_observations, "TAV09")
+TAV0920210630N1C023_conservative <- TAV0920210630N1C023[1, ]
+TAV0920210630N1C023_conservative["species"] <- ""
+TAV0920210630N1C023_notconservative <- TAV0920210630N1C023[1, ]
+TAV0920210630N1C023_notconservative["species"] <- "Stenobothrus nigromaculatus / Stenobothrus stigmaticus / Stenobothrus lineatus"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TAV0920210630N1C023_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TAV0920210630N1C023_notconservative)
 
 
 #' ## Checks on finalised observation data
