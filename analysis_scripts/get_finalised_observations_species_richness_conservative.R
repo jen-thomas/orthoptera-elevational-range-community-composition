@@ -136,6 +136,15 @@ MOL0920211002H1C001_notconservative["species"] <- "Chorthippus mollis"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0920211002H1C001_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, MOL0920211002H1C001_notconservative)
 
+#' ### MOL09 20210915 N1 C002
+MOL0920210915N1C002 <- finalised_observations[finalised_observations$specimen_label == "MOL09 20210915 N1 C002", ]
+MOL0920210915N1C002_conservative <- MOL0920210915N1C002[1, ]
+MOL0920210915N1C002_conservative["species"] <- ""
+MOL0920210915N1C002_notconservative <- MOL0920210915N1C002[1, ]
+MOL0920210915N1C002_notconservative["species"] <- "Chorthippus mollis"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, MOL0920210915N1C002_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, MOL0920210915N1C002_notconservative)
 
 #' ## Checks on finalised observation data
 #'
