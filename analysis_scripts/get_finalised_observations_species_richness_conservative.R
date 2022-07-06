@@ -355,6 +355,16 @@ TOR0920210616N1C004_notconservative["genus"] <- "Omocestus"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0920210616N1C004_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0920210616N1C004_notconservative)
 
+#' ### TOR10 20211004 H1 C002
+TOR1020211004H1C002 <- finalised_observations[finalised_observations$specimen_label == "TOR10 20211004 H1 C002", ]
+confirmed_obs_tor10 <- get_confirmed_obs_site(confirmed_observations, "TOR10")
+TOR1020211004H1C002_conservative <- TOR1020211004H1C002[1, ]
+TOR1020211004H1C002_conservative["species"] <- ""
+TOR1020211004H1C002_notconservative <- TOR1020211004H1C002[1, ]
+TOR1020211004H1C002_notconservative["species"] <- "Chorthippus mollis"
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR1020211004H1C002_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR1020211004H1C002_notconservative)
 
 #' ## Checks on finalised observation data
 #'
