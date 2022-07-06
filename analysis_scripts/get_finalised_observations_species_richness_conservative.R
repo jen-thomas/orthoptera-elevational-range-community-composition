@@ -250,6 +250,18 @@ TOR0120210629N1E007_notconservative["genus"] <- "Conocephalus"
 finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0120210629N1E007_conservative)
 finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0120210629N1E007_notconservative)
 
+#' ### TOR02 20210629 N1 E001
+TOR0220210629N1E001 <- finalised_observations[finalised_observations$specimen_label == "TOR02 20210629 N1 E001", ]
+confirmed_obs_tor02 <- get_confirmed_obs_site(confirmed_observations, "TOR02")
+TOR0220210629N1E001_conservative <- TOR0220210629N1E001[1, ]
+TOR0220210629N1E001_conservative["genus"] <- "" # cannot select just one genus because it could have been either
+TOR0220210629N1E001_notconservative <- TOR0220210629N1E001[1, ]
+TOR0220210629N1E001_notconservative["genus"] <- "" # cannot select just one genus because it could have been either
+
+finalised_identifications_conservative <- rbind(finalised_identifications_conservative, TOR0220210629N1E001_conservative)
+finalised_identifications_notconservative <- rbind(finalised_identifications_notconservative, TOR0220210629N1E001_notconservative)
+
+
 #' ## Checks on finalised observation data
 #'
 #' ### Count the number of rows in the finalised set of identifications
