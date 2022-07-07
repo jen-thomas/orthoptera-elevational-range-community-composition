@@ -200,3 +200,11 @@ calculate_sampling_weights <- function(observations) {
 
   return(sampling_effort)
 }
+
+join_observations <- function(confirmed_observations, finalised_observations) {
+  #' Join the dataframes of the confirmed and finalised observations.
+
+  all_observations <- rbind(confirmed_observations, finalised_observations)
+
+  return(all_observations)
+}

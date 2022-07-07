@@ -16,6 +16,7 @@
 source("utils.R")
 source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
+source("get_finalised_observations_species_richness_conservative.R")
 
 vector_packages <- c("visreg", "ggplot2", "lmerTest")
 get_packages(vector_packages)
@@ -156,10 +157,7 @@ plot_lin_reg_sampling_effort_elevation <- function(dataframe, linear_regression)
         theme_classic()
 }
 
-#' ### Calculate species richness
-#'
-#' Calculate species richness for each site.
-#' <br>**TODO**: add the taxa from the finalised observations.
+#' ## Import and set up the data
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
@@ -173,7 +171,19 @@ observations_sites_df <- import_all_observations(observations_file, sites_file)
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
-species_richness_sites <- calculate_species_richness_sites(observations_sites_df, confirmed_observations)
+#' ### Get the finalised identifications
+
+finalised_identifications <- create_finalised_observations(finalised_observations)
+
+finalised_identifications_conservative <- finalised_identifications[[1]]
+finalised_identifications_notconservative <- finalised_identifications[[2]]
+
+all_observations_conservative <- join_observations(confirmed_observations, finalised_identifications_conservative)
+all_observations_notconservative <- join_observations(confirmed_observations, finalised_identifications_notconservative)
+
+#' Calculate species richness at each site
+
+species_richness_sites <- calculate_species_richness_sites(observations_sites_df, all_observations_notconservative)
 print(species_richness_sites)
 
 #' ### Correlation
@@ -266,7 +276,7 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
 #' method.
 
-sampling_effort <- calculate_sampling_weights(confirmed_observations) # TODO change this to all
+sampling_effort <- calculate_sampling_weights(all_observations_conservative) # TODO change this to all
 # observations when including the finalised observations as well
 
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
@@ -398,7 +408,7 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' Only five species of Ensifera were detected during the surveys, so species richness relationships will
 #' be explored further just for the Caelifera.
 
-caelifera_observations <- get_caelifera_only(confirmed_observations)
+caelifera_observations <- get_caelifera_only(all_observations_conservative)
 
 caelifera_species_richness_sites <- calculate_species_richness_sites(observations_sites_df,
                                                                      caelifera_observations)
