@@ -183,8 +183,12 @@ all_observations_notconservative <- join_observations(confirmed_observations, fi
 
 #' Calculate species richness at each site
 
-species_richness_sites <- calculate_species_richness_sites(observations_sites_df, all_observations_notconservative)
-print(species_richness_sites)
+species_richness_sites <- calculate_species_richness_sites(observations_sites_df, all_observations_conservative)
+
+species_richness_sites_notconservative <- calculate_species_richness_sites(observations_sites_df, all_observations_notconservative)
+
+display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative, by = c("site_elevation", "area", "elevational_band_m"), suffix = c("_conservative", "_notconservative"))
+print(display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative))
 
 #' ### Correlation
 #' Do a correlation test between the species richness at each site and elevation.
@@ -264,6 +268,26 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' (<em>p</em> = 0.0004), therefore we can say there is a significant relationship between the species
 #' richness and elevation.
 #'
+#' ## Check the regression if non-conservative identifications are used
+
+#' Some specimens were identified to one of multiple species or genus, because of, for example, missing or
+#' contradictory features. These are used in a conservative way in the analysis above. This part of the
+#' analysis will check if there is any difference to the relationship between species richness and
+#' elevation, if the less conservative identifications are used.
+#'
+#'
+#' ### Linear regression
+
+#' Create a linear model of species richness against elevation and look at the model output.
+#+ message=FALSE, warning=FALSE
+
+linear_regression_species_richness_conservative <- linear_regression_species_richness_elevation(species_richness_sites_notconservative,
+                       "species_richness", "elevational_band_m")
+summary(linear_regression_species_richness_conservative)
+
+plot_linear_regression_species_richness(species_richness_sites_notconservative, linear_regression_species_richness_conservative)
+
+
 #' ## Account for the effects of sampling effort
 #'
 #' Due to logistical reasons and poor weather, the sampling effort varied a lot across the sampling sites.
