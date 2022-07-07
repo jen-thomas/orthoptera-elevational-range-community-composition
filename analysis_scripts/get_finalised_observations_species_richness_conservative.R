@@ -12,7 +12,6 @@
 
 source("utils.R")
 source("data_preparation.R")
-source("orthoptera_elevation_data_exploration.R")
 
 vector_packages <- c("visreg", "dplyr")
 get_packages(vector_packages)

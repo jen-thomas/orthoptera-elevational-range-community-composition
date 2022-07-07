@@ -24,24 +24,7 @@ get_packages(vector_packages)
 #' ## Investigate effects of elevation on species richness
 #+ message=FALSE, warning=FALSE
 
-calculate_species_richness_sites <- function(all_observations, confirmed_observations) {
-  #' For each site in the dataset, go through and get the summary of the taxa. Count the taxa for each
-  #' site to give the species richness for each site.
-  #'
-  #' Return a dataframe with the site, elevation band and species richness.
-
-  site_elevations <- get_site_elevation(all_observations)
-  unique_taxa_site <- site_elevations
-
-  for (i in rownames(site_elevations)) {
-    site <- (site_elevations[i, "site_elevation"])
-    site_observations <- filter(confirmed_observations, confirmed_observations$site_elevation == site)
-    taxa_site <- get_unique_confirmed_taxa(site_observations)
-    unique_taxa_site$species_richness[unique_taxa_site$site_elevation == site] <- nrow(taxa_site)
-  }
-
-  return(unique_taxa_site)
-}
+#' The following functions calculate the species richness and do the statistics for the analysis of this hypothesis.
 
 plot_elevation_species_richness <- function(species_richness_elevation) {
   #' Plot elevation band against species richness.
@@ -183,9 +166,9 @@ all_observations_notconservative <- join_observations(confirmed_observations, fi
 
 #' Calculate species richness at each site
 
-species_richness_sites <- calculate_species_richness_sites(observations_sites_df, all_observations_conservative)
+species_richness_sites <- calculate_species_richness_sites(all_observations_conservative)
 
-species_richness_sites_notconservative <- calculate_species_richness_sites(observations_sites_df, all_observations_notconservative)
+species_richness_sites_notconservative <- calculate_species_richness_sites(all_observations_notconservative)
 
 display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative, by = c("site_elevation", "area", "elevational_band_m"), suffix = c("_conservative", "_notconservative"))
 display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
@@ -434,8 +417,7 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 
 caelifera_observations <- get_caelifera_only(all_observations_conservative)
 
-caelifera_species_richness_sites <- calculate_species_richness_sites(observations_sites_df,
-                                                                     caelifera_observations)
+caelifera_species_richness_sites <- calculate_species_richness_sites(caelifera_observations)
 caelifera_species_richness_sites$area <- as.factor(caelifera_species_richness_sites$area) # make sure
 # that area is considered as a factor
 

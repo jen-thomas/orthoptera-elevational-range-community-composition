@@ -12,6 +12,7 @@
 #+ message=FALSE, warning=FALSE
 source("data_preparation.R")
 source("utils.R")
+source("get_finalised_observations_species_richness_conservative.R")
 
 vector_packages <- c("fossil", "stringr", "dplyr", "plyr")
 get_packages(vector_packages)
@@ -32,30 +33,57 @@ observations_sites_df <- import_all_observations(observations_file, sites_file)
 
 #' ### Subset observations
 #'
-#' Many small nymphs could not be identified to species level. Furthermore, some adults could only be
-#' identified to genus or a higher taxonomic level due to hard-to-distinguish features or contradictory
-#' features. All specimens identified to one particular taxa had a "confirmed" identification.
+#' All specimens were identified to the lowest taxonomic level possible. Many small nymphs could not be
+#' identified to species level. Furthermore, some adults could only be identified to genus or a higher
+#' taxonomic level due to hard-to-distinguish features or contradictory features. All specimens identified
+#' to one particular taxa had a "confirmed" identification.
 #'
 #' In some cases, specimens could only be identified to one of a set of multiple taxa, for
 #' instance where contradictory features in the keys meant that they could be identified to one of two
 #' particular taxa. An identification was "finalised" when a specimen could be identified to a number of
 #' taxa.
 #'
-#' All specimens were identified to the lowest taxonomic level possible.
-#'
-#' In some parts of the analysis, only those specimens identified to a particular taxa will be used. The
-#' observations used will depend on the question being asked.
-#'
-#' In this section, the observations will be subset according to these different types of identification.
+#' In parts of the analysis, the observations will referred to as confirmed or finalised, and be subset
+#' according to these different types of identification.
+
+#' Get the confirmed identifications.
 
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
-finalised_observations <- get_finalised_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
-#' ## Explore observation data
+#' Get the finalised identifications.
 
-#' ### Summarise all observations
+finalised_observations <- get_finalised_observations(observations_sites_df)
+finalised_identifications <- create_finalised_observations(finalised_observations)
+
+#' When determining what to do with specimens that were identified to multiple taxa, a conservative
+#' approach was taken. There were three cases:
+#' <ul>
+#' <li>none of the multiple taxa had been seen at a site -> a new taxa was included for the specimen</li>
+#' <li>one of the multiple taxa had been seen at a site -> no new taxa was included for the specimen</li>
+#' <li>all of the multiple taxa had been seen at site -> no new taxa was included for the specimen</li>
+#'  </ul>
+#' In order to compare the analysis for the case where the multiple taxa could have added to the taxa at
+#' a site, an approch that was not as conservative, was also taken. Taking the same cases as above:
+#' <ul>
+#' <li>none of the multiple taxa had been seen at a site -> a new taxa was included for the specimen</li>
+#' <li>one of the multiple taxa had been seen at a site -> the other taxa was included for the specimen</li>
+#' <li>all of the multiple taxa had been seen at site -> no new taxa was included for the specimen</li>
+#'  </ul>
+#' The identifications from the conservative approach will be used for the analysis, but the
+#' none-conservative approach will be used as a comparison.
+
+finalised_identifications_conservative <- finalised_identifications[[1]]
+finalised_identifications_notconservative <- finalised_identifications[[2]]
+
+all_observations_conservative <- join_observations(confirmed_observations, finalised_identifications_conservative)
+all_observations_notconservative <- join_observations(confirmed_observations, finalised_identifications_notconservative)
+
+#' The rest of this data exploration will use the "conservative" data.
 #'
+#' ## Explore observation data
+#'
+#' ### Summarise all observations
 #' The following functions summarise the number of observations and taxa from all surveys.
 
 get_number_observations <- function(observations) {
@@ -65,48 +93,6 @@ get_number_observations <- function(observations) {
   number_observations <- nrow(unique_observations)
 
   return(number_observations)
-}
-
-get_unique_species <- function(observations) {
-  #' Get the unique species observed. Use observations identified to species.
-
-  unique_species <- unique(observations[c("species")])
-
-  return(unique_species)
-}
-
-get_number_species <- function(unique_species) {
-  #' Get the number of unique species observed.
-
-  number_species <- nrow(unique_species)
-
-  return(number_species)
-}
-
-get_number_species_suborder <- function(observations) {
-  #' Get the number of species observed within each suborder. Use observations identified to species only.
-  #'
-  #' TODO consider changing this to taxa rather than species
-
-  all_species_suborder <- observations %>%
-    distinct(suborder, species) %>%
-    group_by(suborder) %>%
-    dplyr::summarise("number_species" = n())
-
-  return(all_species_suborder)
-}
-
-get_species_summary_overview <- function(observations) {
-  #' Get a list of the species seen across all the surveys.
-  #'
-  #' Return a dataframe of the species seen.
-  #' TODO change this to all taxa rather than species
-
-  species_summary <- observations %>%
-    distinct(species) %>%
-    arrange(species)
-
-  return(species_summary)
 }
 
 get_number_observations_suborder <- function(observations) {
@@ -122,56 +108,33 @@ get_number_observations_suborder <- function(observations) {
   return(all_number_observations_suborder)
 }
 
-join_suborder_summary_data <- function(number_observations, number_species) {
-  #' Join the summary data about suborders to present together in one table.
-  #'
-  #' TODO if changing the above code, make this taxa rather than species
-
-  joined_data <- full_join(number_observations, number_species, by = "suborder")
-
-  return(joined_data)
-}
-
 #' <br>The total number of observations was
 get_number_observations(observations_sites_df)
 
-#' <br>The total number of observations identified to species was
-get_number_observations(confirmed_observations_species)
-
-#' <br>The total number of species observed was
-unique_species <- get_unique_species(confirmed_observations_species)
-get_number_species(unique_species)
-
 #' <br>The total number of taxa observed from confirmed observations was
-unique_confirmed_taxa <- get_unique_confirmed_taxa(confirmed_observations)
+unique_confirmed_taxa <- get_unique_taxa(all_observations_conservative)
 nrow(unique_confirmed_taxa)
 
-#' <br>TODO manually extract the number of extra taxa that have been identified from the finalised
-#' observations
+#' <br>The following taxa were observed
+unique_confirmed_taxa[order(unique_confirmed_taxa$species, unique_confirmed_taxa$genus, unique_confirmed_taxa$subfamily),]
 
-#' <br>The following species were observed
-get_species_summary_overview(confirmed_observations_species)
+#' <br>Note that although this summary suggests that 41 taxa were observed, two of the possibilities
+#' listed here have been included separately in the rest of the list, so this number is actually 39.
 
-#' <br>Summarise the number of observations and species seen within each suborder. Note that the number of
-#' species only takes into account those identified to species.
-number_observations_suborder <- get_number_observations_suborder(observations_sites_df)
-number_species_suborder <- get_number_species_suborder(confirmed_observations_species)
-
-join_suborder_summary_data(number_observations_suborder, number_species_suborder)
+#' The following number of individuals were identified per suborder
+get_number_observations_suborder(all_observations_conservative)
 
 #' ### Summarise by site
 #'
 #' Three main <em>study areas</em> were visited (TOR, TAV, MOL). Visits to two smaller areas near to
 #' TOR/MOL (BOR, BES) were used to cover lower elevations, although these were not part of the main study
-#' areas. Within each study area, there were numerous <em>study sites</em>, which were numbered, but can
-#' be identified more easily by the elevational band in which they are located. Each site name includes
-#' the elevation in m.
+#' areas. Within each study area, <em>study sites</em> were surveyed at different elevations. These were 
+#' numbered, but can be identified more easily by the elevational band in which they are located. In this 
+#' analysis, each site name includes the elevation in m.
 #'
-#' The following functions summarise the visits to each site, then calculate observation and species
-#' summary across the sites visited.
+#' The following functions summarise the visits to each site, including observations and taxa.
 #'
 #' Numbers of taxa (rather than species) will be considered within each hypothesis separately.
-#' TODO add details about all taxa when worked with the "finalised" observations.
 
 get_number_sites_area <- function(site_survey_df) {
   #' Get the number of sites visited in each survey area and calculate the minimum and maximum elevations
@@ -184,6 +147,8 @@ get_number_sites_area <- function(site_survey_df) {
     group_by(area) %>%
     dplyr::summarise("number_visits" = n(), "minimum_elevation" = min(elevational_band_m),
               "maximum_elevation" = max(elevational_band_m))
+
+  return(number_sites_area)
 }
 
 get_number_visits_site <- function(site_survey_df) {
@@ -211,6 +176,38 @@ get_number_observations_site <- function(observations) {
     dplyr::summarise("number_observations" = n())
 
   return(number_observations_site)
+}
+
+get_site_elevation <- function(site_survey_df) {
+  #' Get the site and its elevational band from the observations dataframe.
+  #'
+  #' Return dataframe of sites and elevational band.
+
+  site_elevations <- subset(site_survey_df, select = c("site_elevation", "area", "elevational_band_m"))
+
+  site_elevations <- site_elevations %>%
+    distinct(site_elevation, area, elevational_band_m)
+
+  return(site_elevations)
+}
+
+calculate_species_richness_sites <- function(all_observations) {
+  #' For each site in the dataset, go through and get the summary of the taxa. Count the taxa for each
+  #' site to give the species richness for each site.
+  #'
+  #' Return a dataframe with the site, elevation band and species richness.
+
+  site_elevations <- get_site_elevation(all_observations)
+  unique_taxa_site <- site_elevations
+
+  for (i in rownames(site_elevations)) {
+    site <- (site_elevations[i, "site_elevation"])
+    site_observations <- filter(all_observations, all_observations$site_elevation == site)
+    taxa_site <- get_unique_taxa(site_observations)
+    unique_taxa_site$species_richness[unique_taxa_site$site_elevation == site] <- nrow(taxa_site)
+  }
+
+  return(unique_taxa_site)
 }
 
 get_number_species_site <- function(observations) {
@@ -291,7 +288,7 @@ get_number_net_surveys <- function(number_surveys_site) {
   return(subset_net_surveys)
 }
 
-join_site_summary_data <- function(number_visits, number_observations, number_species, transect_lengths,
+join_site_summary_data <- function(number_visits, number_observations, species_richness, transect_lengths,
                                    site_survey_summary) {
   #' Get the data which summarise the sites and join it together to present the information in one table.
   #'
@@ -301,10 +298,10 @@ join_site_summary_data <- function(number_visits, number_observations, number_sp
   joined_visits_surveys <- full_join(joined_visits, site_survey_summary, by = "site_elevation")
   joined_visits_observations <- full_join(joined_visits_surveys, number_observations,
                                           by = "site_elevation")
-  joined_visits_observations_species <- full_join(joined_visits_observations, number_species,
+  joined_visits_observations_species <- full_join(joined_visits_observations, species_richness,
                                                   by = "site_elevation")
 
-  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "number_species")
+  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "species_richness")
   joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "number_observations")
 
 
@@ -329,52 +326,33 @@ get_site_survey_summary_data <- function(site_survey_df) {
 #' <br>Summarise the number of sites within each study area and get the minimum and maximum elevations
 #' surveyed within each survey area.
 
-number_sites_area <- get_number_sites_area(site_survey_df)
-print(number_sites_area)
+get_number_sites_area(site_survey_df)
 
 #' <br>Summarise the number of visits to each site and how many observations were seen at each site during
 #' the whole season. Finally, add the number of species observed at each site (note that the number of
 #' species only considers those observations that have been identified to species).
 
 #+ message=FALSE, warning=FALSE
+
 number_visits_site <- get_number_visits_site(site_survey_df)
-number_observations_site <- get_number_observations_site(observations_sites_df)
-number_species_site <- get_number_species_site(confirmed_observations_species)
+number_observations_site <- get_number_observations_site(all_observations_conservative)
+number_taxa_site <- calculate_species_richness_sites(all_observations_conservative)[c("site_elevation", "species_richness")]
 transect_lengths <- get_transect_lengths(site_survey_df)
 
 site_survey_summary <- get_site_survey_summary_data(site_survey_df)
 joined_survey_summary_data <- join_site_summary_data(number_visits_site, number_observations_site,
-                                                     number_species_site, transect_lengths,
+                                                     number_taxa_site, transect_lengths,
                                                      site_survey_summary)
 joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
-
-
-#' <br>The species seen at each site were
-get_species_summary_site(confirmed_observations_species)
 
 #' ### Summarise by elevational band
 #'
 #' Given that this study is looking at the patterns of species richness and elevational range with
-#' elevation, this next section summarises the observations and taxa according to elevation band.
+#' elevation, this next section summarises the observations according to elevation band. Taxa will be
+#' considered within each hypothesis.
 #'
-#' The following functions create the summaries of observations, survey details and species within each
-#' elevational band. Note that summaries of the species are only done with data where the observations
-#' are identified to species. Numbers of taxa (rather than species) will be considered within each
-#' hypothesis.
-#' TODO add details about all taxa when worked with the "finalised" observations.
-
-get_site_elevation <- function(site_survey_df) {
-  #' Get the site and its elevational band from the observations dataframe.
-  #'
-  #' Return dataframe of sites and elevational band.
-
-  site_elevations <- subset(site_survey_df, select = c("site_elevation", "area", "elevational_band_m"))
-
-  site_elevations <- site_elevations %>%
-    distinct(site_elevation, area, elevational_band_m)
-
-  return(site_elevations)
-}
+#' The following functions create the summaries of observations and survey details within each
+#' elevational band.
 
 join_site_summary_data_with_elevation <- function(site_elevations, site_summary_data) {
   #' Join the site summary data with the elevational bands so that the data can be summarised.
@@ -394,7 +372,7 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
 
   site_summary_data_elevation <- join_site_summary_data_with_elevation(site_elevations, site_summary_data)
 
-  columns_with_na <- c("number_hand_surveys", "number_net_surveys", "number_species")
+  columns_with_na <- c("number_hand_surveys", "number_net_surveys")
 
   for (column in columns_with_na) {
     replace_na_with_zero(site_summary_data_elevation, column)
@@ -407,9 +385,7 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
               "number_visits" = sum(number_visits),
               "number_hand_surveys" = sum(number_hand_surveys),
               "number_net_surveys" = sum(number_net_surveys),
-              "number_observations" = sum(number_observations),
-              "number_species" = sum(number_species))
-
+              "number_observations" = sum(number_observations))
   return(elevation_summary_data)
 }
 
