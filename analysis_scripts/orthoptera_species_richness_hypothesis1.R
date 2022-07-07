@@ -188,7 +188,7 @@ species_richness_sites <- calculate_species_richness_sites(observations_sites_df
 species_richness_sites_notconservative <- calculate_species_richness_sites(observations_sites_df, all_observations_notconservative)
 
 display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative, by = c("site_elevation", "area", "elevational_band_m"), suffix = c("_conservative", "_notconservative"))
-print(display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative))
+display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
 
 #' ### Correlation
 #' Do a correlation test between the species richness at each site and elevation.
