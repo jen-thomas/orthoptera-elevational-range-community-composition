@@ -35,9 +35,11 @@ finalised_observations <- get_finalised_observations(observations_sites_df)
 #' ## Count the number of specimens that have a finalised observation
 
 get_unique_specimens_finalised <- function(finalised_observations) {
-unique_specimens <- finalised_observations %>%
-  distinct(specimen_label) %>%
-  group_by(specimen_label)
+  #' Get a dataframe of all unique specimens from the finalised observations.
+  
+  unique_specimens <- finalised_observations %>%
+    distinct(specimen_label) %>%
+    group_by(specimen_label)
 
   return(unique_specimens)
 }
