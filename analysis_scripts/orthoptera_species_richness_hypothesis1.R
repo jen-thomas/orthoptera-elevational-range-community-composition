@@ -299,7 +299,7 @@ plot_linear_regression_species_richness(species_richness_sites_notconservative, 
 #' H0: regression lines are parallel.
 #' H1: regression lines are not parallel.
 #'
-#' TODO: would it be valid to use ANCOVA for this? The values would not be independent because they are
+#' **TODO**: would it be valid to use ANCOVA for this? The values would not be independent because they are
 #' from the same sites.
 #'
 #' ## Account for the effects of sampling effort
