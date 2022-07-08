@@ -99,9 +99,12 @@ observations_species_sites
 
 #' Subset the species considered, by selecting those where they were observed at three or more, and five
 #' or more sites.
-
+#'
+#' Three sites:
 species_three_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 3), ]
 species_three_or_more_sites
+
+#' Five sites:
 species_five_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 5), ]
 species_five_or_more_sites
 
@@ -111,4 +114,4 @@ observations_to_use <- get_observations_of_particular_species(observations_speci
 #' Create the site-species matrix (presence-absence).
 
 site_species_matrix <- create_presence_absence_site_species_matrix(observations_to_use)
-head(site_species_matrix)
+site_species_matrix
