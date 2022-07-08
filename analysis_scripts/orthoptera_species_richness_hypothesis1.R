@@ -287,8 +287,7 @@ plot_linear_regression_species_richness(species_richness_sites_notconservative, 
 #' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
 #' method.
 
-sampling_effort <- calculate_sampling_weights(all_observations_conservative) # TODO change this to all
-# observations when including the finalised observations as well
+sampling_effort <- calculate_sampling_weights(all_observations_conservative)
 
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
 
