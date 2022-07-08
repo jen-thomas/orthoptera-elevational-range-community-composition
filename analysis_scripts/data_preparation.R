@@ -202,6 +202,16 @@ get_caelifera_only <- function(observations) {
   return(caelifera_only)
 }
 
+get_observations_of_particular_species <- function(observations, chosen_species) {
+  #' Get the dataframe of all observations where the have been identified to a set of particular species.
+  #'
+  #' Return dataframe of observation data.
+
+  observations_to_use <- observations[observations$species %in% chosen_species$species,]
+
+  return(observations_to_use)
+}
+
 #' ### Create summaries of species richness data
 
 calculate_sampling_weights <- function(observations) {

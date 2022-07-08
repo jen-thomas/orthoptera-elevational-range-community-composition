@@ -30,6 +30,7 @@ get_packages(vector_packages)
 create_site_species_abundance_df <- function(observations_df) {
     #' Create a data frame of the species abundance at each site from a set of observations at different
     #' sites. Each input observation is of one individual at a particular site.
+    #'
     #' Return species abundance at each site.
 
   # Add presence to the observation data frame.
@@ -38,21 +39,22 @@ create_site_species_abundance_df <- function(observations_df) {
 
   # Aggregate the observations of each species at each site (ignore dates for now).
   site_species_abundance <- setNames(aggregate(observations_df$presence,
-                                               list(observations_df$site_altitude, observations_df$species),
-                                               FUN = sum), # sum over these to calculate abundance of each species at
-                                                          # each site
-                                               c("site_altitude", "species", "abundance"))
+                                               list(observations_df$site_elevation,
+                                                    observations_df$species),
+                                               FUN = sum), # sum over these to calculate abundance of
+                                     # each species at each site
+                                               c("site_elevation", "species", "abundance"))
 
   return(site_species_abundance)
 }
 
 create_presence_absence_site_species_matrix <- function(observations_df) {
-    #' Create a presence-absence site-species matrix. Each value is either 0 (species not observed at a site) or 1
-    #' (species observed at a site).
+    #' Create a presence-absence site-species matrix. Each value is either 0 (species not observed at a
+    #' site) or 1 (species observed at a site).
 
   site_species_abundance <- create_site_species_abundance_df(observations_df)
   site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name = "species",
-                                                         locality = "site_altitude", abund = FALSE,
+                                                         locality = "site_elevation", abund = FALSE,
                                                          abund.col = "abundance"))
 
   return(site_species_presenceabsence_matrix)
@@ -103,7 +105,10 @@ species_three_or_more_sites
 species_five_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 5), ]
 species_five_or_more_sites
 
-#'
-#'
-site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
+species_for_analysis <- unique(species_three_or_more_sites["species"])
+observations_to_use <- get_observations_of_particular_species(observations_species, species_for_analysis)
+
+#' Create the site-species matrix (presence-absence).
+
+site_species_matrix <- create_presence_absence_site_species_matrix(observations_to_use)
 head(site_species_matrix)
