@@ -173,7 +173,11 @@ species_richness_sites_notconservative <- calculate_species_richness_sites(all_o
 display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative, by = c("site_elevation", "area", "elevational_band_m"), suffix = c("_conservative", "_notconservative"))
 display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
 
-#' ### Correlation
+#' Eight sites had a higher species richness when using the conservative identifications. The analysis
+#' will only use conservative identifications until the regression is compared to see if there is any
+#' statistical difference in the relationship between species richness and elevation.
+
+#' ### Correlate species richness and elevation
 #' Do a correlation test between the species richness at each site and elevation.
 #' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
 #' <br>H<sub>1</sub>: the correlation coefficient is different from 0.
@@ -193,7 +197,7 @@ print(coeff_det)
 #' elevation (<em>r</em> = -0.63, <em>t<sub>26</sub></em> = -4.12, <em>p</em> = 0.0004), however only
 #' 39% of the variation in species richness is explained by the elevation.
 #'
-#' ### Plot species richness against elevation.
+#' ### Plot species richness against elevation
 
 plot_elevation_species_richness(species_richness_sites)
 
@@ -210,7 +214,7 @@ summary(linear_regression_species_richness)
 #' richness decreases by 5.7 with an increase in elevation of 1000 m (<em>t</em> = -4.11,
 #' <em>p</em> = 0.0004).
 #'
-#' ### Checking the assumptions of linear regression
+#' ### Check the assumptions of linear regression
 
 #' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
 plot_model_residuals_species_richness_elev(linear_regression_species_richness, species_richness_sites,
@@ -334,7 +338,7 @@ plot_elevation_species_richness_area(species_richness_sites)
 #' and Bordes de Viros are included in this plot. These sites were located further down the valley to
 #' include lower elevations which were not available within the other study areas.
 #'
-#' ### Fit a linear mixed model
+#' ### Fit linear mixed model
 #' Fit a linear mixed model, treating study area and sampling effort as a random factor.
 #+ message=FALSE, warning=FALSE
 
@@ -348,7 +352,7 @@ summary(lmm_species_richness_elev_area_sampling_effort)
 #' I realise that I'm not sure how to interpret this output. The parameter estimates are the same as
 #' those in the model above. **TODO**: how does this output tell us that area is important?
 #'
-#' ### Test the assumptions of the linear mixed model
+#' ### Test assumptions of linear mixed model
 
 plot(lmm_species_richness_elev_area_sampling_effort)
 
