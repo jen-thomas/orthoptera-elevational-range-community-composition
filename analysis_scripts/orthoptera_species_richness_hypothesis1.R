@@ -209,8 +209,8 @@ print(coeff_det)
 
 #' <br>The relationship between species richness and elevation was tested using a Pearson's correlation.
 #' There was evidence to suggest a significant negative relationship between species richness and
-#' elevation (<em>r</em> = -0.63, <em>t<sub>26</sub></em> = -4.12, <em>p</em> = 0.0004), however only
-#' 39% of the variation in species richness is explained by the elevation.
+#' elevation (<em>r</em> = -0.64, <em>t<sub>26</sub></em> = -4.29, <em>p</em> = 0.0002), however only
+#' 41% of the variation in species richness is explained by the elevation.
 #'
 #' ### Plot species richness against elevation
 
@@ -226,8 +226,8 @@ linear_regression_species_richness <- linear_regression_species_richness_elevati
 summary(linear_regression_species_richness)
 
 #' The linear regression shows that both the intercept and slope are statistically significant. Species
-#' richness decreases by 5.7 with an increase in elevation of 1000 m (<em>t</em> = -4.11,
-#' <em>p</em> = 0.0004).
+#' richness decreases by 6.1 with an increase in elevation of 1000 m (<em>t</em> = -4.29,
+#' <em>p</em> = 0.0002).
 #'
 #' ### Check the assumptions of linear regression
 
@@ -255,7 +255,7 @@ plot(linear_regression_species_richness)
 #' The plot below shows the species richness at each site (blue dots). Upper and lower bounds of the
 #' predicted values are bounded within the grey area. The blue line represents the linear relationship
 #' between species richness ($SR$) and elevation ($E$), which can be represented by the equation,
-#' $SR = 16.90 - 0.006E$.
+#' $SR = 17.76 - 0.0061E$.
 #+ message=FALSE, warning=FALSE
 
 plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
@@ -267,7 +267,7 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' <br>H<sub>1</sub>: the slope of the regression is not equal to 0.
 #'
 #' Looking again at the model output above, we can see that the slope is not equal to 0
-#' (<em>p</em> = 0.0004), therefore we can say there is a significant relationship between the species
+#' (<em>p</em> = 0.0002), therefore we can say there is a significant relationship between the species
 #' richness and elevation.
 #'
 #' ## Check the regression if non-conservative identifications are used
@@ -341,10 +341,15 @@ summary(lin_reg_elevation_sampling_effort)
 plot_lin_reg_sampling_effort_elevation(species_richness_sites,
                                        lin_reg_elevation_sampling_effort)
 
+corr_test_sampling_effort <- correlation_test(species_richness_sites, "elevational_band_m",
+                                                "sampling_effort_index")
+corr_coeff_sampling_effort <- corr_test_sampling_effort$estimate
+print(corr_test_sampling_effort)
+
 #' As expected, species richness significantly increases with sampling effort (<em>R<sup>2</sup></em> =
-#' 0.40; <em>p</em> = 0.0003). Although sampling effort was lower at higher elevations, it was significantly
-#' so (<em>R<sup>2</sup></em> = 0.13; <em>p</em> = 0.06), suggesting that although this might be a factor
-#' which influences the species richness, it probably is not the main one.
+#' 0.41; <em>p</em> = 0.0003). Sampling effort was lower at higher elevations (<em>R<sup>2</sup></em> =
+#' 0.14; <em>p</em> = 0.05), but only 40% of the variation in the sampling effort index was explained by
+#' the elevation.
 #'
 #' **TODO**: I had thought about including sampling effort as a random factor here, but as it is a
 #' continuous variable, I am not sure how to go about this.
@@ -434,12 +439,11 @@ plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_ri
 #' Whilst there was no relationship at Tor (<em>r</em> = -0.30; <em>F</em> = 0.77; <em>df</em> = 1, 8;
 #' <em>p</em> = 0.41), a clear decrease in species richness with elevation can be seen at La Molinassa
 #' (<em>r</em> = -0.80; <em>F</em> = 10.34; <em>df</em> = 1, 6; <em>p</em> = 0.02) and Tavascan
-#' (<em>r</em> = -0.98; <em>F</em> = 120.4; <em>df</em> = 1, 5; <em>p</em> < 0.01).
+#' (<em>r</em> = -0.97; <em>F</em> = 79.95; <em>df</em> = 1, 5; <em>p</em> < 0.01).
 #'
 #' ### Plot linear regression
 
 #' **TODO**: I'll put the above plots on one set of axes.
-
 #'
 #' ## Investigate effects of elevation on Caelifera species richness
 #' Only five species of Ensifera were detected during the surveys, so species richness relationships will
@@ -453,7 +457,7 @@ caelifera_species_richness_sites$area <- as.factor(caelifera_species_richness_si
 
 plot_elevation_species_richness_area(caelifera_species_richness_sites)
 
-#'  Run linear regression for each site separately. Ignore the two small sites which do not have an
+#' Run linear regression for each site separately. Ignore the two small sites which do not have an
 #' elevational gradient.
 #'
 #' #### Tor
@@ -492,16 +496,16 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' There was no evidence of a relationship between Caelifera species richness and elevation at Tor
 #' (<em>r</em> = -0.11; <em>F</em> = 0.09; <em>df</em> = 1, 8; <em>p</em> = 0.77), but a clear and
 #' significant decrease with elevation at both La Molinassa (<em>r</em> = -0.82; <em>F</em> = 12.35;
-#' <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan (<em>r</em> = -0.97; <em>F</em> = 95.17;
-#' <em>df</em> = 1, 5; <em>p</em> = 0.0002).
+#' <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan (<em>r</em> = -0.98; <em>F</em> = 141.2;
+#' <em>df</em> = 1, 5; <em>p</em> = < 0.001>).
 #'
 #' ## Results
 #'
 #' <br>A simple linear regression was used to investigate the relationship between elevation and species richness.
 #' Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
-#' = -0.63). Species richness was shown to decrease by 5.7 for an increase in elevation of 1000 m
-#' (<em>t</em> = -4.11; <em>p</em> = 0.0004). However, only 39% of the variation in species richness can
-#' be explained by elevation (<em>F</em> = 16.89; <em>df</em> = 1, 26; <em>p</em> = 0.0004).
+#' = -0.64). Species richness was shown to decrease by 6.1 for an increase in elevation of 1000 m
+#' (<em>t</em> = -4.29; <em>p</em> < 0.001>). However, only 41% of the variation in species richness can
+#' be explained by elevation (<em>F</em> = 18.39; <em>df</em> = 1, 26; <em>p</em> < 0.001).
 #'
 #' **TODO**: add details of effects of sampling effort.
 #'
@@ -511,9 +515,9 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' investigate if there was any effect of study area on species richness. [**TODO**: add interpretation of
 #' this]. Given the effect of area on species richness, simple linear regressions were used to model the
 #' species richness with elevation within each study area separately. Whilst there was no relationship at
-#' Tor (<em>r</em> = -0.30; <em>F</em> = 0.77; <em>df</em> = 1, 8; <em>p</em> = 0.41), a clear decrease in
-#' species richness with elevation can be seen at La Molinassa (<em>r</em> = -0.80; <em>F</em> = 10.34;
-#' <em>df</em> = 1, 6; <em>p</em> = 0.02) and Tavascan (<em>r</em> = -0.98; <em>F</em> = 120.4;
+#' Tor (<em>r</em> = -0.30; <em>F</em> = 0.77; <em>df</em> = 1, 8; <em>p</em> = 0.41), a clear decrease
+#' in species richness with elevation can be seen at La Molinassa (<em>r</em> = -0.80; <em>F</em> = 10.34;
+#' <em>df</em> = 1, 6; <em>p</em> = 0.02) and Tavascan (<em>r</em> = -0.97; <em>F</em> = 79.95;
 #' <em>df</em> = 1, 5; <em>p</em> < 0.01).
 #'
 #' Out of 37 species observed, 29 were Caelifera. A linear mixed model with elevation as a fixed effect
@@ -523,7 +527,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' Caelifera species richness and elevation at Tor (<em>r</em> = -0.11; <em>F</em> = 0.09; <em>df</em> =
 #' 1, 8; <em>p</em> = 0.77), but a clear and significant decrease with elevation at both La Molinassa
 #' (<em>r</em> = -0.82; <em>F</em> = 12.35; <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan
-#' (<em>r</em> = -0.97; <em>F</em> = 95.17; <em>df</em> = 1, 5; <em>p</em> = 0.0002).
+#' (<em>r</em> = -0.98; <em>F</em> = 141.2; <em>df</em> = 1, 5; <em>p</em> = < 0.001).
 #'
 #' ## Questions
 #' <ol>
