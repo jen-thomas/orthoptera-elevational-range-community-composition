@@ -191,7 +191,7 @@ both_species_richness
 #' Eight sites had a higher species richness when using the conservative identifications. The analysis
 #' will only use conservative identifications until the regression is compared to see if there is any
 #' statistical difference in the relationship between species richness and elevation.
-
+#'
 #' ### Correlate species richness and elevation
 #' Do a correlation test between the species richness at each site and elevation.
 #' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
@@ -296,8 +296,8 @@ plot_linear_regression_species_richness(species_richness_sites_notconservative, 
 #'
 #' Use a hypothesis test to check for any statistical difference between the slopes of the regressions
 #' with the conservative and non-conservative identifications.
-#' H0: regression lines are parallel.
-#' H1: regression lines are not parallel.
+#' <br>H<sub>0</sub>: regression lines are parallel.
+#' <br>H<sub>1</sub>: regression lines are not parallel.
 #'
 #' **TODO**: would it be valid to use ANCOVA for this? The values would not be independent because they are
 #' from the same sites.
