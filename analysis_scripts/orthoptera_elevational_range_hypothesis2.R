@@ -12,15 +12,24 @@
 #' <br>Import functions from other files.
 
 source("utils.R")
+source("data_preparation.R")
+source("orthoptera_elevation_data_exploration.R")
+
+vector_packages <- c("visreg", "ggplot2", "dplyr")
+get_packages(vector_packages)
 
 #' ## Create site-species matrix.
+#+ message=FALSE, warning=FALSE
 
-#' Create a dataframe of species abundance at each site (note that this is not really relevant in this study because
-#' multiple capture techniques were used). Convert this into a presence-absence site-species matrix.
+#' Create a dataframe of species abundance at each site (note that abundance is not really relevant in
+#' this study because multiple capture techniques were used). Convert this into a presence-absence
+#' site-species matrix.
+#'
+#' The following functions are used to create the species-site matrix.
 
 create_site_species_abundance_df <- function(observations_df) {
-    #' Create a data frame of the species abundance at each site from a set of observations at different sites. Each
-    #' input observation is of one individual at a particular site.
+    #' Create a data frame of the species abundance at each site from a set of observations at different
+    #' sites. Each input observation is of one individual at a particular site.
     #' Return species abundance at each site.
 
   # Add presence to the observation data frame.
@@ -49,21 +58,52 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
   return(site_species_presenceabsence_matrix)
 }
 
-#' Use only observations that have been identified to species, for now. Create and preview the presence-absence
-#' site-species matrix. Site name is in the format altitude(m)_site where the name is an
-#' abbreviation of the study area.
+#'Create and preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site
+#' where the name is an abbreviation of the study area.
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
 surveys_file <- "../data/surveys.csv"
 
 sites_df <- read_csv_data_file(sites_file)
-surveys_df <- read_csv_data_file(surveys_file)
-site_survey_df <- join_site_survey(sites_df, surveys_df)
 
+#' See exploratory data analysis and hypothesis 1 for an explanation of confirmed and finalised
+#' observations.
+#'
+#' Get all observations.
 observations_sites_df <- import_all_observations(observations_file, sites_file)
+confirmed_observations <- get_confirmed_observations(observations_sites_df)
 
-confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
+finalised_identifications <- create_finalised_observations(finalised_observations)
 
+finalised_identifications_conservative <- finalised_identifications[[1]]
+
+all_observations_conservative <- join_observations(confirmed_observations, finalised_identifications_conservative)
+
+#' Get all observations to species only. **TODO**: consider if this should also be done to genus, or
+#' include those that add another taxa (if there are enough observations).
+
+observations_species <- get_observations_to_species(all_observations_conservative)
+
+#' Count the number of observations of each species to see if they should be included in the analysis.
+
+observations_count_species <- count_observations_of_species(observations_species)
+observations_count_species
+
+#' Count the number of sites at which each species has been observed.
+
+observations_species_sites <- count_sites_where_species_observed(observations_species)
+observations_species_sites
+
+#' Subset the species considered, by selecting those where they were observed at three or more, and five
+#' or more sites.
+
+species_three_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 3), ]
+species_three_or_more_sites
+species_five_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 5), ]
+species_five_or_more_sites
+
+#'
+#'
 site_species_matrix <- create_presence_absence_site_species_matrix(confirmed_observations_species)
 head(site_species_matrix)

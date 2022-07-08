@@ -125,6 +125,41 @@ get_confirmed_observations_to_species <- function(observations_sites_df) {
   return(confirmed_observations_species)
 }
 
+get_observations_to_species <- function(observations_df) {
+  #' Get all observations identified to species. Use the condition that species is not null.
+  #'
+  #' Return dataframe of full observation data.
+
+  observations_species <- observations_df[(observations_df$species != ""), ]
+
+  return(observations_species)
+}
+
+count_observations_of_species <- function(observations_df) {
+  #' Count the numbers of observations of each species.
+  #'
+  #' Return a dataframe of species and count.
+
+  observations_count_species <- observations_df %>%
+    group_by(species) %>%
+    dplyr::summarise("number_observations" = n())
+
+  return(observations_count_species)
+}
+
+count_sites_where_species_observed <- function(observations_df) {
+  #' Count the number of sites at which each species was observed.
+  #'
+  #' Return dataframe of species and number of sites.
+
+  sites_species_observed <- observations_df %>%
+    distinct(species, site_elevation) %>%
+    group_by(species) %>%
+    dplyr::summarise("number_sites" = n())
+
+  return(sites_species_observed)
+}
+
 get_unique_taxa <- function(observations) {
   #' Get the unique taxa observed from the observations.
   #'
