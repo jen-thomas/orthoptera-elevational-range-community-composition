@@ -155,6 +155,20 @@ confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 
 #' ### Get the finalised identifications
+#'
+#' #### Explanation of confirmed and finalised identifications (copied from data exploration section)
+#' All specimens were identified to the lowest taxonomic level possible. Many small nymphs could not be
+#' identified to species level. Furthermore, some adults could only be identified to genus or a higher
+#' taxonomic level due to hard-to-distinguish features or contradictory features. All specimens identified
+#' to one particular taxa had a "confirmed" identification.
+#'
+#' In some cases, specimens could only be identified to one of a set of multiple taxa, for
+#' instance where contradictory features in the keys meant that they could be identified to one of two
+#' particular taxa. An identification was "finalised" when a specimen could be identified to a number of
+#' taxa.
+#'
+#' In parts of the analysis, the observations will referred to as confirmed or finalised, and be subset
+#' according to these different types of identification.
 
 finalised_identifications <- create_finalised_observations(finalised_observations)
 
@@ -171,7 +185,8 @@ species_richness_sites <- calculate_species_richness_sites(all_observations_cons
 species_richness_sites_notconservative <- calculate_species_richness_sites(all_observations_notconservative)
 
 display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative, by = c("site_elevation", "area", "elevational_band_m"), suffix = c("_conservative", "_notconservative"))
-display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
+both_species_richness <- display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
+both_species_richness
 
 #' Eight sites had a higher species richness when using the conservative identifications. The analysis
 #' will only use conservative identifications until the regression is compared to see if there is any
@@ -262,19 +277,31 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #' analysis will check if there is any difference to the relationship between species richness and
 #' elevation, if the less conservative identifications are used.
 #'
-#'
 #' ### Linear regression
 
 #' Create a linear model of species richness against elevation and look at the model output.
 #+ message=FALSE, warning=FALSE
 
-linear_regression_species_richness_conservative <- linear_regression_species_richness_elevation(species_richness_sites_notconservative,
+linear_regression_species_richness_notconservative <- linear_regression_species_richness_elevation(species_richness_sites_notconservative,
                        "species_richness", "elevational_band_m")
-summary(linear_regression_species_richness_conservative)
+summary(linear_regression_species_richness_notconservative)
 
-plot_linear_regression_species_richness(species_richness_sites_notconservative, linear_regression_species_richness_conservative)
+plot_linear_regression_species_richness(species_richness_sites_notconservative, linear_regression_species_richness_notconservative)
 
-
+#' The linear regression shows that both the intercept and slope are statistically significant. Species
+#' richness decreases by 6.6 with an increase in elevation of 1000 m (<em>t</em> = -4.53,
+#' <em>p</em> = 0.0001).
+#'
+#' ### Test for statistical significance between regressions
+#'
+#' Use a hypothesis test to check for any statistical difference between the slopes of the regressions
+#' with the conservative and non-conservative identifications.
+#' H0: regression lines are parallel.
+#' H1: regression lines are not parallel.
+#'
+#' TODO: would it be valid to use ANCOVA for this? The values would not be independent because they are
+#' from the same sites.
+#'
 #' ## Account for the effects of sampling effort
 #'
 #' Due to logistical reasons and poor weather, the sampling effort varied a lot across the sampling sites.

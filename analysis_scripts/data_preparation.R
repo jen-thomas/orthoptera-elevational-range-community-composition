@@ -15,7 +15,7 @@ source("utils.R")
 
 #' Install packages.
 #+ message=FALSE, warning=FALSE
-vector_packages <- c("fossil", "stringr", "tidyr")
+vector_packages <- c("fossil", "stringr", "tidyr", "dplyr")
 get_packages(vector_packages)
 
 #' ## Initial data preparation
@@ -205,4 +205,16 @@ join_observations <- function(confirmed_observations, finalised_observations) {
   all_observations <- rbind(confirmed_observations, finalised_observations)
 
   return(all_observations)
+}
+
+get_data_into_format_for_ancova<- function(species_richness_conservative, species_richness_notconservative) {
+  #' Put data into dataframe format for comparing two groups.
+  #'
+  #' Return dataframe.
+
+  species_richness_conservative$category <- "conservative"
+  species_richness_notconservative$category <- "notconservative"
+
+  all_species_richness <- rbind(species_richness_conservative, species_richness_notconservative)
+  return(all_species_richness)
 }
