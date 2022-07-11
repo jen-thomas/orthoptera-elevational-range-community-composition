@@ -10,6 +10,7 @@
 #' ---
 
 #' <br>Import functions from other files.
+#+ message=FALSE, warning=FALSE
 
 source("utils.R")
 source("data_preparation.R")
