@@ -21,42 +21,6 @@ get_packages(vector_packages)
 
 #' ## Prepare data.
 #+ message=FALSE, warning=FALSE
-#'
-#' The following functions are used to prepare the data and create the species-site matrix.
-
-create_site_species_abundance_df <- function(observations_df) {
-      #' Create a data frame of the species abundance at each site from a set of observations at different
-      #' sites. Each input observation is of one individual at a particular site.
-      #'
-      #' Return species abundance at each site.
-
-  # Add presence to the observation data frame.
-  presence <- rep(1, nrow(observations_df)) # create vector of 1s to act as presence
-  observations_df$presence <- presence # join the vector with the observations data frame
-
-  # Aggregate the observations of each species at each site (ignore dates for now).
-  site_species_abundance <- setNames(aggregate(observations_df$presence,
-                                               list(observations_df$site_elevation,
-                                                    observations_df$species),
-                                               FUN = sum), # sum over these to calculate abundance of
-                                     # each species at each site
-                                     c("site_elevation", "species", "abundance"))
-
-  return(site_species_abundance)
-}
-
-create_presence_absence_site_species_matrix <- function(observations_df) {
-      #' Convert the abundance matrix into a presence-absence site-species matrix. Each value is either 0
-      #' (species not observed at a site) or 1 (species observed at a site).
-
-  site_species_abundance <- create_site_species_abundance_df(observations_df)
-  site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name = "species",
-                                                         locality = "site_elevation", abund = FALSE,
-                                                         abund.col = "abundance"))
-
-  return(site_species_presenceabsence_matrix)
-}
-
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
@@ -106,10 +70,73 @@ species_five_or_more_sites
 species_for_analysis <- unique(species_three_or_more_sites["species"])
 observations_to_use <- get_observations_of_particular_species(observations_species, species_for_analysis)
 
-#' ## Create site-species matrix.
+## Calculate elevational range for each taxa
 
-#' #'Create and preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site
-#' where the name is an abbreviation of the study area.
+#' The functions below calculate the elevational range of each taxa.
 
-site_species_matrix <- create_presence_absence_site_species_matrix(observations_to_use)
-site_species_matrix
+calculate_elevational_range <- function(observations) {
+    #' Calculate the minimum, maximum and mid-point of the elevational range for each taxa. Assume here that
+    #' all specimens are identified to species.
+
+  elevational_ranges_species <- observations %>%
+    distinct(species, elevational_band_m) %>%
+    group_by(species) %>%
+    dplyr::summarise("min_elevation" = min(elevational_band_m), "max_elevation" = max(elevational_band_m),
+                     "elevational_range" = max_elevation - min_elevation,
+                     "elevational_range_midpoint" = max_elevation - elevational_range/2,
+                     "mean_elevation" = mean(elevational_band_m))
+
+  return(elevational_ranges_species)
+}
+
+elevational_ranges_species <- calculate_elevational_range(observations_to_use)
+
+#' ## Linear regression testing Rapoport's Rule for elevation
+#'
+#' We hypothesise that species that live at a higher elevation will occupy a larger elevational range.
+#' Elevational range was calculated by subtracting the minimum elevation at which a species was observed,
+#' from the maximum.
+#'
+#' Two measures of elevation were calculated: the midpoint between the minimum and maximum elevation,
+#' which was calculated by subtracting half of the elevational range from the maximum elevation; and the
+#' mean elevation of all of the observations of each species.
+#'
+#' Look at the distribution of elevational range.
+
+par(mfrow = c(2,2))
+elevational_ranges_species$sqrt_elevational_range <- sqrt(elevational_ranges_species$elevational_range)
+elevational_ranges_species$log_elevational_range <- log(elevational_ranges_species$elevational_range)
+hist(elevational_ranges_species$elevational_range, xlab = "Elevational range (m a.s.l)", ylab = "Frequency")
+hist(elevational_ranges_species$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = "Frequency")
+hist(elevational_ranges_species$log_elevational_range, xlab = "Log elevational range (m a.s.l)", ylab = "Frequency")
+
+#' There is a slight left skew to the data. Transformations of the elevational range do not help.
+#'
+#' Plot the relationships between the measures of elevation and the elevational range at which each
+#' species was observed.
+
+plot(elevational_range ~ elevational_range_midpoint, data = elevational_ranges_species,
+       xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m a.s.l)")
+
+plot(elevational_range ~ mean_elevation, data = elevational_ranges_species,
+       xlab = "Mean elevation (m a.s.l)", ylab = "Elevational range (m a.s.l)")
+
+#' From these plots, we can see that the relationship does not appear to be linear.
+
+lin_reg_elevational_range_midpoint <- lm(elevational_ranges_species[["elevational_range"]] ~
+                                           elevational_ranges_species[["elevational_range_midpoint"]])
+summary(lin_reg_elevational_range_midpoint)
+par(mfrow = c(2,2))
+plot(lin_reg_elevational_range_midpoint)
+
+#' Plot then test the relationship between the mean elevation and elevational range at which each species was observed.
+
+lin_reg_mean_elevation <- lm(elevational_ranges_species[["elevational_range"]] ~
+                               elevational_ranges_species[["mean_elevation"]])
+summary(lin_reg_mean_elevation)
+par(mfrow = c(2,2))
+plot(lin_reg_mean_elevation)
+
+#' There is a clear non-linear relationship between the elevational range and both measures of elevation
+#' (mean and mid-point) as seen on both of the plots. The linear regression shows the linear relationship
+#' is not statistically significant.
