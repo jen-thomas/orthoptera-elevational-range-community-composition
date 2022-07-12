@@ -106,17 +106,17 @@ transform_elevational_range <- function(dataframe) {
   #'
   #' Return dataframe.
 
-  elevational_ranges_species$sqrt_elevational_range <- sqrt(elevational_ranges_species$elevational_range)
-  elevational_ranges_species$log_elevational_range <- log(elevational_ranges_species$elevational_range)
+  dataframe$sqrt_elevational_range <- sqrt(dataframe$elevational_range)
+  dataframe$log_elevational_range <- log(dataframe$elevational_range)
 
-  return(elevational_ranges_species)
+  return(dataframe)
 }
 
 plot_histograms_elevational_range <- function(dataframe) {
   #' Plot histograms of the different elevational range parameters.
 
   par(mfrow = c(2, 2))
-  ylab = "Frequency"
+  ylab <- "Frequency"
 
   hist(dataframe$elevational_range, xlab = "Elevational range (m a.s.l)", ylab = ylab)
   hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = ylab)
@@ -141,8 +141,7 @@ linear_regression_elevrange_elevation <- function(dataframe, elevation_parameter
   #'
   #' Return the regression.
 
-  lin_reg <- lm(elevational_ranges_species[["elevational_range"]] ~
-                                           elevational_ranges_species[[elevation_parameter]])
+  lin_reg <- lm(dataframe[["elevational_range"]] ~ dataframe[[elevation_parameter]])
   summary(lin_reg)
 
   par(mfrow = c(2, 2))
@@ -174,23 +173,42 @@ linear_regression_elevrange_elevation_polynomial <- function(dataframe) {
 
   lin_regs_polynomial <- list()
 
-  lin_reg <- lm(elevational_range ~ mean_elevation,
-                        data = elevational_ranges_species)
+  lin_reg <- lm(elevational_range ~ mean_elevation, data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(lin_reg))
 
-  nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation + mean_elevation2,
-                        data = elevational_ranges_species)
+  nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation + mean_elevation2, data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quadratic))
 
   nonlin_reg_cubic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3,
-                       data = elevational_ranges_species)
+                       data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_cubic))
 
   nonlin_reg_quartic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3 +
-                         mean_elevation4, data = elevational_ranges_species)
+                         mean_elevation4, data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quartic))
 
   return(lin_regs_polynomial)
+}
+
+plot_quadratic_model <- function(dataframe, model) {
+  #' Plot the elevational range as a function of elevation (data points) and include the line for the
+  #' predicted values from the quadratic model.
+  #'
+  #' Get the parameters from the model output and add the equation of the line to the plot.
+
+  plot_elevrange_elevation(dataframe)
+  i <- seq(min(dataframe$mean_elevation), max(dataframe$mean_elevation), len=100) #  x-value limits for line
+  predicted_values <- predict(model, data.frame(mean_elevation=i, mean_elevation2=i*i)) #  fitted values
+  lines(i, predicted_values, lty=1, lwd=2, col="blue")
+
+  # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
+  cf <- round(coef(model), 2)
+
+  equation <- paste0("elev_range = ", cf[1],
+                     ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]), " elev ",
+                     ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " elev^2 ")
+
+  mtext(equation, side = 3, line = -2)
 }
 
 #' Look at the distribution of elevational range, as well as the transformed elevational range
@@ -253,4 +271,8 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 #'
 #' This evidence suggests that the quadratic model should be selected. View the summary of the quadratic
 #' model.
+
 summary(nonlin_reg_quadratic)
+
+plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
+
