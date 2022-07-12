@@ -19,16 +19,15 @@ source("orthoptera_elevation_data_exploration.R")
 vector_packages <- c("visreg", "ggplot2", "dplyr", "rcompanion")
 get_packages(vector_packages)
 
-#' ## Prepare data.
+#' ## Prepare data
 #+ message=FALSE, warning=FALSE
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
 
 #' See exploratory data analysis and hypothesis 1 for an explanation of confirmed and finalised
-#' observations.
+#' observations. Get all observations.
 #'
-#' Get all observations.
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
 
@@ -64,12 +63,16 @@ species_three_or_more_sites
 species_five_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 5),]
 species_five_or_more_sites
 
+#' Species that were observed at three or more sites will be used for this analysis. **TODO**: do I need
+#' to show why, statistically?
+
 species_for_analysis <- unique(species_three_or_more_sites["species"])
 observations_to_use <- get_observations_of_particular_species(observations_species, species_for_analysis)
 
-## Calculate elevational range for each taxa
+#' ## Calculate elevational range for each taxa
 
-#' The functions below calculate the elevational range of each taxa.
+#' The functions below, calculate the elevational range of each taxa.
+#+ message=FALSE, warning=FALSE
 
 calculate_elevational_range <- function(observations) {
       #' Calculate the minimum, maximum and mid-point of the elevational range for each taxa. Assume here that
@@ -88,7 +91,7 @@ calculate_elevational_range <- function(observations) {
 
 elevational_ranges_species <- calculate_elevational_range(observations_to_use)
 
-#' ## Linear regression testing Rapoport's Rule for elevation
+#' ## Test Rapoport's Rule for elevation
 #'
 #' We hypothesise that species that live at a higher elevation will occupy a larger elevational range.
 #' Elevational range was calculated by subtracting the minimum elevation at which a species was observed,
@@ -120,11 +123,11 @@ plot_histograms_elevational_range <- function(dataframe) {
 
   hist(dataframe$elevational_range, xlab = "Elevational range (m)", ylab = ylab)
 
-  if (exists("dataframe$sqrt_elevational_range")) {
+  if ("sqrt_elevational_range" %in% colnames(dataframe)) {
     hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m^0.5)", ylab = ylab)
   }
 
-  if (exists("dataframe$log_elevational_range")) {
+  if ("log_elevational_range" %in% colnames(dataframe)) {
     hist(dataframe$log_elevational_range, xlab = "Log elevational range", ylab = ylab)
   }
 }
@@ -391,3 +394,18 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #'
 #' ## Results
 
+#' There was a significant relationship between elevation and elevational range (<em>R<sup>2</sup></em> =
+#' 0.60; <em>df</em> = 2, 19; <em>p</em> = < 0.001). A maximum elevational range ($ER$) of 857 m was
+#' predicted at an elevation ($E$) of 1,739 m a.s.l ($ER = -6100 + 8E - 0.0023 ER^2$).
+#'
+#' There was a similar significant relationship between elevation and elevational range when considerng
+#' only the Caelifera (<em>R<sup>2</sup></em> = 0.78; <em>df</em> = 2, 14; <em>p</em> = < 0.001). A
+#' maximum elevational range ($ER$) of 1044 m was predicted at an elevation ($E$) of 1,760 m a.s.l ($ER =
+#' -6700 + 8.8E - 0.0025 ER^2$).
+#'
+#' **TODO / questions**:
+#' <ul>
+#' <li>Can these results be compared? i.e. can we say that the addition of Ensifera to the analysis
+#' lowered the maximum elevational range, and the elevation at which it occurred?</li>
+#' <li>Are we okay to accept the assumptions of both of the models?</li>
+#'
