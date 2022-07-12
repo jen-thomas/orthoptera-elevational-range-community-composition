@@ -235,7 +235,7 @@ nonlin_reg_quartic <- lin_regs_polynomial[[4]]
 
 #' Compare the models to look at the AIC and adjusted R squared.
 
-compareLM(lin_reg_mean_elevation, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
+compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 #' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
 #' This model also has the largest adjusted R-squared.
@@ -245,6 +245,12 @@ compareLM(lin_reg_mean_elevation, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin
 #' <br>H<sub>1</sub>: there is a difference between the models.
 #+ message=FALSE, warning=FALSE
 
-anova(lin_reg_mean_elevation, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
+anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
+#' The comparison of the models shows that the quadratic is significantly better than the linear model,
+#' but that the cubic is not significantly better than quadratic, and the quartic is not significantly
+#' better than the cubic.
+#'
+#' This evidence suggests that the quadratic model should be selected. View the summary of the quadratic
+#' model.
 summary(nonlin_reg_quadratic)
