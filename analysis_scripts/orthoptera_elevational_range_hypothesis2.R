@@ -299,7 +299,7 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' do not appear to be distributed normally and there is a trend in the residuals with the
 #' fitted values, suggesting that it violates the assumption of heteroscedasticity. However, without this
 #' point, the assumption of heteroscedasticity does not appear to be violated. **TODO**: how
-#' sensitive is this model to violation of the assumptions? **TODO**: check which the outlying point is.
+#' sensitive is this model to violation of the assumptions?
 #'
 #' ## Investigate Rapoport's Rule for Caelifera only
 #'
@@ -341,6 +341,7 @@ plot_elevrange_elevation_suborder(elevational_ranges_species)
 caelifera_observations_to_use <- get_caelifera_observations(observations_to_use)
 
 #' Calculate the elevational ranges (and elevation-related parameters).
+#+ message=FALSE, warning=FALSE
 
 elevational_ranges_caelifera <- calculate_elevational_range(caelifera_observations_to_use)
 
@@ -369,6 +370,8 @@ nonlin_reg_quartic_caelifera <- lin_regs_polynomial_caelifera[[4]]
 compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
+
+summary(nonlin_reg_quadratic_caelifera)
 
 #' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
 #' This model also has the largest adjusted R-squared.
