@@ -295,3 +295,5 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' point, the assumption of heteroscedasticity does not appear to be violated. **TODO**: how
 #' sensitive is this model to violation of the assumptions? **TODO**: check which the outlying point is.
 #'
+#' ## Investigate Rapoport's Rule for Caelifera only
+

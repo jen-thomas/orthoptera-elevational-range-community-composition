@@ -153,8 +153,8 @@ count_sites_where_species_observed <- function(observations_df) {
   #' Return dataframe of species and number of sites.
 
   sites_species_observed <- observations_df %>%
-    distinct(species, site_elevation) %>%
-    group_by(species) %>%
+    distinct(species, suborder, site_elevation) %>%
+    group_by(species, suborder) %>%
     dplyr::summarise("number_sites" = n())
 
   return(sites_species_observed)
