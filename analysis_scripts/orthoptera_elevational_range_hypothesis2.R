@@ -373,6 +373,8 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 summary(nonlin_reg_quadratic_caelifera)
 
+plot_quadratic_model(elevational_ranges_caelifera, nonlin_reg_quadratic_caelifera)
+
 #' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
 #' This model also has the largest adjusted R-squared.
 #'
