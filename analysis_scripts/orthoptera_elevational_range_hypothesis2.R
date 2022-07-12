@@ -392,9 +392,9 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' maximum elevational range ($ER$) of 1044 m was predicted at an elevation ($E$) of 1,760 m a.s.l ($ER =
 #' -6700 + 8.8E - 0.0025 ER^2$).
 #'
-#' **TODO / questions**:
+#' ## TODO / questions:
 #' <ul>
 #' <li>Can these results be compared? i.e. can we say that the addition of Ensifera to the analysis
 #' lowered the maximum elevational range, and the elevation at which it occurred?</li>
 #' <li>Are we okay to accept the assumptions of both of the models?</li>
-#'
+#' </ul>
