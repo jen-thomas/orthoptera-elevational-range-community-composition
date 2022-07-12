@@ -289,6 +289,9 @@ plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
 
 check_model_assumptions(nonlin_reg_quadratic)
 
-#' The residuals do not appear to be distributed normally and there is a trend in the residuals with the
-#' fitted values, suggesting that it violates the assumption of heteroscedasticity. **TODO**: how
-#' sensitive is this model to violation of the assumptions?
+#' There appears to be one data point which is skewing the residuals. Including this point, the residuals
+#' do not appear to be distributed normally and there is a trend in the residuals with the
+#' fitted values, suggesting that it violates the assumption of heteroscedasticity. However, without this
+#' point, the assumption of heteroscedasticity does not appear to be violated. **TODO**: how
+#' sensitive is this model to violation of the assumptions? **TODO**: check which the outlying point is.
+#'
