@@ -316,13 +316,27 @@ get_caelifera_observations <- function(observations_df) {
   return(caelifera_observations)
 }
 
+plot_elevrange_elevation_suborder <- function(dataframe) {
+  #' Plot the elevational range against elevation. Colour by the suborder.
+
+  ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
+    geom_point(size = 2) +
+    labs(x = "Elevation (m a.s.l)", y = "Elevational range (m)") +
+    theme_classic()
+}
+
+#' Plot elevational range against elevation and colour the points by suborder. Only a small number of
+#' Ensifera are being used in this analysis, so it might be worth considering Caelifera only.
+
+plot_elevrange_elevation_suborder(observations_to_use)
+
 #' Get the Caelifera observations to use
 
-cacelifera_observations_to_use <- get_caelifera_observations(observations_to_use)
+caelifera_observations_to_use <- get_caelifera_observations(observations_to_use)
 
 #' Calculate the elevational ranges (and elevation-related parameters)
 
-elevational_ranges_caelifera <- calculate_elevational_range(cacelifera_observations_to_use)
+elevational_ranges_caelifera <- calculate_elevational_range(caelifera_observations_to_use)
 
 #' Check the distribution of the Caelifera species elevational range with elevation
 
@@ -362,4 +376,7 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 check_model_assumptions(nonlin_reg_quadratic_caelifera)
 
 #' It is hard to tell if the assumption of heteroscedasticity is violated or not because there are many
-#' more data points for higher fitted values. The residuals have a left-skewed distribution. 
+#' more data points for higher fitted values. The residuals have a left-skewed distribution.
+#'
+#' ## Results
+
