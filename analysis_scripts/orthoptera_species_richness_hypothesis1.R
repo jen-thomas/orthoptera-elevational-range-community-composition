@@ -144,11 +144,8 @@ plot_lin_reg_sampling_effort_elevation <- function(dataframe, linear_regression)
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
-surveys_file <- "../data/surveys.csv"
 
 sites_df <- read_csv_data_file(sites_file)
-surveys_df <- read_csv_data_file(surveys_file)
-site_survey_df <- join_site_survey(sites_df, surveys_df)
 
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
