@@ -98,41 +98,120 @@ elevational_ranges_species <- calculate_elevational_range(observations_to_use)
 #' which was calculated by subtracting half of the elevational range from the maximum elevation; and the
 #' mean elevation of all of the observations of each species.
 #'
-#' Look at the distribution of elevational range.
+#' The functions below manipulate the data needed for the modelling below.
 
-par(mfrow = c(2, 2))
-elevational_ranges_species$sqrt_elevational_range <- sqrt(elevational_ranges_species$elevational_range)
-elevational_ranges_species$log_elevational_range <- log(elevational_ranges_species$elevational_range)
-hist(elevational_ranges_species$elevational_range, xlab = "Elevational range (m a.s.l)", ylab = "Frequency")
-hist(elevational_ranges_species$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = "Frequency")
-hist(elevational_ranges_species$log_elevational_range, xlab = "Log elevational range (m a.s.l)", ylab = "Frequency")
+transform_elevational_range <- function(dataframe) {
+  #' Calculate the square-root and log of a parameter to transform it. Add it to a new column in the
+  #' dataframe.
+  #'
+  #' Return dataframe.
+
+  elevational_ranges_species$sqrt_elevational_range <- sqrt(elevational_ranges_species$elevational_range)
+  elevational_ranges_species$log_elevational_range <- log(elevational_ranges_species$elevational_range)
+
+  return(elevational_ranges_species)
+}
+
+plot_histograms_elevational_range <- function(dataframe) {
+  #' Plot histograms of the different elevational range parameters.
+
+  par(mfrow = c(2, 2))
+  ylab = "Frequency"
+
+  hist(dataframe$elevational_range, xlab = "Elevational range (m a.s.l)", ylab = ylab)
+  hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = ylab)
+  hist(dataframe$log_elevational_range, xlab = "Log elevational range (m a.s.l)", ylab = ylab)
+}
+
+plot_elevrange_elevation <- function(dataframe) {
+  #' Plot the elevational range as a function of the measures of elevation.
+
+  y_param <- dataframe$elevational_range
+  ylab <- "Elevational range (m a.s.l)"
+
+  plot(y_param ~ elevational_range_midpoint, data = dataframe,
+       xlab = "Elevational range midpoint (m a.s.l)", ylab = ylab)
+
+  plot(y_param ~ mean_elevation, data = dataframe, xlab = "Mean elevation (m a.s.l)", ylab = ylab)
+}
+
+linear_regression_elevrange_elevation <- function(dataframe, elevation_parameter) {
+  #' Do a linear regression of elevational range as a function of elevation. Plot and summarise the
+  #' regression.
+  #'
+  #' Return the regression.
+
+  lin_reg <- lm(elevational_ranges_species[["elevational_range"]] ~
+                                           elevational_ranges_species[[elevation_parameter]])
+  summary(lin_reg)
+
+  par(mfrow = c(2, 2))
+  plot(lin_reg)
+
+  return(lin_reg)
+}
+
+calculate_polynomials_elevation <- function(dataframe) {
+  #' Calculate the square, cube and fourth degree of the measure of elevation. Add to dataframe as new
+  #' columns.
+  #'
+  #' Return dataframe.
+
+  parameter <- dataframe$mean_elevation
+
+  dataframe$mean_elevation2 <- parameter^2
+  dataframe$mean_elevation3 <- parameter^3
+  dataframe$mean_elevation4 <- parameter^4
+
+  return(dataframe)
+}
+
+linear_regression_elevrange_elevation_polynomial <- function(dataframe) {
+  #' Do linear regressions of elevational range as a function of elevation. The measure of elevation will
+  #' be a polynomial of varying order as specified in each regression.
+  #'
+  #' Return a list of the regressions.
+
+  lin_regs_polynomial <- list()
+
+  nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation + mean_elevation2,
+                        data = elevational_ranges_species)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quadratic))
+
+  nonlin_reg_cubic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3,
+                       data = elevational_ranges_species)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_cubic))
+
+  nonlin_reg_quartic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3 +
+                         mean_elevation4, data = elevational_ranges_species)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quartic))
+
+  return(lin_regs_polynomial)
+}
+
+#' Look at the distribution of elevational range, as well as the transformed elevational range
+#' (square-root and log).
+
+elevational_ranges_species <- transform_elevational_range(elevational_ranges_species)
+
+plot_histograms_elevational_range(elevational_ranges_species)
 
 #' There is a slight left skew to the data. Transformations of the elevational range do not help.
 #'
 #' Plot the relationships between the measures of elevation and the elevational range at which each
 #' species was observed.
 
-plot(elevational_range ~ elevational_range_midpoint, data = elevational_ranges_species,
-     xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m a.s.l)")
+plot_elevrange_elevation(elevational_ranges_species)
 
-plot(elevational_range ~ mean_elevation, data = elevational_ranges_species,
-     xlab = "Mean elevation (m a.s.l)", ylab = "Elevational range (m a.s.l)")
+#' From these plots, we can see that the relationship does not appear to be linear. There appears to be
+#' little difference between the two measures of elevation in the plot. **TODO** decide which measure of
+#' elevation seems to be most appropriate from the literature.
 
-#' From these plots, we can see that the relationship does not appear to be linear.
+#' Try a linear regression to see if there is any relationship (although this is not expected because
+#' there seems to be a clear non-linear (likely quadratic) relationship.
 
-lin_reg_elevational_range_midpoint <- lm(elevational_ranges_species[["elevational_range"]] ~
-                                           elevational_ranges_species[["elevational_range_midpoint"]])
-summary(lin_reg_elevational_range_midpoint)
-par(mfrow = c(2, 2))
-plot(lin_reg_elevational_range_midpoint)
-
-#' Plot then test the relationship between the mean elevation and elevational range at which each species was observed.
-
-lin_reg_mean_elevation <- lm(elevational_ranges_species[["elevational_range"]] ~
-                               elevational_ranges_species[["mean_elevation"]])
-summary(lin_reg_mean_elevation)
-par(mfrow = c(2, 2))
-plot(lin_reg_mean_elevation)
+lin_reg_elevational_range_midpoint <- linear_regression_elevrange_elevation(elevational_ranges_species, "elevational_range_midpoint")
+lin_reg_mean_elevation <- linear_regression_elevrange_elevation(elevational_ranges_species, "mean_elevation")
 
 #' There is a clear non-linear relationship between the elevational range and both measures of elevation
 #' (mean and mid-point) as seen on both of the plots. The linear regression shows the linear relationship
@@ -141,16 +220,13 @@ plot(lin_reg_mean_elevation)
 #' The relationship seems to be quadratic. Test the quadratic, cubic and quartic models. Calculate these
 #' parameters first.
 
-elevational_ranges_species$mean_elevation2 <- (elevational_ranges_species$mean_elevation)^2
-elevational_ranges_species$mean_elevation3 <- (elevational_ranges_species$mean_elevation)^3
-elevational_ranges_species$mean_elevation4 <- (elevational_ranges_species$mean_elevation)^4
+elevational_ranges_species <- calculate_polynomials_elevation(elevational_ranges_species)
 
-nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation + mean_elevation2,
-                        data = elevational_ranges_species)
-nonlin_reg_cubic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3,
-                       data = elevational_ranges_species)
-nonlin_reg_quartic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3 +
-                         mean_elevation4, data = elevational_ranges_species)
+lin_regs_polynomial <- linear_regression_elevrange_elevation_polynomial(elevational_ranges_species)
+
+nonlin_reg_quadratic <- lin_regs_polynomial[[1]]
+nonlin_reg_cubic <- lin_regs_polynomial[[2]]
+nonlin_reg_quartic <- lin_regs_polynomial[[3]]
 
 #' Compare the models to look at the AIC and adjusted R squared.
 
