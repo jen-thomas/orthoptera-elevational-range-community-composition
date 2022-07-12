@@ -202,11 +202,11 @@ plot_quadratic_model <- function(dataframe, model) {
   lines(i, predicted_values, lty=1, lwd=2, col="blue")
 
   # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
-  cf <- round(coef(model), 2)
+  cf <- signif(coef(model), 2)
 
-  equation <- paste0("elev_range = ", cf[1],
-                     ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]), " elev ",
-                     ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " elev^2 ")
+  equation <- paste0("ER = ", cf[1],
+                     ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]), " E ",
+                     ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " e^2 ")
 
   mtext(equation, side = 3, line = -12)
 }
@@ -275,4 +275,6 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 summary(nonlin_reg_quadratic)
 
 plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
+
+#'
 
