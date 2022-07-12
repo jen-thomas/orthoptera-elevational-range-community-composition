@@ -153,7 +153,6 @@ linear_regression_elevrange_elevation <- function(dataframe, elevation_parameter
   lin_reg <- lm(dataframe[["elevational_range"]] ~ dataframe[[elevation_parameter]])
   summary(lin_reg)
 
-  par(mfrow = c(2, 2))
   plot(lin_reg)
 
   return(lin_reg)
@@ -236,29 +235,19 @@ elevational_ranges_species <- transform_elevational_range(elevational_ranges_spe
 
 plot_histograms_elevational_range(elevational_ranges_species)
 
-#' There is a slight left skew to the data. Transformations of the elevational range do not help.
+#' There is a slight left skew to the data, although it is not strong. Transformations of the elevational
+#' range do not help.
 #'
 #' Plot the relationships between the measures of elevation and the elevational range at which each
 #' species was observed.
 
 plot_elevrange_elevation(elevational_ranges_species)
 
-#' From these plots, we can see that the relationship does not appear to be linear. There appears to be
-#' little difference between the two measures of elevation in the plot. **TODO** decide which measure of
-#' elevation seems to be most appropriate from the literature.
-
-#' Try a linear regression to see if there is any relationship (although this is not expected because
-#' there seems to be a clear non-linear (likely quadratic) relationship.
-
-lin_reg_elevational_range_midpoint <- linear_regression_elevrange_elevation(elevational_ranges_species, "elevational_range_midpoint")
-lin_reg_mean_elevation <- linear_regression_elevrange_elevation(elevational_ranges_species, "mean_elevation")
-
-#' There is a clear non-linear relationship between the elevational range and both measures of elevation
-#' (mean and mid-point) as seen on both of the plots. The linear regression shows the linear relationship
-#' is not statistically significant.
+#' From these plots, we can see that the relationship does not appear to be linear.
 #'
-#' The relationship seems to be quadratic. Test the quadratic, cubic and quartic models. Calculate these
-#' parameters first.
+#' There is a clear non-linear relationship between the elevational range and both measures of elevation
+#' (mean and mid-point) as seen on both of the plots. The relationship seems to be quadratic. Test the
+#' quadratic, cubic and quartic models. Calculate these parameters first.
 
 elevational_ranges_species <- calculate_polynomials_elevation(elevational_ranges_species)
 
@@ -269,7 +258,7 @@ nonlin_reg_quadratic <- lin_regs_polynomial[[2]]
 nonlin_reg_cubic <- lin_regs_polynomial[[3]]
 nonlin_reg_quartic <- lin_regs_polynomial[[4]]
 
-#' Compare the models to look at the AIC and adjusted R squared.
+#' Compare the models to look at the AIC and adjusted R-squared.
 
 compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
