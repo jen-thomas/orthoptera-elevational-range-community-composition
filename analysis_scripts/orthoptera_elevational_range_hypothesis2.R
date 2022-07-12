@@ -119,8 +119,14 @@ plot_histograms_elevational_range <- function(dataframe) {
   ylab <- "Frequency"
 
   hist(dataframe$elevational_range, xlab = "Elevational range (m a.s.l)", ylab = ylab)
-  hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = ylab)
-  hist(dataframe$log_elevational_range, xlab = "Log elevational range (m a.s.l)", ylab = ylab)
+
+  if (exists("dataframe$sqrt_elevational_range")) {
+    hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = ylab)
+  }
+
+  if (exists("dataframe$log_elevational_range")) {
+    hist(dataframe$log_elevational_range, xlab = "Log elevational range (m a.s.l)", ylab = ylab)
+  }
 }
 
 plot_elevrange_elevation <- function(dataframe) {
@@ -296,4 +302,57 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' sensitive is this model to violation of the assumptions? **TODO**: check which the outlying point is.
 #'
 #' ## Investigate Rapoport's Rule for Caelifera only
+#' **TODO** plot the data points coloured for Caelifera and Ensifera
+#' The functions below prepare the data and run the models for Caelifera only.
+
+get_caelifera_observations <- function(observations_df) {
+  #' Subset the observations of Caelifera only from those that have been identified to use in this
+  #' analysis.
+  #'
+  #' Return the dataframe of Caelifera.
+
+  caelifera_observations <- filter(observations_df, suborder == "Caelifera")
+
+  return(caelifera_observations)
+}
+
+#' Get the Caelifera observations to use
+
+cacelifera_observations_to_use <- get_caelifera_observations(observations_to_use)
+
+#' Calculate the elevational ranges (and elevation-related parameters)
+
+elevational_ranges_caelifera <- calculate_elevational_range(cacelifera_observations_to_use)
+
+#' Check the distribution of the Caelifera species elevational range with elevation
+
+transform_elevational_range(elevational_ranges_caelifera)
+plot_histograms_elevational_range(elevational_ranges_caelifera)
+
+#' Plot elevational range against elevation for Caelifera only
+
+plot_elevrange_elevation(elevational_ranges_caelifera)
+
+#' The relationship between elevation and elevational range again appears to be an inverse quadratic. Run
+#' model for polynomials up to the fourth order and do model selection to choose the most parsimonious
+#' model.
+
+elevational_ranges_caelifera <- calculate_polynomials_elevation(elevational_ranges_caelifera)
+
+lin_regs_polynomial_caelifera <- linear_regression_elevrange_elevation_polynomial(elevational_ranges_caelifera)
+
+lin_reg_caelifera <- lin_regs_polynomial_caelifera[[1]]
+nonlin_reg_quadratic_caelifera <- lin_regs_polynomial_caelifera[[2]]
+nonlin_reg_cubic_caelifera <- lin_regs_polynomial_caelifera[[3]]
+nonlin_reg_quartic_caelifera <- lin_regs_polynomial_caelifera[[4]]
+
+compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
+
+anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
+
+#' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
+#' This model also has the largest adjusted R-squared.
 #'
+#' Using ANOVA for a direct comparison between the models, the quadratic model is significantly better
+#' than the linear model and the cubic and quartic models do not show any significant improvement on the
+#' quadratic.
