@@ -24,9 +24,6 @@ get_packages(vector_packages)
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
-surveys_file <- "../data/surveys.csv"
-
-sites_df <- read_csv_data_file(sites_file)
 
 #' See exploratory data analysis and hypothesis 1 for an explanation of confirmed and finalised
 #' observations.
