@@ -296,4 +296,4 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' sensitive is this model to violation of the assumptions? **TODO**: check which the outlying point is.
 #'
 #' ## Investigate Rapoport's Rule for Caelifera only
-
+#'
