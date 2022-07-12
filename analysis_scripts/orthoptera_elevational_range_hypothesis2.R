@@ -206,9 +206,18 @@ plot_quadratic_model <- function(dataframe, model) {
 
   equation <- paste0("ER = ", cf[1],
                      ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]), " E ",
-                     ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " e^2 ")
+                     ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " E^2 ")
 
-  mtext(equation, side = 3, line = -12)
+  mtext(equation, side = 3, line = -13)
+}
+
+check_model_assumptions <- function(model) {
+  #' Plot a histogram of the residuals to check for a normal distribution. Secondly, plot the residuals
+  #' against the predicted values, to check for homoscedasticity.
+
+  hist(residuals(model), col="darkgray")
+
+  plot(fitted(model), residuals(model))
 }
 
 #' Look at the distribution of elevational range, as well as the transformed elevational range
@@ -276,5 +285,10 @@ summary(nonlin_reg_quadratic)
 
 plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
 
-#'
+#' ### Check model assumptions
 
+check_model_assumptions(nonlin_reg_quadratic)
+
+#' The residuals do not appear to be distributed normally and there is a trend in the residuals with the
+#' fitted values, suggesting that it violates the assumption of heteroscedasticity. **TODO**: how
+#' sensitive is this model to violation of the assumptions?
