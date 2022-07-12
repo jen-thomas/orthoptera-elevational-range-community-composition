@@ -76,8 +76,8 @@ calculate_elevational_range <- function(observations) {
       #' all specimens are identified to species.
 
   elevational_ranges_species <- observations %>%
-    distinct(species, elevational_band_m) %>%
-    group_by(species) %>%
+    distinct(species, suborder, elevational_band_m) %>%
+    group_by(species, suborder) %>%
     dplyr::summarise("min_elevation" = min(elevational_band_m), "max_elevation" = max(elevational_band_m),
                      "elevational_range" = max_elevation - min_elevation,
                      "elevational_range_midpoint" = max_elevation - elevational_range / 2,
@@ -118,14 +118,14 @@ plot_histograms_elevational_range <- function(dataframe) {
   par(mfrow = c(2, 2))
   ylab <- "Frequency"
 
-  hist(dataframe$elevational_range, xlab = "Elevational range (m a.s.l)", ylab = ylab)
+  hist(dataframe$elevational_range, xlab = "Elevational range (m)", ylab = ylab)
 
   if (exists("dataframe$sqrt_elevational_range")) {
-    hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m a.s.l)", ylab = ylab)
+    hist(dataframe$sqrt_elevational_range, xlab = "Sqrt elevational range (m^0.5)", ylab = ylab)
   }
 
   if (exists("dataframe$log_elevational_range")) {
-    hist(dataframe$log_elevational_range, xlab = "Log elevational range (m a.s.l)", ylab = ylab)
+    hist(dataframe$log_elevational_range, xlab = "Log elevational range", ylab = ylab)
   }
 }
 
@@ -133,7 +133,7 @@ plot_elevrange_elevation <- function(dataframe) {
   #' Plot the elevational range as a function of the measures of elevation.
 
   y_param <- dataframe$elevational_range
-  ylab <- "Elevational range (m a.s.l)"
+  ylab <- "Elevational range (m)"
 
   plot(y_param ~ elevational_range_midpoint, data = dataframe,
        xlab = "Elevational range midpoint (m a.s.l)", ylab = ylab)
@@ -302,7 +302,7 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' sensitive is this model to violation of the assumptions? **TODO**: check which the outlying point is.
 #'
 #' ## Investigate Rapoport's Rule for Caelifera only
-#' **TODO** plot the data points coloured for Caelifera and Ensifera
+#'
 #' The functions below prepare the data and run the models for Caelifera only.
 
 get_caelifera_observations <- function(observations_df) {
@@ -328,22 +328,28 @@ plot_elevrange_elevation_suborder <- function(dataframe) {
 #' Plot elevational range against elevation and colour the points by suborder. Only a small number of
 #' Ensifera are being used in this analysis, so it might be worth considering Caelifera only.
 
-plot_elevrange_elevation_suborder(observations_to_use)
+plot_elevrange_elevation_suborder(elevational_ranges_species)
 
-#' Get the Caelifera observations to use
+#' Only five Ensifera species were considered to have enough data to be used in the analysis above. There
+#' are too few data points to extract a pattern, but is there potentially a peak as there is in Caelifera,
+#' but at a lower elevation? This would be an interesting point to explore if there were more specimens.
+#'
+#' For this part of the analysis, consider only Caelifera.
+
+#' Get the Caelifera observations to use.
 
 caelifera_observations_to_use <- get_caelifera_observations(observations_to_use)
 
-#' Calculate the elevational ranges (and elevation-related parameters)
+#' Calculate the elevational ranges (and elevation-related parameters).
 
 elevational_ranges_caelifera <- calculate_elevational_range(caelifera_observations_to_use)
 
-#' Check the distribution of the Caelifera species elevational range with elevation
+#' Check the distribution of the Caelifera species elevational range with elevation.
 
 transform_elevational_range(elevational_ranges_caelifera)
 plot_histograms_elevational_range(elevational_ranges_caelifera)
 
-#' Plot elevational range against elevation for Caelifera only
+#' Plot elevational range against elevation for Caelifera only.
 
 plot_elevrange_elevation(elevational_ranges_caelifera)
 
