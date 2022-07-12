@@ -356,3 +356,10 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 #' Using ANOVA for a direct comparison between the models, the quadratic model is significantly better
 #' than the linear model and the cubic and quartic models do not show any significant improvement on the
 #' quadratic.
+#'
+#' ### Check models assumptions
+
+check_model_assumptions(nonlin_reg_quadratic_caelifera)
+
+#' It is hard to tell if the assumption of heteroscedasticity is violated or not because there are many
+#' more data points for higher fitted values. The residuals have a left-skewed distribution. 
