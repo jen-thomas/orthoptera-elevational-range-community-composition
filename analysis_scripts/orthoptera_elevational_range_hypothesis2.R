@@ -174,6 +174,10 @@ linear_regression_elevrange_elevation_polynomial <- function(dataframe) {
 
   lin_regs_polynomial <- list()
 
+  lin_reg <- lm(elevational_range ~ mean_elevation,
+                        data = elevational_ranges_species)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(lin_reg))
+
   nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation + mean_elevation2,
                         data = elevational_ranges_species)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quadratic))
@@ -224,14 +228,18 @@ elevational_ranges_species <- calculate_polynomials_elevation(elevational_ranges
 
 lin_regs_polynomial <- linear_regression_elevrange_elevation_polynomial(elevational_ranges_species)
 
-nonlin_reg_quadratic <- lin_regs_polynomial[[1]]
-nonlin_reg_cubic <- lin_regs_polynomial[[2]]
-nonlin_reg_quartic <- lin_regs_polynomial[[3]]
+lin_reg_ <- lin_regs_polynomial[[1]]
+nonlin_reg_quadratic <- lin_regs_polynomial[[2]]
+nonlin_reg_cubic <- lin_regs_polynomial[[3]]
+nonlin_reg_quartic <- lin_regs_polynomial[[4]]
 
 #' Compare the models to look at the AIC and adjusted R squared.
 
 compareLM(lin_reg_mean_elevation, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
+#' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
+#' This model also has the largest adjusted R-squared.
+#'
 #' Do a direct comparison of the difference between the models using ANOVA.
 #' <br>H<sub>0</sub>: there is no difference between the models.
 #' <br>H<sub>1</sub>: there is a difference between the models.
