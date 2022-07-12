@@ -208,7 +208,7 @@ plot_quadratic_model <- function(dataframe, model) {
                      ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]), " elev ",
                      ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " elev^2 ")
 
-  mtext(equation, side = 3, line = -2)
+  mtext(equation, side = 3, line = -12)
 }
 
 #' Look at the distribution of elevational range, as well as the transformed elevational range
