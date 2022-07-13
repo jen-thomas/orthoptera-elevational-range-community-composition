@@ -125,6 +125,30 @@ get_confirmed_observations_to_species <- function(observations_sites_df) {
   return(confirmed_observations_species)
 }
 
+get_conservative_observations <- function(confirmed_observations, finalised_observations) {
+    #' Get all observations to use in the analysis. Conservative where in doubt.
+
+  finalised_identifications <- create_finalised_observations(finalised_observations)
+  finalised_identifications_conservative <- finalised_identifications[[1]]
+
+  all_observations_conservative <- join_observations(confirmed_observations,
+                                                     finalised_identifications_conservative)
+
+  return(all_observations_conservative)
+}
+
+get_nonconservative_observations <- function(confirmed_observations, finalised_observations) {
+    #' Get all observations to use in the analysis. Not conservative where in doubt.
+
+  finalised_identifications <- create_finalised_observations(finalised_observations)
+  finalised_identifications_notconservative <- finalised_identifications[[2]]
+
+  all_observations_notconservative <- join_observations(confirmed_observations,
+                                                     finalised_identifications_notconservative)
+
+  return(all_observations_notconservative)
+}
+
 get_observations_to_species <- function(observations_df) {
   #' Get all observations identified to species. Use the condition that species is not null.
   #'

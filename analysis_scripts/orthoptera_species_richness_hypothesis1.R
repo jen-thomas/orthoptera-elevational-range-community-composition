@@ -27,18 +27,18 @@ get_packages(vector_packages)
 #' The following functions calculate the species richness and do the statistics for the analysis of this hypothesis.
 
 plot_elevation_species_richness <- function(species_richness_elevation) {
-  #' Plot elevation band against species richness.
+    #' Plot elevation band against species richness.
 
   plot(species_richness ~ elevational_band_m, data = species_richness_elevation,
        xlab = "Elevation band (m a.s.l)", ylab = "Species richness")
 }
 
 linear_regression_species_richness_elevation <- function(dataframe, species_richness,
-elevational_band_m) {
-  #' Create a linear model (do a linear regression) of the explanatory variable (elevation) on the
-  #' response variable (species richness).
-  #'
-  #' Return the model.
+                                                         elevational_band_m) {
+    #' Create a linear model (do a linear regression) of the explanatory variable (elevation) on the
+    #' response variable (species richness).
+    #'
+    #' Return the model.
 
   regression <- lm(dataframe[[species_richness]] ~ dataframe[[elevational_band_m]])
 
@@ -46,17 +46,17 @@ elevational_band_m) {
 }
 
 plot_model_residuals_species_richness_elev <- function(model, dataframe, elevational_band_m) {
-  #' Calculate and plot the residuals from the regression as a function of the explanatory variable
-  #' (elevational band).
+    #' Calculate and plot the residuals from the regression as a function of the explanatory variable
+    #' (elevational band).
 
   plot(residuals(model) ~ dataframe[[elevational_band_m]])
-  abline(h=0)
+  abline(h = 0)
 }
 
 correlation_test <- function(dataframe, para1, para2) {
-  #' Calculate the correlation coefficient between two variables.
-  #'
-  #' Return the coefficient.
+    #' Calculate the correlation coefficient between two variables.
+    #'
+    #' Return the coefficient.
 
   corr_test <- cor.test(x = dataframe[[para1]], y = dataframe[[para2]])
 
@@ -64,9 +64,9 @@ correlation_test <- function(dataframe, para1, para2) {
 }
 
 calculate_coefficient_of_determination <- function(correlation_coefficient) {
-  #' Calculate the coefficient of determination (R^2) for a correlation coefficient.
-  #'
-  #' Return the coefficient.
+    #' Calculate the coefficient of determination (R^2) for a correlation coefficient.
+    #'
+    #' Return the coefficient.
 
   coeff_det <- correlation_coefficient^2
 
@@ -74,9 +74,9 @@ calculate_coefficient_of_determination <- function(correlation_coefficient) {
 }
 
 get_predicted_values <- function(linear_regression) {
-  #' Get the predicted values using the linear regression.
-  #'
-  #' Return data frame of predicted values.
+    #' Get the predicted values using the linear regression.
+    #'
+    #' Return data frame of predicted values.
 
   predicted <- predict(linear_regression, interval = "prediction")
 
@@ -84,23 +84,23 @@ get_predicted_values <- function(linear_regression) {
 }
 
 plot_linear_regression_species_richness <- function(dataframe, linear_regression) {
-  #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
-  #' values.
+    #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
+    #' values.
 
   predicted_values <- get_predicted_values(linear_regression)
   df <- cbind.data.frame(dataframe, predicted_values, stringsAsFactors = FALSE)
 
   ggplot(df, aes(y = species_richness, x = elevational_band_m)) +
-        geom_point(size = 3, col = "blue") +
-        geom_smooth(method = "lm", se = TRUE) +
-        #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
-        #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
-        labs(x = "Elevation (m a.s.l)", y = "Species richness") +
-        theme_classic()
+    geom_point(size = 3, col = "blue") +
+    geom_smooth(method = "lm", se = TRUE) +
+    #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+    #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+    labs(x = "Elevation (m a.s.l)", y = "Species richness") +
+    theme_classic()
 }
 
 plot_elevation_species_richness_area <- function(dataframe) {
-  #' Plot the species richness against elevation band. Colour by the study area.
+    #' Plot the species richness against elevation band. Colour by the study area.
 
   ggplot(dataframe, aes(x = elevational_band_m, y = species_richness, colour = area)) +
     geom_point(size = 2) +
@@ -109,35 +109,35 @@ plot_elevation_species_richness_area <- function(dataframe) {
 }
 
 plot_lin_reg_sampling_effort_species_richness <- function(dataframe, linear_regression) {
-  #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
-  #' values.
+    #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
+    #' values.
 
   predicted_values <- get_predicted_values(linear_regression)
   df <- cbind.data.frame(dataframe, predicted_values, stringsAsFactors = FALSE)
 
   ggplot(df, aes(y = species_richness, x = sampling_effort_index)) +
-        geom_point(size = 3, col = "blue") +
-        geom_smooth(method = "lm", se = TRUE) +
-        #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
-        #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
-        labs(x = "Sampling effort index", y = "Species richness") +
-        theme_classic()
+    geom_point(size = 3, col = "blue") +
+    geom_smooth(method = "lm", se = TRUE) +
+    #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+    #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+    labs(x = "Sampling effort index", y = "Species richness") +
+    theme_classic()
 }
 
 plot_lin_reg_sampling_effort_elevation <- function(dataframe, linear_regression) {
-  #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
-  #' values.
+    #' Plot the data points with 95% CI, the linear model and the lower and upper bounds for the predicted
+    #' values.
 
   predicted_values <- get_predicted_values(linear_regression)
   df <- cbind.data.frame(dataframe, predicted_values, stringsAsFactors = FALSE)
 
   ggplot(df, aes(y = sampling_effort_index, x = elevational_band_m)) +
-        geom_point(size = 3, col = "blue") +
-        geom_smooth(method = "lm", se = TRUE) +
-        #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
-        #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
-        labs(x = "Elevation (m a.s.l)", y = "Sampling effort index") +
-        theme_classic()
+    geom_point(size = 3, col = "blue") +
+    geom_smooth(method = "lm", se = TRUE) +
+    #geom_line(aes(y = lwr), color = "black", linetype = "dashed") +
+    #geom_line(aes(y = upr), color = "black", linetype = "dashed") +
+    labs(x = "Elevation (m a.s.l)", y = "Sampling effort index") +
+    theme_classic()
 }
 
 #' ## Import and set up the data
@@ -168,13 +168,8 @@ finalised_observations <- get_finalised_observations(observations_sites_df)
 #' In parts of the analysis, the observations will referred to as confirmed or finalised, and be subset
 #' according to these different types of identification.
 
-finalised_identifications <- create_finalised_observations(finalised_observations)
-
-finalised_identifications_conservative <- finalised_identifications[[1]]
-finalised_identifications_notconservative <- finalised_identifications[[2]]
-
-all_observations_conservative <- join_observations(confirmed_observations, finalised_identifications_conservative)
-all_observations_notconservative <- join_observations(confirmed_observations, finalised_identifications_notconservative)
+all_observations_conservative <- get_conservative_observations(confirmed_observations, finalised_observations)
+all_observations_notconservative <- get_nonconservative_observations(confirmed_observations, finalised_observations)
 
 #' Calculate species richness at each site
 
@@ -197,7 +192,7 @@ both_species_richness
 #'
 #' View the test
 corr_test <- correlation_test(species_richness_sites, "elevational_band_m",
-                                                "species_richness")
+                              "species_richness")
 corr_coeff <- corr_test$estimate
 print(corr_test)
 
@@ -220,7 +215,7 @@ plot_elevation_species_richness(species_richness_sites)
 #' ### Linear regression
 #' Create a linear model of species richness against elevation and look at the model output.
 linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites,
-                       "species_richness", "elevational_band_m")
+                                                                                   "species_richness", "elevational_band_m")
 summary(linear_regression_species_richness)
 
 #' The linear regression shows that both the intercept and slope are statistically significant. Species
@@ -232,7 +227,7 @@ summary(linear_regression_species_richness)
 #' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
 plot_model_residuals_species_richness_elev(linear_regression_species_richness, species_richness_sites,
                                            "elevational_band_m")
-par(mfrow = c(2,2))
+par(mfrow = c(2, 2))
 plot(linear_regression_species_richness)
 
 #' <br>Comments about assumptions:
@@ -281,7 +276,7 @@ plot_linear_regression_species_richness(species_richness_sites, linear_regressio
 #+ message=FALSE, warning=FALSE
 
 linear_regression_species_richness_notconservative <- linear_regression_species_richness_elevation(species_richness_sites_notconservative,
-                       "species_richness", "elevational_band_m")
+                                                                                                   "species_richness", "elevational_band_m")
 summary(linear_regression_species_richness_notconservative)
 
 plot_linear_regression_species_richness(species_richness_sites_notconservative, linear_regression_species_richness_notconservative)
@@ -340,7 +335,7 @@ plot_lin_reg_sampling_effort_elevation(species_richness_sites,
                                        lin_reg_elevation_sampling_effort)
 
 corr_test_sampling_effort <- correlation_test(species_richness_sites, "elevational_band_m",
-                                                "sampling_effort_index")
+                                              "sampling_effort_index")
 corr_coeff_sampling_effort <- corr_test_sampling_effort$estimate
 print(corr_test_sampling_effort)
 
@@ -371,8 +366,8 @@ plot_elevation_species_richness_area(species_richness_sites)
 #' Fit a linear mixed model, treating study area and sampling effort as a random factor.
 #+ message=FALSE, warning=FALSE
 
-lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1|area),
-                                                  data = species_richness_sites)
+lmm_species_richness_elev_area_sampling_effort <- lmer(species_richness ~ elevational_band_m + (1 | area),
+                                                       data = species_richness_sites)
 summary(lmm_species_richness_elev_area_sampling_effort)
 
 #' The value of variance for area (random effects section) is 0 (or presumably just very small if only
@@ -404,10 +399,10 @@ qqline(resid(lmm_species_richness_elev_area_sampling_effort))
 #' #### Tor
 #+ message=FALSE, warning=FALSE
 
-species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor", ]
+species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor",]
 
 lin_reg_species_richness_area_tor <- lm(species_richness ~ elevational_band_m,
-                                            data = species_richness_tor)
+                                        data = species_richness_tor)
 summary(lin_reg_species_richness_area_tor)
 
 plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_richness_area_tor)
@@ -415,10 +410,10 @@ plot_linear_regression_species_richness(species_richness_tor, lin_reg_species_ri
 #' #### La Molinassa
 #+ message=FALSE, warning=FALSE
 
-species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa", ]
+species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa",]
 
 lin_reg_species_richness_area_mol <- lm(species_richness ~ elevational_band_m,
-                                            data = species_richness_mol)
+                                        data = species_richness_mol)
 summary(lin_reg_species_richness_area_mol)
 
 plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_richness_area_mol)
@@ -426,10 +421,10 @@ plot_linear_regression_species_richness(species_richness_mol, lin_reg_species_ri
 #' #### Tavascan
 #+ message=FALSE, warning=FALSE
 
-species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan", ]
+species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan",]
 
 lin_reg_species_richness_area_tav <- lm(species_richness ~ elevational_band_m,
-                                            data = species_richness_tav)
+                                        data = species_richness_tav)
 summary(lin_reg_species_richness_area_tav)
 
 plot_linear_regression_species_richness(species_richness_tav, lin_reg_species_richness_area_tav)
@@ -461,10 +456,10 @@ plot_elevation_species_richness_area(caelifera_species_richness_sites)
 #' #### Tor
 #+ message=FALSE, warning=FALSE
 
-caelifera_species_richness_tor <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tor", ]
+caelifera_species_richness_tor <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tor",]
 
 lin_reg_caelifera_species_richness_area_tor <- linear_regression_species_richness_elevation(caelifera_species_richness_tor,
-                                                       "species_richness", "elevational_band_m")
+                                                                                            "species_richness", "elevational_band_m")
 summary(lin_reg_caelifera_species_richness_area_tor)
 
 plot_linear_regression_species_richness(caelifera_species_richness_tor, lin_reg_caelifera_species_richness_area_tor)
@@ -472,10 +467,10 @@ plot_linear_regression_species_richness(caelifera_species_richness_tor, lin_reg_
 #' #### La Molinassa
 #+ message=FALSE, warning=FALSE
 
-caelifera_species_richness_mol <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "La Molinassa", ]
+caelifera_species_richness_mol <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "La Molinassa",]
 
 lin_reg_caelifera_species_richness_area_mol <- linear_regression_species_richness_elevation(caelifera_species_richness_mol,
-                                                                 "species_richness", "elevational_band_m")
+                                                                                            "species_richness", "elevational_band_m")
 summary(lin_reg_caelifera_species_richness_area_mol)
 
 plot_linear_regression_species_richness(caelifera_species_richness_mol, lin_reg_caelifera_species_richness_area_mol)
@@ -483,10 +478,10 @@ plot_linear_regression_species_richness(caelifera_species_richness_mol, lin_reg_
 #' #### Tavascan
 #+ message=FALSE, warning=FALSE
 
-caelifera_species_richness_tav <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tavascan", ]
+caelifera_species_richness_tav <- caelifera_species_richness_sites[caelifera_species_richness_sites$area == "Tavascan",]
 
 lin_reg_caelifera_species_richness_area_tav <- linear_regression_species_richness_elevation(caelifera_species_richness_tav,
-                                                       "species_richness", "elevational_band_m")
+                                                                                            "species_richness", "elevational_band_m")
 summary(lin_reg_caelifera_species_richness_area_tav)
 
 plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_caelifera_species_richness_area_tav)
