@@ -9,6 +9,8 @@
 #'     df_print: paged
 #' ---
 
+#' <br>**Project <a href="https://falciot.net/orthoptera-94940">homepage</a>**
+#'
 #' <br>Import functions from other files.
 #+ message=FALSE, warning=FALSE
 
@@ -89,7 +91,18 @@ calculate_elevational_range <- function(observations) {
   return(elevational_ranges_species)
 }
 
+plot_elevrange_elevation_species <- function(observations) {
+  #' Plot the elevational range against elevation, with each data point coloured by species.
+
+    ggplot(observations, aes(x = mean_elevation, y = elevational_range, colour = species)) +
+    geom_point(size = 2) +
+    labs(x = "Elevation (m a.s.l)", y = "Elevational range (m)") +
+    theme_classic()
+}
+
 elevational_ranges_species <- calculate_elevational_range(observations_to_use)
+elevational_ranges_species
+plot_elevrange_elevation_species(elevational_ranges_species)
 
 #' ## Test Rapoport's Rule for elevation
 #'
@@ -293,7 +306,7 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' point, the assumption of heteroscedasticity does not appear to be violated. **TODO**: how
 #' sensitive is this model to violation of the assumptions?
 #'
-#' ## Investigate Rapoport's Rule for Caelifera only
+#' ## Test Rapoport's Rule for Caelifera only
 #'
 #' The functions below prepare the data and run the models for Caelifera only.
 
@@ -392,7 +405,7 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' maximum elevational range ($ER$) of 1044 m was predicted at an elevation ($E$) of 1,760 m a.s.l ($ER =
 #' -6700 + 8.8E - 0.0025 ER^2$).
 #'
-#' ## TODO / questions:
+#' ## TODO / questions
 #' <ul>
 #' <li>Can these results be compared? i.e. can we say that the addition of Ensifera to the analysis
 #' lowered the maximum elevational range, and the elevation at which it occurred?</li>
