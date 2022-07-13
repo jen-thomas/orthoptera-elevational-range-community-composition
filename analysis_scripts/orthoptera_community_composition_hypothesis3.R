@@ -68,3 +68,43 @@ unique_taxa_sites
 
 site_species_matrix <- create_presence_absence_site_species_matrix(unique_taxa_sites)
 site_species_matrix
+
+#' ## Environmental variables
+#'
+#' Environmental variables will be checked for collinearity, then the quantitative environmental variables
+#' (average vegetation height, maximum vegetation height and vegetation density) will be normalised to
+#' have a mean of 0 and standard deviation of 1. Site aspect will be converted to eight compass points and
+#' other environmental variables transformed as needed.
+#'
+#' ### Prepare data
+#'
+#' ### Check for collinearity between environmental variables
+
+#' ## Detrended canonical analysis
+#'
+#' t might be expected that this matrix will contain many zeros where species have not been observed at
+#' sites along the elevational gradient, which in some ordination methods would lead to problems of
+#' closely associating sites when they lack species (double-zero problem)
+#' [@legendreEcologicallyMeaningfulTransformations2001]. To determine if the response of the species data
+#' is linear or unimodal, a detrended canonical analysis will be used. If the results do not meet the
+#' criteria for a linear ordination method, then one option would be to apply a Hellinger transformation,
+#' which has been shown to be suitable for presence-absence data [@legendreNumericalEcology2012], to be
+#' able to then use a principle components analysis (PCA)
+#' [@legendreEcologicallyMeaningfulTransformations2001]; a second option would be to use a distance method
+#' of unconstrained ordination which does not rely on linear ordination, to identify any natural clusters
+#' that might occur in the data due to the environmental variables.
+#'
+#' ## Constrained canonical analysis
+#'
+#' Given there are likely lots of zeros in the dataset because it is possible that species occur
+#' non-uniformly across the sites, an asymmetric, constrained canonical analysis (CCA) could be used
+#' [@legendreNumericalEcology2012] to understand the relationship between Orthoptera community
+#' composition, and altitude and the environment in which they are found. Site aspect, altitude,
+#' vegetation structure and ground cover will be used to constrain the ordination. If this is significant,
+#' forward selection of the environmental variables will be done to identify which influence the community
+#' composition of Orthoptera in the Pyrenees. The variables will be ordered according to the variation
+#' they explain, then a Monte Carlo permutation test will be used to test the significance of the
+#' variation explained by the highest-ranking variable. If the permutation test is significant, then the
+#' variable will be selected (and used in the next step as a covariate). PERMANOVA will be used to test
+#' for variation between the groups. Beforehand, the dispersion within groups will be tested to ensure
+#' that a false difference in means is not found [@wartonDistancebasedMultivariateAnalyses2012].
