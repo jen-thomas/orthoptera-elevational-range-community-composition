@@ -106,7 +106,7 @@ plot_elevrange_elevation_species(elevational_ranges_species)
 
 #' This plot isn't particularly useful in itself, it was just helpful to pick out some of the different
 #' species and think about the results a bit more.
-
+#'
 #' ## Test Rapoport's Rule for elevation
 #'
 #' We hypothesise that species that live at a higher elevation will occupy a larger elevational range.
