@@ -26,8 +26,8 @@ get_packages(vector_packages)
 #' The following functions are used to prepare the data and create the species-site matrix.
 
 create_site_species_abundance_df <- function(observations_df) {
-        #' Create a data frame of the species abundance at each site from a set of observations at different
-        #' sites. Each input observation is of one individual at a particular site.
+        #' Create a data frame of the species abundance at each site from a set of observations at
+        #' different sites. Each input observation is of one individual at a particular site.
         #'
         #' Return species abundance at each site.
 
@@ -47,8 +47,8 @@ create_site_species_abundance_df <- function(observations_df) {
 }
 
 create_presence_absence_site_species_matrix <- function(observations_df) {
-        #' Convert the abundance matrix into a presence-absence site-species matrix. Each value is either 0
-        #' (species not observed at a site) or 1 (species observed at a site).
+        #' Convert the abundance matrix into a presence-absence site-species matrix. Each value is either
+        #' 0 (species not observed at a site) or 1 (species observed at a site).
 
   site_species_abundance <- create_site_species_abundance_df(observations_df)
   site_species_presenceabsence_matrix <- t(create.matrix(site_species_abundance, tax.name = "species",
@@ -70,10 +70,11 @@ confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
 finalised_observations <- get_finalised_observations(observations_sites_df)
 
-all_observations_conservative <- get_conservative_observations(confirmed_observations, finalised_observations)
+all_observations_conservative <- get_conservative_observations(confirmed_observations,
+                                                               finalised_observations)
 
-#' Create and preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site
-#' where the name is an abbreviation of the study area.
+#' Create and preview the presence-absence site-species matrix. Site name is in the format
+#' altitude(m)_site where the name is an abbreviation of the study area.
 
-site_species_matrix <- create_presence_absence_site_species_matrix(observations_to_use)
+site_species_matrix <- create_presence_absence_site_species_matrix(all_observations_conservative)
 site_species_matrix
