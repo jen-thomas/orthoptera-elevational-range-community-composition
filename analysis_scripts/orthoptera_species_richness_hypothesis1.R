@@ -150,6 +150,7 @@ sites_df <- read_csv_data_file(sites_file)
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
 confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
+finalised_observations <- get_finalised_observations(observations_sites_df)
 
 #' ### Get the finalised identifications
 #'

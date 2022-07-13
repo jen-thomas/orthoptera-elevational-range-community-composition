@@ -58,7 +58,11 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
   return(site_species_presenceabsence_matrix)
 }
 
-#' #'Create and preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site
+#' Prepare the data for the matrix.
+
+
+
+#' Create and preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site
 #' where the name is an abbreviation of the study area.
 
 site_species_matrix <- create_presence_absence_site_species_matrix(observations_to_use)
