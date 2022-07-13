@@ -210,6 +210,54 @@ calculate_species_richness_sites <- function(all_observations) {
   return(unique_taxa_site)
 }
 
+get_taxa_name <- function(taxa_record) {
+  #' Get the taxa name of record, whichever taxonomic level it is from.
+  #'
+  #' Return the taxonomic name.
+
+  if (taxa_record$species != "") {
+    taxa_name <- taxa_record$species
+  }
+  else if ((taxa_record$genus != "") & (taxa_record$species == "")) {
+    taxa_name <- taxa_record$genus
+  }
+  else if ((taxa_record$subfamily != "") & (taxa_record$genus == "") & (taxa_record$species == "")) {
+    taxa_name <- taxa_record$subfamily
+  }
+  else if ((taxa_record$family != "") & (taxa_record$subfamily == "") & (taxa_record$genus == "") & (taxa_record$species == "")) {
+    taxa_name <- taxa_record$family
+  }
+  else {print("XXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")}
+  return(as.character(taxa_name))
+}
+
+get_unique_taxa_site <- function(all_observations) {
+  #' For each site in the dataset, go through and get each unique taxa. Add a finalised taxa name for each
+  #' of the unique taxa (this is needed because it will potentially be at a different taxonomic level).
+  #'
+  #' Return a dataframe with the site and taxa.
+
+  site_elevations <- get_site_elevation(all_observations) # makes sure all sites are searched for
+  # specimens
+
+  taxa_all_sites <- data.frame()
+  unique_taxa_site <- data.frame()
+
+  for (i in rownames(site_elevations)) {
+    site <- (site_elevations[i, "site_elevation"])
+    site_observations <- filter(all_observations, all_observations$site_elevation == site)
+    unique_taxa_site <- get_unique_taxa(site_observations)
+      for (record in rownames(unique_taxa_site)) {
+        taxa_name <- get_taxa_name(unique_taxa_site[record, ])
+        unique_taxa_site[record, "taxa"] <- taxa_name
+        unique_taxa_site[record, "site_elevation"] <- site
+      }
+    taxa_all_sites <- rbind(taxa_all_sites, unique_taxa_site)
+  }
+
+  return(taxa_all_sites)
+}
+
 get_number_species_site <- function(observations) {
   #' Get the observations data frame and group it by site and species.
   #'
