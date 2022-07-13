@@ -60,7 +60,17 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
 
 #' Prepare the data for the matrix.
 
+observations_file <- "../data/observations.csv"
+sites_file <- "../data/sites.csv"
 
+sites_df <- read_csv_data_file(sites_file)
+
+observations_sites_df <- import_all_observations(observations_file, sites_file)
+confirmed_observations <- get_confirmed_observations(observations_sites_df)
+confirmed_observations_species <- get_confirmed_observations_to_species(observations_sites_df)
+finalised_observations <- get_finalised_observations(observations_sites_df)
+
+all_observations_conservative <- get_conservative_observations(confirmed_observations, finalised_observations)
 
 #' Create and preview the presence-absence site-species matrix. Site name is in the format altitude(m)_site
 #' where the name is an abbreviation of the study area.

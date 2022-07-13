@@ -168,17 +168,23 @@ finalised_observations <- get_finalised_observations(observations_sites_df)
 #' In parts of the analysis, the observations will referred to as confirmed or finalised, and be subset
 #' according to these different types of identification.
 
-all_observations_conservative <- get_conservative_observations(confirmed_observations, finalised_observations)
-all_observations_notconservative <- get_nonconservative_observations(confirmed_observations, finalised_observations)
+all_observations_conservative <- get_conservative_observations(confirmed_observations,
+                                                               finalised_observations)
+all_observations_notconservative <- get_nonconservative_observations(confirmed_observations,
+                                                                     finalised_observations)
 
 #' Calculate species richness at each site
 
 species_richness_sites <- calculate_species_richness_sites(all_observations_conservative)
 
-species_richness_sites_notconservative <- calculate_species_richness_sites(all_observations_notconservative)
+species_richness_sites_notconservative <-
+  calculate_species_richness_sites(all_observations_notconservative)
 
-display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative, by = c("site_elevation", "area", "elevational_band_m"), suffix = c("_conservative", "_notconservative"))
-both_species_richness <- display_species_richness %>% select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
+display_species_richness <- left_join(species_richness_sites, species_richness_sites_notconservative,
+                                      by = c("site_elevation", "area", "elevational_band_m"),
+                                      suffix = c("_conservative", "_notconservative"))
+both_species_richness <- display_species_richness %>%
+  select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
 both_species_richness
 
 #' Eight sites had a higher species richness when using the conservative identifications. The analysis
