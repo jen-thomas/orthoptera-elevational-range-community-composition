@@ -16,11 +16,6 @@ source("data_preparation.R")
 vector_packages <- c("visreg", "dplyr")
 get_packages(vector_packages)
 
-#' ## Import data
-
-sites_file <- "../data/sites.csv"
-vegetation_file <- "../data/vegetation_plots.csv"
-
 #' ## Vegetation data
 #'
 #' Calculate the mean value for each parameter at each site over both seasons.

@@ -44,6 +44,7 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
+vegetation_file <- "../data/vegetation_plots.csv"
 
 sites_df <- read_csv_data_file(sites_file)
 
