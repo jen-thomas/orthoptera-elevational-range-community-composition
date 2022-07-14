@@ -17,6 +17,7 @@
 source("utils.R")
 source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
+source("prepare_vegetation_data.R")
 
 vector_packages <- c("visreg", "ggplot2", "dplyr")
 get_packages(vector_packages)
@@ -77,12 +78,14 @@ site_species_matrix
 #' other environmental variables transformed as needed.
 #'
 #' ### Prepare data
-#'
-#' ### Check for collinearity between environmental variables
 
-#' ## Detrended canonical analysis
+vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
+
+#' ### Check for collinearity between environmental variables
 #'
-#' t might be expected that this matrix will contain many zeros where species have not been observed at
+#' ## Detrended canonical correspondance analysis
+#'
+#' It might be expected that this matrix will contain many zeros where species have not been observed at
 #' sites along the elevational gradient, which in some ordination methods would lead to problems of
 #' closely associating sites when they lack species (double-zero problem)
 #' [@legendreEcologicallyMeaningfulTransformations2001]. To determine if the response of the species data
