@@ -16,7 +16,7 @@
 
 source("utils.R")
 
-vector_packages <- c("raster", "terra", "XML", "lubridate")
+vector_packages <- c("raster", "terra", "XML", "lubridate", "sp", "maptools", "leaflet", "rgeos")
 get_packages(vector_packages)
 
 #' ## Import raster data files
@@ -102,33 +102,126 @@ get_site_transect_data <- function(gpx_file) {
   timestamps <- xpathSApply(site_gpx_data, path = "//trkpt/time", xmlValue)
 
   site_transect_points <- data.frame(
-    timestamps_cest = ymd_hms(timestamps, tz = "CEST"),
-    lat = as.numeric(coordinates["lat",]),
-    lon = as.numeric(coordinates["lon",])
+    #timestamps_cest = ymd_hms(timestamps, tz = "CEST"),
+    lon = as.numeric(coordinates["lon",]),
+    lat = as.numeric(coordinates["lat",])
   )
 
   return(site_transect_points)
 }
 
-plot_set_of_points <- function(datafrane) {
+plot_set_of_points <- function(dataframe) {
   #' Draw a simple plot of points in a dataframe.
 
-  plot(x = datafrane$lon, y = datafrane$lat,
+  plot(x = dataframe$lon, y = dataframe$lat,
      type = "l", col = "blue", lwd = 3,
      xlab = "Longitude", ylab = "Latitude")
 }
 
-convert_points_to_line <- function(points) {
-  #' Convert a set of ordered points to a line.
+convert_points_to_line <- function(site_transect_points) {
+  #' Convert a set of ordered points to a set of SpatialPoints. Convert the coordinate reference system
+  #' to that used by the raster, which in this case is EPSG 25831.
   #'
-  #' Return line.
+  #' Convert the points to a SpatialLine.
+  #'
+  #' Return SpatialLine object.
+
+  site_transect_sp_points <- sp::SpatialPoints(site_transect_points, proj4string=CRS("+proj=longlat"))
+  site_transect_sp_points_transformed <- spTransform(site_transect_sp_points, CRS("+init=epsg:25831"))
+
+  site_transect_sp_line <- as(site_transect_sp_points_transformed,"SpatialLines")
+
+  return(site_transect_sp_line)
 }
 
-get_terrain_features_along_line <- function(line) {
+get_terrain_features_along_line <- function(raster, line) {
   #' Get the slope and aspect from the DEM along a line.
   #'
   #' Return dataframe of average slope and aspect along the line.
+
+  site_transect_terrain_all_pars <- extract(raster, line,
+                                            method = "bilinear", # interpolate values from values of four
+                                            # nearest raster cells
+                                            buffer = 5,
+                                            fun=mean, # calculate the mean value of each of the parameters
+                                            # along the line
+                                            na.rm=TRUE,
+                                            cellnumbers=FALSE,
+                                            df=TRUE, # return as dataframe
+                                            exact = FALSE, # lines not polygons so not relevant
+                                            factors=FALSE, # return numerical values
+                                            along=FALSE,
+                                            sp=FALSE
+  )
+
+  return(site_transect_terrain_all_pars)
 }
+
+get_terrain_features_at_points <- function(raster, points) {
+  #' Get the slope and aspect from the DEM along a line.
+  #'
+  #' Return dataframe of average slope and aspect along the line.
+
+  site_transect_terrain_all_pars <- extract(raster, points,
+                                            method = "bilinear", # interpolate values from values of four
+                                            # nearest raster cells
+                                            buffer = 5,
+                                            fun=mean, # calculate the mean value of each of the parameters
+                                            # at the points
+                                            na.rm=TRUE,
+                                            cellnumbers=FALSE,
+                                            df=TRUE, # return as dataframe
+                                            exact = FALSE, # points not polygons so not relevant
+                                            factors=FALSE, # return numerical values
+                                            along=FALSE,
+                                            sp=FALSE
+  )
+
+  return(site_transect_terrain_all_pars)
+}
+
+get_points_at_interval_along_line <- function(line, interval) {
+  #' Get a point at every specified interval along a line.
+  #'
+  #' Return a dataframe of SpatialPoints.
+
+  distances <- seq(0, rgeos::gLength(line), by = interval)
+
+  points_along_line <- gInterpolate(line, distances, normalized = FALSE)
+
+  return(points_along_line)
+}
+
+get_transect_mean_slope <- function(interval_terrain_values) {
+  #' Calculate the mean slope from a set of values.
+  #'
+  #' Return the mean slope.
+
+  mean_slope <- mean(interval_terrain_values$slope)
+
+  return(mean_slope)
+}
+
+get_transect_mean_aspect <- function(interval_terrain_values) {
+  #' Calculate the mean aspect from a set of values.
+  #'
+  #' Return the mean aspect.
+
+  mean_aspect <- mean(interval_terrain_values$aspect)
+
+  return(mean_aspect)
+}
+
+#' ## Example
 
 bes01_transect_points <- get_site_transect_data("../metadata/Besan site 01.gpx")
 plot_set_of_points(bes01_transect_points)
+
+bes01_transect_sp_line <- convert_points_to_line(bes01_transect_points)
+
+bes01_interval_points_along_line <- get_points_at_interval_along_line(bes01_transect_sp_line, 2)
+
+bes01_interval_terrain_values <- get_terrain_features_at_points(terrain_study_areas, bes01_interval_points_along_line)
+
+bes01_mean_slope <- get_transect_mean_slope(bes01_interval_terrain_values)
+bes01_mean_aspect <- get_transect_mean_aspect(bes01_interval_terrain_values)
