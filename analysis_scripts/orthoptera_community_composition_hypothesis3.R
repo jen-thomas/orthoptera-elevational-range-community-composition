@@ -78,9 +78,79 @@ site_species_matrix
 #' have a mean of 0 and standard deviation of 1. Site aspect will be converted to eight compass points and
 #' other environmental variables transformed as needed.
 #'
-#' ### Prepare data
+#' ### Vegetation data
 
 vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
+
+#' ### Slope and aspect data of each site
+
+#' Get digital elevation model for the area and calculate slope and aspect.
+
+dem_data_besan <- "../data/dem/besan_20220601_165822.tif"
+dem_data_bordes <- "../data/dem/bordes_de_viros_20220601_165754.tif"
+dem_data_molinassa <- "../data/dem/la_molinassa_20220601_165849.tif"
+dem_data_tavascan <- "../data/dem/tavascan_20220601_170011.tif"
+dem_data_tor1 <- "../data/dem/tor_20220601_164907.tif"
+dem_data_tor2 <- "../data/dem/tor_20220601_165633.tif"
+
+dem_raster_besan <- raster(dem_data_besan)
+dem_raster_bordes <- raster(dem_data_bordes)
+dem_raster_molinassa <- raster(dem_data_molinassa)
+dem_raster_tavascan <- raster(dem_data_tavascan)
+dem_raster_tor <- merge(raster(dem_data_tor1), raster(dem_data_tor2))
+
+dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan, dem_raster_tor)
+
+#' Plot DEM to get an overview. Also look at the number of layers within the raster, the coordinate
+#' system and get an overview of the data.
+
+get_overview_dem(dem_study_areas)
+
+#' Look at the data for each study area separately to make sure there are no bad elevation values.
+
+# par(mfrow = c(2, 2))
+# hist(dem_raster_tavascan)
+# hist(dem_raster_molinassa)
+# hist(dem_raster_tor)
+
+#' Calculate the slope and aspect along each transect at the sites.
+
+terrain_study_areas <- calculate_terrain_features(dem_study_areas)
+
+#' Use a dictionary of site names and filenames to get the transect data for each site.
+
+sites_files <- c("BES01" = "../metadata/Besan site 01.gpx",
+                 "BES02" = "../metadata/Besan site 02.gpx",
+                 "BOR02" = "../metadata/Bordes de Viros site 02.gpx",
+                 "MOL01" = "../metadata/La Molinassa site 01.gpx",
+                 "MOL02" = "../metadata/La Molinassa site 02.gpx",
+                 "MOL03" = "../metadata/La Molinassa site 03.gpx",
+                 "MOL04" = "../metadata/La Molinassa site 04.gpx",
+                 "MOL05" = "../metadata/La Molinassa site 05.gpx",
+                 "MOL06" = "../metadata/La Molinassa site 06.gpx",
+                 "MOL08" = "../metadata/La Molinassa site 08.gpx",
+                 "MOL09" = "../metadata/La Molinassa site 09.gpx",
+                 "TAV01" = "../metadata/Tavascan site 01.gpx",
+                 "TAV03" = "../metadata/Tavascan site 03.gpx",
+                 "TAV05" = "../metadata/Tavascan site 05.gpx",
+                 "TAV06" = "../metadata/Tavascan site 06.gpx",
+                 "TAV07" = "../metadata/Tavascan site 07.gpx",
+                 "TAV08" = "../metadata/Tavascan site 08.gpx",
+                 "TAV09" = "../metadata/Tavascan site 09.gpx",
+                 "TOR01" = "../metadata/Tor site 01.gpx",
+                 "TOR02" = "../metadata/Tor site 02.gpx",
+                 "TOR03" = "../metadata/Tor site 03.gpx",
+                 "TOR04" = "../metadata/Tor site 04.gpx",
+                 "TOR05" = "../metadata/Tor site 05.gpx",
+                 "TOR06" = "../metadata/Tor site 06.gpx",
+                 "TOR07" = "../metadata/Tor site 07.gpx",
+                 "TOR08" = "../metadata/Tor site 08.gpx",
+                 "TOR09" = "../metadata/Tor site 09.gpx",
+                 "TOR10" = "../metadata/Tor site 10.gpx"
+                 )
+
+site_terrain <- create_df_of_terrain_values_for_sites(sites_files)
+site_terrain
 
 #' ### Check for collinearity between environmental variables
 #'
