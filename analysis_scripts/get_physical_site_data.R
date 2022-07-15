@@ -84,7 +84,7 @@ get_overview_dem(dem_study_areas)
 # hist(dem_raster_molinassa)
 # hist(dem_raster_tor)
 
-#' Get slope and aspect from DEM.
+#' Calculate slope and aspect from DEM.
 
 terrain_study_areas <- calculate_terrain_features(dem_study_areas)
 
@@ -214,14 +214,82 @@ get_transect_mean_aspect <- function(interval_terrain_values) {
 
 #' ## Example
 
-bes01_transect_points <- get_site_transect_data("../metadata/Besan site 01.gpx")
-plot_set_of_points(bes01_transect_points)
+get_terrain_site <- function(filename, raster, site_name) {
+  transect_points <- get_site_transect_data(filename)
+  plot_set_of_points(transect_points)
 
-bes01_transect_sp_line <- convert_points_to_line(bes01_transect_points)
+  transect_sp_line <- convert_points_to_line(transect_points)
 
-bes01_interval_points_along_line <- get_points_at_interval_along_line(bes01_transect_sp_line, 2)
+  interval_points_along_line <- get_points_at_interval_along_line(transect_sp_line, 2)
 
-bes01_interval_terrain_values <- get_terrain_features_at_points(terrain_study_areas, bes01_interval_points_along_line)
+  interval_terrain_values <- get_terrain_features_at_points(raster, interval_points_along_line)
 
-bes01_mean_slope <- get_transect_mean_slope(bes01_interval_terrain_values)
-bes01_mean_aspect <- get_transect_mean_aspect(bes01_interval_terrain_values)
+  site_terrain_values_df <- data.frame(site_name=site_name,
+                        slope=get_transect_mean_slope(interval_terrain_values),
+                        aspect=get_transect_mean_aspect(interval_terrain_values))
+
+  return(site_terrain_values_df)
+}
+
+get_gpx_filename <- function(site) {
+
+  gpx_filename <- paste0("../metadata/", site, ".gpx")
+  return(gpx_filename)
+}
+
+create_df_of_terrain_values_for_sites <- function(sites_files) {
+  #' For each site, get the data file and calculate the terrain values along the transect.
+  #'
+  #' Put site name and values into data frame.
+  #'
+  #' Return data frame.
+
+  # Create empty data frame
+  terrain_df <- data.frame()
+
+  # For each site, get the file name and use this to get the terrain values.
+  for (site_name in names(sites_files)) {
+
+    filename <- as.character(sites_files[site_name])
+
+    site_terrain_values_df <- get_terrain_site(filename, terrain_study_areas, site_name)
+
+    # Add the row of site name and values to the data frame.
+    terrain_df <- rbind(terrain_df, site_terrain_values_df)
+  }
+
+  return(terrain_df)
+}
+
+sites_files <- c("BES01" = "../metadata/Besan site 01.gpx",
+                 "BES02" = "../metadata/Besan site 02.gpx",
+                 "BOR02" = "../metadata/Bordes de Viros site 02.gpx",
+                 "MOL01" = "../metadata/La Molinassa site 01.gpx",
+                 "MOL02" = "../metadata/La Molinassa site 02.gpx",
+                 "MOL03" = "../metadata/La Molinassa site 03.gpx",
+                 "MOL04" = "../metadata/La Molinassa site 04.gpx",
+                 "MOL05" = "../metadata/La Molinassa site 05.gpx",
+                 "MOL06" = "../metadata/La Molinassa site 06.gpx",
+                 "MOL08" = "../metadata/La Molinassa site 08.gpx",
+                 "MOL09" = "../metadata/La Molinassa site 09.gpx",
+                 "TAV01" = "../metadata/Tavascan site 01.gpx",
+                 "TAV03" = "../metadata/Tavascan site 03.gpx",
+                 "TAV05" = "../metadata/Tavascan site 05.gpx",
+                 "TAV06" = "../metadata/Tavascan site 06.gpx",
+                 "TAV07" = "../metadata/Tavascan site 07.gpx",
+                 "TAV08" = "../metadata/Tavascan site 08.gpx",
+                 "TAV09" = "../metadata/Tavascan site 09.gpx",
+                 "TOR01" = "../metadata/Tor site 01.gpx",
+                 "TOR02" = "../metadata/Tor site 02.gpx",
+                 "TOR03" = "../metadata/Tor site 03.gpx",
+                 "TOR04" = "../metadata/Tor site 04.gpx",
+                 "TOR05" = "../metadata/Tor site 05.gpx",
+                 "TOR06" = "../metadata/Tor site 06.gpx",
+                 "TOR07" = "../metadata/Tor site 07.gpx",
+                 "TOR08" = "../metadata/Tor site 08.gpx",
+                 "TOR09" = "../metadata/Tor site 09.gpx",
+                 "TOR10" = "../metadata/Tor site 10.gpx"
+                 )
+
+site_terrain <- create_df_of_terrain_values_for_sites(sites_files)
+site_terrain
