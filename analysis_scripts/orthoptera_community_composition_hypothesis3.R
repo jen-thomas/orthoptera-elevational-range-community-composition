@@ -110,9 +110,9 @@ get_overview_dem(dem_study_areas)
 #+ message=FALSE, warning=FALSE
 
 par(mfrow = c(2, 2))
-hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", title ="Tavascan")
-hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", title = "La Molinassa")
-hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", title = "Tor")
+hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", main ="Tavascan")
+hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
+hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
 
 #' Calculate the slope and aspect along each transect at the sites.
 

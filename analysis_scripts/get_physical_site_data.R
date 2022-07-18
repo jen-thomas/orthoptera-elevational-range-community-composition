@@ -50,7 +50,7 @@ calculate_terrain_features <- function(dem_raster) {
   #' Return raster.
 
   dem_terrain <- terrain(dem_raster, opt = c("slope", "aspect"), unit = "degrees")
-  plot(dem_terrain, xlab = "UTM", ylab = "UTM")
+  plot(dem_terrain)
 
   return(dem_terrain)
 }
