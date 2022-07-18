@@ -18,8 +18,9 @@ source("utils.R")
 source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("prepare_vegetation_data.R")
+source("get_physical_site_data.R")
 
-vector_packages <- c("visreg", "ggplot2", "dplyr")
+vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp", "maptools", "leaflet", "rgeos")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -90,14 +91,13 @@ dem_data_besan <- "../data/dem/besan_20220601_165822.tif"
 dem_data_bordes <- "../data/dem/bordes_de_viros_20220601_165754.tif"
 dem_data_molinassa <- "../data/dem/la_molinassa_20220601_165849.tif"
 dem_data_tavascan <- "../data/dem/tavascan_20220601_170011.tif"
-dem_data_tor1 <- "../data/dem/tor_20220601_164907.tif"
-dem_data_tor2 <- "../data/dem/tor_20220601_165633.tif"
+dem_data_tor <- "../data/dem/tor_20220715_171056.tif"
 
 dem_raster_besan <- raster(dem_data_besan)
 dem_raster_bordes <- raster(dem_data_bordes)
 dem_raster_molinassa <- raster(dem_data_molinassa)
 dem_raster_tavascan <- raster(dem_data_tavascan)
-dem_raster_tor <- merge(raster(dem_data_tor1), raster(dem_data_tor2))
+dem_raster_tor <- raster(dem_data_tor)
 
 dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan, dem_raster_tor)
 

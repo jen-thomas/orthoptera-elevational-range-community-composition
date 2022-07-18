@@ -192,7 +192,7 @@ get_unique_taxa <- function(observations) {
 
   #' Return a dataframe of the unique taxa.
 
-  observations_tax_levels <- select(observations, suborder, family, subfamily,
+  observations_tax_levels <- dplyr::select(observations, suborder, family, subfamily,
                                     genus, species)
   observations_species <- filter(observations_tax_levels, species != "")
   distinct_species <- distinct(observations_species)

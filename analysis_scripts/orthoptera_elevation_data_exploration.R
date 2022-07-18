@@ -289,7 +289,7 @@ get_transect_lengths <- function(site_survey_df) {
   #'
   #' Return a data frame with the transect length for each site.
 
-  transect_lengths_sites <- select(site_survey_df, site_elevation, transect_length_m)
+  transect_lengths_sites <- dplyr::select(site_survey_df, site_elevation, transect_length_m)
 
   transect_lengths_sites <- transect_lengths_sites %>%
     distinct(site_elevation, transect_length_m) %>%
