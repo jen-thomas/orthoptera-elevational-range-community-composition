@@ -20,7 +20,8 @@ source("orthoptera_elevation_data_exploration.R")
 source("prepare_vegetation_data.R")
 source("get_physical_site_data.R")
 
-vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp", "maptools", "leaflet", "rgeos")
+vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp",
+                     "maptools", "leaflet", "rgeos")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -30,13 +31,11 @@ get_packages(vector_packages)
 create_presence_absence_site_species_matrix <- function(observations_df) {
         #' Convert the abundance matrix into a presence-absence site-species matrix. Each value is either
         #' 0 (species not observed at a site) or 1 (species observed at a site).
+        #'
+        #' Return matrix.
 
-  #site_species_abundance <- create_site_species_abundance_df(observations_df)
   site_species_presenceabsence_matrix <- t(create.matrix(observations_df, tax.name = "taxa",
-                                                         locality = "site_elevation", abund = FALSE
-    #,
-  #                                                       abund.col = "abundance"
-  ))
+                                                         locality = "site_elevation", abund = FALSE))
 
   return(site_species_presenceabsence_matrix)
 }
@@ -99,7 +98,8 @@ dem_raster_molinassa <- raster(dem_data_molinassa)
 dem_raster_tavascan <- raster(dem_data_tavascan)
 dem_raster_tor <- raster(dem_data_tor)
 
-dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan, dem_raster_tor)
+dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan,
+                         dem_raster_tor)
 
 #' Plot DEM to get an overview. Also look at the number of layers within the raster, the coordinate
 #' system and get an overview of the data.
@@ -108,10 +108,10 @@ get_overview_dem(dem_study_areas)
 
 #' Look at the data for each study area separately to make sure there are no bad elevation values.
 
-# par(mfrow = c(2, 2))
-# hist(dem_raster_tavascan)
-# hist(dem_raster_molinassa)
-# hist(dem_raster_tor)
+par(mfrow = c(2, 2))
+hist(dem_raster_tavascan)
+hist(dem_raster_molinassa)
+hist(dem_raster_tor)
 
 #' Calculate the slope and aspect along each transect at the sites.
 
