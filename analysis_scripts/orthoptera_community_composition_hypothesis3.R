@@ -21,7 +21,7 @@ source("prepare_vegetation_data.R")
 source("get_physical_site_data.R")
 
 vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp",
-                     "maptools", "leaflet", "rgeos")
+                     "maptools", "leaflet", "rgeos", "corrplot", "psych")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -152,10 +152,26 @@ sites_transects_files <- c("BES01" = "../metadata/Besan site 01.gpx",
                  )
 
 site_terrain <- create_df_of_terrain_values_for_sites(sites_transects_files, sites_df)
-site_terrain
+#site_terrain <- calculate_cardinal_direction_column(site_terrain)
+site_terrain$aspect_cardinal <- apply(site_terrain, 1, convert_aspect_to_cardinal_direction)
+
+#' Put vegetation and terrain data into one dataframe.
+
+site_env_var_data <- left_join(site_terrain, vegetation_averaged_df, by = "site_elevation")
 
 #' ### Check for collinearity between environmental variables
-#'
+
+pairs(~elevational_band_m + mean_perc_veg_cover + mean_perc_bare_ground + mean_per_rock +
+      mean_height_75percent + mean_max_height + mean_density,
+      data = site_env_var_data)
+
+veg_params_to_compare <- site_env_var_data %>%
+                          dplyr::select(elevational_band_m, mean_perc_veg_cover, mean_perc_bare_ground,
+                                        mean_per_rock, mean_max_height, mean_height_75percent,
+                                        mean_density)
+pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
+             lm = FALSE, method = "pearson", factor = 2)
+
 #' ## Detrended canonical correspondance analysis
 #'
 #' It might be expected that this matrix will contain many zeros where species have not been observed at

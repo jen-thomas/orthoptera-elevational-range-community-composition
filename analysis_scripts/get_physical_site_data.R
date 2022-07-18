@@ -227,3 +227,20 @@ create_df_of_terrain_values_for_sites <- function(sites_transect_files, sites_df
 
   return(terrain_df)
 }
+
+convert_aspect_to_cardinal_direction <- function(row) {
+  #' Convert aspect in degrees to cardinal directions, N and S.
+  #'
+  #' Return value.
+
+  aspect <- as.numeric(row["aspect"])
+
+  if (270 >= aspect && aspect > 90) {
+    aspect_cardinal <- "S"
+  }
+  else if (aspect > 270 || aspect <= 90) {
+    aspect_cardinal <- "N"
+  }
+
+  return(aspect_cardinal)
+}
