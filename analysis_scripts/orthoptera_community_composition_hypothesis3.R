@@ -121,7 +121,7 @@ terrain_study_areas <- calculate_terrain_features(dem_study_areas)
 #' Use a dictionary of site names and filenames to get the transect data for each site.
 #+ message=FALSE, warning=FALSE
 
-sites_files <- c("BES01" = "../metadata/Besan site 01.gpx",
+sites_transects_files <- c("BES01" = "../metadata/Besan site 01.gpx",
                  "BES02" = "../metadata/Besan site 02.gpx",
                  "BOR02" = "../metadata/Bordes de Viros site 02.gpx",
                  "MOL01" = "../metadata/La Molinassa site 01.gpx",
@@ -151,7 +151,7 @@ sites_files <- c("BES01" = "../metadata/Besan site 01.gpx",
                  "TOR10" = "../metadata/Tor site 10.gpx"
                  )
 
-site_terrain <- create_df_of_terrain_values_for_sites(sites_files)
+site_terrain <- create_df_of_terrain_values_for_sites(sites_transects_files, sites_df)
 site_terrain
 
 #' ### Check for collinearity between environmental variables

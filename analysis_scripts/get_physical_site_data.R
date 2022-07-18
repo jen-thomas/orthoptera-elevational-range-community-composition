@@ -198,7 +198,7 @@ get_gpx_filename <- function(site) {
   return(gpx_filename)
 }
 
-create_df_of_terrain_values_for_sites <- function(sites_files) {
+create_df_of_terrain_values_for_sites <- function(sites_transect_files, sites_df) {
   #' For each site, get the data file and calculate the terrain values along the transect.
   #'
   #' Put site name and values into data frame.
@@ -209,15 +209,21 @@ create_df_of_terrain_values_for_sites <- function(sites_files) {
   terrain_df <- data.frame()
 
   # For each site, get the file name and use this to get the terrain values.
-  for (site_name in names(sites_files)) {
+  for (site_name in names(sites_transect_files)) {
 
-    filename <- as.character(sites_files[site_name])
+    filename <- as.character(sites_transect_files[site_name])
 
     site_terrain_values_df <- get_terrain_site(filename, terrain_study_areas, site_name)
 
     # Add the row of site name and values to the data frame.
     terrain_df <- rbind(terrain_df, site_terrain_values_df)
   }
+
+  # Get the elevation of each site and create the site_elevation parameter to have more useful site names
+  sites <- rename_site_with_elevation(sites_df)
+  terrain_df <- left_join(terrain_df, sites, by = "site_name")
+  terrain_df <- terrain_df %>%
+    dplyr::select(site_name, site_elevation, elevational_band_m, slope, aspect)
 
   return(terrain_df)
 }
