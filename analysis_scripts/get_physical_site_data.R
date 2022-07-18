@@ -50,7 +50,7 @@ calculate_terrain_features <- function(dem_raster) {
   #' Return raster.
 
   dem_terrain <- terrain(dem_raster, opt = c("slope", "aspect"), unit = "degrees")
-  plot(dem_terrain)
+  plot(dem_terrain, xlab = "UTM", ylab = "UTM")
 
   return(dem_terrain)
 }
@@ -63,10 +63,8 @@ get_site_transect_data <- function(gpx_file) {
 
   site_gpx_data <- htmlTreeParse(gpx_file, useInternalNodes = TRUE)
   coordinates <- xpathSApply(site_gpx_data, path = "//trkpt", xmlAttrs)
-  timestamps <- xpathSApply(site_gpx_data, path = "//trkpt/time", xmlValue)
 
   site_transect_points <- data.frame(
-    #timestamps_cest = ymd_hms(timestamps, tz = "CEST"),
     lon = as.numeric(coordinates["lon",]),
     lat = as.numeric(coordinates["lat",])
   )
@@ -163,7 +161,7 @@ get_transect_mean_slope <- function(interval_terrain_values) {
 
   mean_slope <- mean(interval_terrain_values$slope)
 
-  return(mean_slope)
+  return(round(mean_slope, 0))
 }
 
 get_transect_mean_aspect <- function(interval_terrain_values) {
@@ -173,14 +171,13 @@ get_transect_mean_aspect <- function(interval_terrain_values) {
 
   mean_aspect <- mean(interval_terrain_values$aspect)
 
-  return(mean_aspect)
+  return(round(mean_aspect, 0))
 }
 
 #' ## Example
 
 get_terrain_site <- function(filename, raster, site_name) {
   transect_points <- get_site_transect_data(filename)
-  plot_set_of_points(transect_points)
 
   transect_sp_line <- convert_points_to_line(transect_points)
 

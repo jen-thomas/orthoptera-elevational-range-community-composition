@@ -107,17 +107,19 @@ dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinas
 get_overview_dem(dem_study_areas)
 
 #' Look at the data for each study area separately to make sure there are no bad elevation values.
+#+ message=FALSE, warning=FALSE
 
 par(mfrow = c(2, 2))
-hist(dem_raster_tavascan)
-hist(dem_raster_molinassa)
-hist(dem_raster_tor)
+hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", title ="Tavascan")
+hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", title = "La Molinassa")
+hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", title = "Tor")
 
 #' Calculate the slope and aspect along each transect at the sites.
 
 terrain_study_areas <- calculate_terrain_features(dem_study_areas)
 
 #' Use a dictionary of site names and filenames to get the transect data for each site.
+#+ message=FALSE, warning=FALSE
 
 sites_files <- c("BES01" = "../metadata/Besan site 01.gpx",
                  "BES02" = "../metadata/Besan site 02.gpx",

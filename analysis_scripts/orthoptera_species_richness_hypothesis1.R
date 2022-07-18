@@ -18,7 +18,7 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -184,7 +184,7 @@ display_species_richness <- left_join(species_richness_sites, species_richness_s
                                       by = c("site_elevation", "area", "elevational_band_m"),
                                       suffix = c("_conservative", "_notconservative"))
 both_species_richness <- display_species_richness %>%
-  select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
+  dplyr::select(site_elevation, area, species_richness_conservative, species_richness_notconservative)
 both_species_richness
 
 #' Eight sites had a higher species richness when using the conservative identifications. The analysis
