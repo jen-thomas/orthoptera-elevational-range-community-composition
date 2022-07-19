@@ -103,11 +103,6 @@ vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
 #' These parameters were calculated along each transect and averaged to get one value per site. The DEM
 #' data were provided by the Institut Cartogràfic i Geològic de Catalunya (ICGC) with a resolution of
 #' 2x2m.
-#'
-#' In more detail, each transect was recorded as a number of points. These transects were imported into R
-#' and using the sp package, were extrapolated into a line. Using the rgeos and terra packages, slope and
-#' aspect values were obtained from the DEM at equally-spaced points along the line, separated
-#' by 2m. Values of slope and aspect were then averaged, to get one value for each site.
 
 dem_data_besan <- "../data/dem/besan_20220601_165822.tif"
 dem_data_bordes <- "../data/dem/bordes_de_viros_20220601_165754.tif"
@@ -138,6 +133,11 @@ get_overview_dem(dem_study_areas)
 # hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
 
 #' Calculate the slope and aspect along each transect.
+#'
+#' Each transect was recorded as a number of points. These transects were imported into R
+#' and using the sp package, were extrapolated into a line. Using the rgeos and terra packages, slope and
+#' aspect values were averaged from the four nearest raster cells, every 2m along the transect. These
+#' values of slope and aspect were then averaged, to get one value for each site.
 
 terrain_study_areas <- calculate_terrain_features(dem_study_areas)
 
@@ -183,13 +183,28 @@ site_env_var_data <- left_join(site_terrain, vegetation_averaged_df, by = "site_
 
 #' ### Check for collinearity between environmental variables
 
-veg_params_to_compare <- site_env_var_data %>%
-  dplyr::select(elevational_band_m, mean_perc_veg_cover, mean_perc_bare_ground,
-                mean_per_rock, mean_max_height, mean_height_75percent,
-                mean_density)
-pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
-             lm = FALSE, method = "pearson", factor = 2)
+check_collinearity <- function(env_var_df) {
+  #' Select the environmental variables to check against one another for collinearity. Plot histogram,
+  #' scatterplot and correlation coefficient (Pearson's) for each combination.
 
+  veg_params_to_compare <- env_var_df %>%
+    dplyr::select(elevational_band_m, slope, aspect, mean_perc_veg_cover, mean_perc_bare_ground,
+                  mean_per_rock, mean_max_height, mean_height_75percent,
+                  mean_density)
+
+  pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
+               lm = FALSE, method = "pearson", factor = 2)
+}
+
+check_collinearity(site_env_var_data)
+
+#' Looking at the previous plots we can see that there seems to be some collinearity between the two
+#' measures of vegetation height. Given that the maximum vegetation height can just represent one piece of
+#' vegetation within the plots, the mean 75% height of vegetation in the plot is a more suitable measure
+#' of the vegetation across the plots at a site. As expected, the compositional data representing three
+#' measures of ground cover in terms of percentages, are also correlated. The vegetation ground cover will
+#' be used in this analysis.
+#'
 #' Prepare the matrix of environmental variables to be used in the next part of the analysis. Only include
 #' site elevation, aspect, slope, vegetation height, vegetation ground cover and vegetation density.
 
@@ -200,20 +215,21 @@ env_var_matrix <- create_env_var_matrix(site_env_var_data)
 #' The species-site matrix contains many zeros where species were not observed at sites along the
 #' elevational gradient, which in some ordination methods would lead to problems of closely associating
 #' sites when they lack species (double-zero problem) [@legendreEcologicallyMeaningfulTransformations2001].
-#' To determine if the response of the species data is linear or unimodal, a detrended canonical analysis
-#' (DCA) will be used. If the results do not meet the criteria for a linear ordination method, then one option
-#' would be to apply a Hellinger transformation, which has been shown to be suitable for presence-absence
-#' data [@legendreNumericalEcology2012], to be able to then use a principle components analysis (PCA)
-#' [@legendreEcologicallyMeaningfulTransformations2001]; a second option would be to use a distance method
-#' of unconstrained ordination which does not rely on linear ordination, to identify any natural clusters
-#' that might occur in the data due to the environmental variables.
+#' To determine if the response of the species data wass linear or unimodal, a detrended canonical analysis
+#' (DCA) was used.
 
 dca <- decorana(site_species_matrix)
 dca
 
-#' Given that the length of the first axis is > 4 SD (6.03), then linear ordination cannot be used. Given
-#' the heterogeneity of the data, try a Hellinger transformation to then be able to use a linear
-#' ordination method.
+#' Given that the length of the first axis is > 4 SD (6.03), then linear ordination methods cannot be used. Given
+#' the heterogeneity of the data, a Hellinger transformation was applied first before using a linear
+#' ordination method such as principle components analysis (PCA)
+#' [@legendreEcologicallyMeaningfulTransformations2001]. This has been shown to be suitable for
+#' presence-absence data [@legendreNumericalEcology2012].
+#'
+#' An alternative option (that has not been done) would be to use a distance method of unconstrained
+#' ordination which does not rely on linear ordination, to identify any natural clusters that might occur
+#' in the data due to the environmental variables.
 
 site_species_matrix_hellinger <- decostand(site_species_matrix, "hellinger")
 site_species_matrix_hellinger
