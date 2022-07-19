@@ -535,7 +535,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' once?</li>
 #'  <li>I'm not sure how to interpret the output of the linear mixed model with elevation as a fixed
 #' effect and study area as a random effect
-#' (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-a-linear-mixed-model).
+#' (https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#fit-linear-mixed-model).
 #' How can I use this to say that from this result, we decided to look at the relationship for each study
 #' area separately? In the output for area there are no p-values.</li>
 #'  <li>In the same output, does it matter that the variance of area is very small (0)?</li>
@@ -543,4 +543,13 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' report the relationships for modelling species richness separately for each study area, I have used the
 #' multiple R-squared (rather than adjusted R-squared) output because I understand that we are not
 #' adjusting for the number of predictors in the model. Is this correct or should I be using something else?</li>
+#' <li>Accounting for sampling effort: I have calculated an index of sampling effort using the proportion
+#' of Orthoptera captured by hand and net (from all surveys) and then summing the product of the relevant
+#' proportion and number of Orthoptera captured by hand and net at each site. We were thinking about
+#' including this as a factor in the linear model, but does this sound like the right way to go?</li>
+#' <li>Where specimens could only be identified to one of two (or more) taxa, the identification was
+#' chosen to be conservative in terms of affecting the species richness at a site. In order to make sure
+#' this did not affect the results, I wanted to compare the models when using the conservative and
+#' non-conservative identifications. Having done the models, would it be correct to use something like
+#' ANCOVA to compare them and check if they are statistically different? (see https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_species_richness_hypothesis1.html#test-for-statistical-significance-between-regressions)</li>
 #' </ol>
