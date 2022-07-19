@@ -227,6 +227,9 @@ dca
 #' [@legendreEcologicallyMeaningfulTransformations2001]. This has been shown to be suitable for
 #' presence-absence data [@legendreNumericalEcology2012].
 #'
+#' In this first part of the analysis, we are looking to see if there are any patterns between species and
+#' sites.
+#'
 #' An alternative option (that has not been done) would be to use a distance method of unconstrained
 #' ordination which does not rely on linear ordination, to identify any natural clusters that might occur
 #' in the data due to the environmental variables.
@@ -234,22 +237,22 @@ dca
 site_species_matrix_hellinger <- decostand(site_species_matrix, "hellinger")
 site_species_matrix_hellinger
 
-#' Points to think about for this part of the analysis:
+#' ### Points to think about for this part of the analysis
 #' <ol>
-#' <li>do the environmental variables need to be scaled to have a mean of 0 and variance of 1? Maybe
-#' this would come in the CCA below, which includes the environmental variables.</li>
-#' <li>is scale=TRUE still needed if the presence-absence data are always either 0 or 1?</li>
-#' <li>should we use SCALE = TRUE (correlation matrix) or SCALE = FALSE (covariance matrix). TRUE
+#' <li>Is scale=TRUE still needed if the presence-absence data are always either 0 or 1? I think this
+#' might be the case because the Hellinger transformation has been done.</li>
+#' <li>Should we use SCALE = TRUE (correlation matrix) or SCALE = FALSE (covariance matrix). TRUE
 #' would best represent the chi-squared differences between the species. FALSE would best represent the
 #' chi-squared difference between the sites. This is also somehow represented in the scaling parameter.
 #' Symmetric shows the least distorion between sites and species.</li>
-#' <li>should the Ochiai transformation be used instead of Hellinger (because the data are binary
+#' <li>Should the Ochiai transformation be used instead of Hellinger (because the data are binary
 #' presence-absence)? See https://peerj.com/articles/9777/#p-1</li>
-#' <li>according to the same article https://peerj.com/articles/9777/#p-1, should a GLM be used
+#' <li>According to the same article https://peerj.com/articles/9777/#p-1, should a GLM be used
 #' (likely a binomial GLM with a logit link function) and AIC model selection, instead of ordination? In
 #' this example, GLMs outperformed RDA when considering two different possibilities for absences (1 -
 #' species not present; 2 - poor sampling, species not found). GLMs always selected the correct
 #' environmental variables.</li>
+#' </ol>
 
 #' ### First attempt
 tbpca_hellinger_species <- rda(site_species_matrix_hellinger, scale = TRUE)
@@ -270,9 +273,12 @@ summary(eigenvals(tbpca_hellinger_species))
 
 #' **Question**: is the arch effect in this plot important?
 #'
-#' Look at the screeplot to see how many axes should be chosen
+#' Look at the screeplot to see how many axes should be chosen.
 screeplot(tbpca_hellinger_species, bstick = TRUE, type = 'l', main = NULL)
 
+#' From the plot here, the first two axes would be chosen because this is where there is a distinct change
+#' in the gradient of the ordination.
+#'
 #' ### Second attempt
 
 #' According to webinar (https://www.youtube.com/watch?v=tVnnG7mFeqA), CA is normally used in preference
@@ -317,6 +323,9 @@ ordipointlabel(cca_hellinger_sites,
                scaling = "sites", add = TRUE)
 
 #' ## Constrained canonical analysis
+#'
+#' In this second part of the analysis, we are looking to see if there is any relationship between the
+#' Orthoptera communities and the environmental conditions.
 #'
 #' Given there are likely lots of zeros in the dataset because it is possible that species occur
 #' non-uniformly across the sites, an asymmetric, constrained canonical analysis (CCA) could be used
@@ -366,11 +375,46 @@ sort(abs(loadings[, 1]), decreasing = TRUE)
 #' Draw a biplot of the environmental variables
 biplot(pca_env_var, display = "species", scaling = "species")
 
-#' **TODO**:
-#' Once the correct method above has been chosen, forward selection of the environmental variables will be done to identify which influence the community
-#' composition of Orthoptera in the Pyrenees. The variables will be ordered according to the variation
-#' they explain, then a Monte Carlo permutation test will be used to test the significance of the
-#' variation explained by the highest-ranking variable. If the permutation test is significant, then the
-#' variable will be selected (and used in the next step as a covariate). PERMANOVA will be used to test
-#' for variation between the groups. Beforehand, the dispersion within groups will be tested to ensure
-#' that a false difference in means is not found [@wartonDistancebasedMultivariateAnalyses2012].
+#' **TODO**: Once the correct method above has been chosen, forward selection of the environmental
+#' variables will be done to identify which influence the community composition of Orthoptera in the
+#' Pyrenees. The variables will be ordered according to the variation they explain, then a Monte Carlo
+#' permutation test will be used to test the significance of the variation explained by the
+#' highest-ranking variable. If the permutation test is significant, then the variable will be selected
+#' (and used in the next step as a covariate). PERMANOVA will be used to test for variation between the
+#' groups. Beforehand, the dispersion within groups will be tested to ensure that a false difference in
+#' means is not found [@wartonDistancebasedMultivariateAnalyses2012].
+#'
+#' ## Questions
+#' ### Environmental variables
+#' <ol>
+#' <li>I was considering also calculating a radiation index from the aspect, slope and elevation
+#' parameters. It could perhaps be used instead of slope and / or aspect, given that it could affect the
+#' microclimate.</li>
+#' <li>I converted aspect (degs) to N, S, E, W taking each point as a 90-degree segment, e.g 45-135degs is
+#' East. Given the orientation of the Pyrenees and the climate there, the difference between a northerly
+#' and southerly aspect seems to be the most important, but I wanted to capture those sites that do not
+#' face directly to the North or South. Whilst I treated them all as 90-deg segments, another paper used
+#' a smaller segment of E/W +/- 20 degs (or similar).</li>
+#' </ol>
+#' ### Ordination
+#' Some questions copied from above: https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_community_composition_hypothesis3.html#points-to-think-about-for-this-part-of-the-analysis
+#' <ol>
+#' <li>I am not sure I am using the correct methods for each part of the ordination. See the sections
+#' above.</li>
+#' <li>Is scale=TRUE still needed if the presence-absence data are always either 0 or 1? I think this
+#' might be the case because the Hellinger transformation has been done.</li>
+#' <li>Should we use SCALE = TRUE (correlation matrix) or SCALE = FALSE (covariance matrix). TRUE
+#' would best represent the chi-squared differences between the species. FALSE would best represent the
+#' chi-squared difference between the sites. This is also somehow represented in the scaling parameter.
+#' Symmetric shows the least distorion between sites and species.</li>
+#' <li>Should the Ochiai transformation be used instead of Hellinger (because the data are binary
+#' presence-absence)? See https://peerj.com/articles/9777/#p-1</li>
+#' <li>According to the same article https://peerj.com/articles/9777/#p-1, should a GLM be used
+#' (likely a binomial GLM with a logit link function) and AIC model selection, instead of ordination? In
+#' this example, GLMs outperformed RDA when considering two different possibilities for absences (1 -
+#' species not present; 2 - poor sampling, species not found). GLMs always selected the correct
+#' environmental variables.</li>
+#' <li>For this same part, is the arch effect in this plot important? See https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_community_composition_hypothesis3.html#first-attempt</li>
+#' <li>Do I understand correctly, that the scale = TRUE parameter in the CCA would standardise the
+#' environmental variables, giving them a mean of 0 and variance of 1?</li>
+#' </ol>
