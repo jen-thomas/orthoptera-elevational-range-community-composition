@@ -409,8 +409,55 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' -6700 + 8.8E - 0.0025 ER^2$).
 #'
 #' ## TODO / questions
-#' <ul>
-#' <li>Can these results be compared? i.e. can we say that the addition of Ensifera to the analysis
-#' lowered the maximum elevational range, and the elevation at which it occurred?</li>
-#' <li>Are we okay to accept the assumptions of both of the models?</li>
-#' </ul>
+#' <ol>
+#' <li>This analysis has been done with only the identifications to species. This reduces the number of
+#' observations to ~600. It didn't seem meaningful to use those to genus (or higher taxonomic order).</li>
+#' <li>Do I need to justify statistically, why I have chosen to use species that occur at 3 or more
+#' sites?</li>
+#' <li>Is it suitable to compare the results of the analysis for Caelifera only, and overall results? i.e.
+#' can we say that the addition of Ensifera to the analysis lowered the maximum elevational range, and the
+#' elevation at which it occurred?</li>
+#' <li>Is it okay to accept the assumptions of both of the models?</li>
+#' </ol>
+#' ## Questions from email 2022-07-13
+#' <ol>
+#' <li>I haven't included any of the specimens that were only identified to genus (or higher taxonomic
+#' levels) because I don't think this is meaningful. The species within a genus have different life
+#' histories and therefore I don't think the results would tell us very much. It would also reduce the
+#' number of data points that are being used. Does this sound reasonable?</li>
+#' <li>I would have liked to be able to compare the results for Caelifera only with the Ensifera, because
+#' it seems as though there could be a similar pattern but at a lower elevation (see plot:
+#' https://falciot.net/orthoptera-94940/analysis_outputs/orthoptera_elevational_range_hypothesis2.html#investigate-rapoports-rule-for-caelifera-only).
+#' But there are only five Ensifera species in the subsetted data so I don't think we could do this.
+#' Would it instead, be valid to say that addition of the Ensifera species lowered the maximum elevational
+#' range and the elevation at which it occurred, suggesting that Ensifera may occur overall at a lower
+#' elevation than Caelifera?</li>
+#' <li>The quadratic relationship between elevational range and elevation is statistically significant and
+#' I was thinking about the possible reasons for this pattern. My feeling is that it is possibly due to
+#' an effect of the sampling. Three possibilities occur to me at the moment: a) the elevational ranges
+#' that were observed here are possibly curtailed at the upper and lower levels because of the elevational
+#' limits of sampling.; b) A lot fewer specimens were caught at higher elevations, therefore we are just
+#' not getting the numbers or species richness to demonstrate the actual occurrences of Orthoptera at
+#' these elevations; c) I do not have samples from 1300m or 1400m so this may also add to smaller ranges
+#' in some species.  I am not sure how to go about testing this. One way I had thought of would be to
+#' include abundance of each species, but given the use of both hand and net sampling, I cannot do this.
+#' A different way would be to look at the ranges that touch the upper and / or lower elevations of the
+#' sampling. I'm not sure if there is any way to test this, but it could be represented on a plot and
+#' discussed? Actually, looking again at the data, I wonder if the species with smaller elevational ranges
+#' are affecting the shape of the relationship and it could in fact be more linear (significant or not).
+#' If I had more time (or maybe for the publication rather than my MSc), I would probably try and get hold
+#' of some data from other observations in the area to add to the dataset. I don't feel it is right to
+#' just remove these points even if I could try to justify it saying that they are at the edges of the
+#' elevations studied and therefore it is likely their elevational ranges are smaller than they really
+#' are.</li>
+#' <li>I had considered covariates that would help to explain some of the patterns seen in this analysis.
+#' I could use parameters of vegetation / habitat, but these would be a compilation of all of the
+#' vegetation measures from each of the sites within the elevational band, so given the differences
+#' depending on the study area, I don't think this would be particularly valuable. Temperature data
+#' (as a summary over weeks / months / years) is not available at 100-m resolution for this area, so this
+#' couldn't be used either.</li>
+#' <li>Finally, I had considered exploring the relationship within each study area separately. We can
+#' discuss if this is worth considering (or I will have a go if I have time before the meeting). My main
+#' concern is there will not be enough observations within each study area to consider them
+#' separately.</li>
+#' </ol>
