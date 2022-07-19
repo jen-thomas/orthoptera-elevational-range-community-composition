@@ -174,9 +174,12 @@ get_transect_mean_aspect <- function(interval_terrain_values) {
   return(round(mean_aspect, 0))
 }
 
-#' ## Example
-
 get_terrain_site <- function(filename, raster, site_name) {
+  #' Convert the transect points to a line, then create equally-spaced points along the transect line. Get
+  #' the topography (slope and aspect) at these points, then average the values along the transect.
+  #'
+  #' Return a dataframe of the sites and topography values.
+
   transect_points <- get_site_transect_data(filename)
 
   transect_sp_line <- convert_points_to_line(transect_points)

@@ -88,18 +88,26 @@ site_species_matrix
 
 #' ## Environmental variables
 #'
-#' Environmental variables will be checked for collinearity, then the quantitative environmental variables
-#' (average vegetation height, maximum vegetation height and vegetation density) will be normalised to
-#' have a mean of 0 and standard deviation of 1. Site aspect will be converted to four compass points and
-#' other environmental variables transformed as needed.
+#' Environmental variables will be checked for collinearity, then the quantitative variables describing
+#' the vegetation (average vegetation height, maximum vegetation height and vegetation density) will be
+#' normalised (**TODO**) to have a mean of 0 and standard deviation of 1. Site aspect will be converted to
+#' four compass points and other environmental variables transformed as needed.
 #'
 #' ### Vegetation data
 
 vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
 
-#' ### Slope and aspect data of each site
+#' ### Site topography
 
-#' Get digital elevation model for the area and calculate slope and aspect.
+#' Get digital elevation model (DEM) data for the study areas and calculate slope and aspect at each site.
+#' These parameters were calculated along each transect and averaged to get one value per site. The DEM
+#' data were provided by the Institut Cartogràfic i Geològic de Catalunya (ICGC) with a resolution of
+#' 2x2m.
+#'
+#' In more detail, each transect was recorded as a number of points. These transects were imported into R
+#' and using the sp package, were extrapolated into a line. Using the rgeos and terra packages, slope and
+#' aspect values were obtained from the DEM at equally-spaced points along the line, separated
+#' by 2m. Values of slope and aspect were then averaged, to get one value for each site.
 
 dem_data_besan <- "../data/dem/besan_20220601_165822.tif"
 dem_data_bordes <- "../data/dem/bordes_de_viros_20220601_165754.tif"
@@ -129,7 +137,7 @@ get_overview_dem(dem_study_areas)
 # hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
 # hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
 
-#' Calculate the slope and aspect along each transect at the sites.
+#' Calculate the slope and aspect along each transect.
 
 terrain_study_areas <- calculate_terrain_features(dem_study_areas)
 
