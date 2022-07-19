@@ -30,10 +30,10 @@ get_packages(vector_packages)
 #' environmental variables.
 
 create_presence_absence_site_species_matrix <- function(observations_df) {
-  #' Create a presence-absence site-species matrix. Each value is either 0 (species not observed at a
-  #' site) or 1 (species observed at a site).
-  #'
-  #' Return matrix.
+    #' Create a presence-absence site-species matrix. Each value is either 0 (species not observed at a
+    #' site) or 1 (species observed at a site).
+    #'
+    #' Return matrix.
 
   site_species_presenceabsence_matrix <- t(create.matrix(observations_df, tax.name = "taxa",
                                                          locality = "site_elevation", abund = FALSE))
@@ -42,14 +42,14 @@ create_presence_absence_site_species_matrix <- function(observations_df) {
 }
 
 create_env_var_matrix <- function(env_var_df) {
-  #' Create a matrix of the environmental variables for each site.
-  #'
-  #' Return matrix.
+    #' Create a matrix of the environmental variables for each site.
+    #'
+    #' Return matrix.
 
-  #' set row names to be the site_elevation column
+    #' set row names to be the site_elevation column
   rownames(env_var_df) <- env_var_df$site_elevation
 
-  #' select only a subset of the parameters to use in the analysis
+    #' select only a subset of the parameters to use in the analysis
   env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect,
                                   mean_perc_veg_cover, mean_height_75percent, mean_density)
 
@@ -119,18 +119,18 @@ dem_raster_tor <- raster(dem_data_tor)
 dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan,
                          dem_raster_tor)
 
-#' Plot DEM to get an overview. Also look at the number of layers within the raster, the coordinate
-#' system and get an overview of the data.
+#' Plot DEM to get an overview. Only the areas of the DEM files are displayed. Also look at the number of
+#' layers within the raster, the coordinate system and get an overview of the data.
 
 get_overview_dem(dem_study_areas)
 
 #' Look at the data for each study area separately to make sure there are no bad elevation values.
 #+ message=FALSE, warning=FALSE
-#
-# par(mfrow = c(2, 2))
-# hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", main ="Tavascan")
-# hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
-# hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
+
+par(mfrow = c(2, 2))
+hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", main ="Tavascan")
+hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
+hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
 
 #' Calculate the slope and aspect along each transect.
 #'
@@ -184,8 +184,8 @@ site_env_var_data <- left_join(site_terrain, vegetation_averaged_df, by = "site_
 #' ### Check for collinearity between environmental variables
 
 check_collinearity <- function(env_var_df) {
-  #' Select the environmental variables to check against one another for collinearity. Plot histogram,
-  #' scatterplot and correlation coefficient (Pearson's) for each combination.
+    #' Select the environmental variables to check against one another for collinearity. Plot histogram,
+    #' scatterplot and correlation coefficient (Pearson's) for each combination.
 
   veg_params_to_compare <- env_var_df %>%
     dplyr::select(elevational_band_m, slope, aspect, mean_perc_veg_cover, mean_perc_bare_ground,
@@ -215,15 +215,15 @@ env_var_matrix <- create_env_var_matrix(site_env_var_data)
 #' The species-site matrix contains many zeros where species were not observed at sites along the
 #' elevational gradient, which in some ordination methods would lead to problems of closely associating
 #' sites when they lack species (double-zero problem) [@legendreEcologicallyMeaningfulTransformations2001].
-#' To determine if the response of the species data wass linear or unimodal, a detrended canonical analysis
+#' To determine if the response of the species data was linear or unimodal, a detrended canonical analysis
 #' (DCA) was used.
 
 dca <- decorana(site_species_matrix)
 dca
 
-#' Given that the length of the first axis is > 4 SD (6.03), then linear ordination methods cannot be used. Given
-#' the heterogeneity of the data, a Hellinger transformation was applied first before using a linear
-#' ordination method such as principle components analysis (PCA)
+#' Given that the length of the first axis is > 4 SD (6.03), then linear ordination methods cannot be
+#' used. As the data are heterogeneous, a Hellinger transformation was applied before using a linear
+#' ordination method, in this case, principle components analysis (PCA)
 #' [@legendreEcologicallyMeaningfulTransformations2001]. This has been shown to be suitable for
 #' presence-absence data [@legendreNumericalEcology2012].
 #'
@@ -234,25 +234,49 @@ dca
 site_species_matrix_hellinger <- decostand(site_species_matrix, "hellinger")
 site_species_matrix_hellinger
 
-tbpca_scaling_true <- rda(site_species_matrix_hellinger, scale = TRUE) # scale = TRUE -> correlation matrix **TODO**: maybe this doesn't need doing with
-# the presence absence data. Make sure environmental variables are scaled
-# to have a mean of 0 and variance of 1
-tbpca_scaling_true
-biplot(tbpca_scaling_true, scaling = "symmetric") # Best approximation to show the least distortion between sites and species
-biplot(tbpca_scaling_true, scaling = "species", correlation = TRUE) # species scaling best represents the relationship between species (chi-squared diff in species composition). Relationships between sites are not as well preserved, but are approximate
-screeplot(tbpca_scaling_true, bstick = TRUE, type = 'l', main = NULL)
-summary(eigenvals(tbpca_scaling_true))
+#' Points to think about for this part of the analysis:
+#' <ol>
+#' <li>do the environmental variables need to be scaled to have a mean of 0 and variance of 1? Maybe
+#' this would come in the CCA below, which includes the environmental variables.</li>
+#' <li>is scale=TRUE still needed if the presence-absence data are always either 0 or 1?</li>
+#' <li>should we use SCALE = TRUE (correlation matrix) or SCALE = FALSE (covariance matrix). TRUE
+#' would best represent the chi-squared differences between the species. FALSE would best represent the
+#' chi-squared difference between the sites. This is also somehow represented in the scaling parameter.
+#' Symmetric shows the least distorion between sites and species.</li>
+#' <li>should the Ochiai transformation be used instead of Hellinger (because the data are binary
+#' presence-absence)? See https://peerj.com/articles/9777/#p-1</li>
+#' <li>according to the same article https://peerj.com/articles/9777/#p-1, should a GLM be used
+#' (likely a binomial GLM with a logit link function) and AIC model selection, instead of ordination? In
+#' this example, GLMs outperformed RDA when considering two different possibilities for absences (1 -
+#' species not present; 2 - poor sampling, species not found). GLMs always selected the correct
+#' environmental variables.</li>
 
-tbpca_scaling_false <- rda(site_species_matrix_hellinger, scale = FALSE) # scale = FALSE -> covariance matrix. Best representing the chi-squared difference between the samples (sites). **TODO**: maybe this doesn't need doing with
-# the presence absence data. Make sure environmental variables are scaled
-# to have a mean of 0 and variance of 1
-tbpca_scaling_false
-biplot(tbpca_scaling_false, scaling = "symmetric")
-biplot(tbpca_scaling_false, scaling = "species")
-screeplot(tbpca_scaling_false, bstick = TRUE, type = 'l', main = NULL)
-summary(eigenvals(tbpca_scaling_false))
+#' ### First attempt
+tbpca_hellinger_species <- rda(site_species_matrix_hellinger, scale = TRUE)
+tbpca_hellinger_species
 
-#' According to webinar, CA is used rather than PCA for presence - absence data.
+#' Focus on species
+ordiplot(tbpca_hellinger_species, display = "species", scaling = "species")
+points(tbpca_hellinger_species,
+       display = "species",
+       scaling = "species",
+       pch = 19,
+       col = "blue")
+ordipointlabel(tbpca_hellinger_species,
+               display = "species",
+               scaling = "species", add = TRUE)
+
+summary(eigenvals(tbpca_hellinger_species))
+
+#' **Question**: is the arch effect in this plot important?
+#'
+#' Look at the screeplot to see how many axes should be chosen
+screeplot(tbpca_hellinger_species, bstick = TRUE, type = 'l', main = NULL)
+
+#' ### Second attempt
+
+#' According to webinar (https://www.youtube.com/watch?v=tVnnG7mFeqA), CA is normally used in preference
+#' to PCA for presence - absence data.
 
 cca_hellinger_species <- cca(site_species_matrix_hellinger, scaling = "species")
 cca_hellinger_species
@@ -297,34 +321,15 @@ ordipointlabel(cca_hellinger_sites,
 #' Given there are likely lots of zeros in the dataset because it is possible that species occur
 #' non-uniformly across the sites, an asymmetric, constrained canonical analysis (CCA) could be used
 #' [@legendreNumericalEcology2012] to understand the relationship between Orthoptera community
-#' composition, and altitude and the environment in which they are found. Site aspect, altitude,
-#' vegetation structure and ground cover will be used to constrain the ordination. If this is significant,
-#' forward selection of the environmental variables will be done to identify which influence the community
-#' composition of Orthoptera in the Pyrenees. The variables will be ordered according to the variation
-#' they explain, then a Monte Carlo permutation test will be used to test the significance of the
-#' variation explained by the highest-ranking variable. If the permutation test is significant, then the
-#' variable will be selected (and used in the next step as a covariate). PERMANOVA will be used to test
-#' for variation between the groups. Beforehand, the dispersion within groups will be tested to ensure
-#' that a false difference in means is not found [@wartonDistancebasedMultivariateAnalyses2012].
-
+#' composition, elevation and the environment in which they are found. Site aspect, elevation,
+#' vegetation structure and ground cover were used to constrain the ordination.
+#'
+#' ### First attempt
 cca_env_data <- cca(env_var_matrix, scaling = "symmetric")
 cca_env_data
-#plot(cca_env_data, scaling = "symmetric")
 
-plot(cca_env_data,
-     display = "sites",
-     scaling = "sites",
-     type = "n")
-points(cca_env_data,
-       display = "sites",
-       scaling = "sites",
-       pch = 19,
-       col = "blue")
-set.seed(10)
-ordipointlabel(cca_env_data,
-               display = "sites",
-               scaling = "sites", add = TRUE)
-
+#' ### Second attempt
+#' Do the CCA using the Hellinger-transformed data. Define the formula
 cca_env_formula <- cca(site_species_matrix_hellinger ~ elevational_band_m +
   aspect +
   mean_height_75percent +
@@ -333,10 +338,39 @@ cca_env_formula
 ordiplot(cca_env_formula)
 ordipointlabel(cca_env_data, display = "sites", add = TRUE)
 
+#' ### Third attempt
+#' Should this be a PCA rather than a CCA?
+#' Do a PCA and draw an ordination plot. Environmental variables are displayed in blue. Sites are displayed in red.
 rda_env_formula <- rda(site_species_matrix_hellinger ~ elevational_band_m +
   aspect +
   mean_height_75percent +
   mean_density, data = env_var_matrix)
 rda_env_formula
-ordiplot(rda_env_formula)
-ordipointlabel(rda_env_formula, display = "sites", add = TRUE)
+rda_env_plot <- ordiplot(rda_env_formula, scaling = 1)
+
+#' ### Fourth attempt
+#' Following example 2 from https://www.davidzeleny.net/anadat-r/doku.php/en:pca_examples
+pca_env_var <- rda(env_var_matrix, scale = TRUE) # standardise the environmental variables
+
+head(summary(pca_env_var))
+
+#' Calculate the loadings of individual variables and axes, which represents the " standardized
+#' correlation of each variable to each axis".
+loadings <- scores (pca_env_var, display = 'species', scaling = 0)
+loadings
+
+#' Sort the loadings to find out which variables have the highest correlation to the first and second axes:
+sort(abs(loadings[, 1]), decreasing = TRUE)
+sort(abs(loadings[, 1]), decreasing = TRUE)
+
+#' Draw a biplot of the environmental variables
+biplot(pca_env_var, display = "species", scaling = "species")
+
+#' **TODO**:
+#' Once the correct method above has been chosen, forward selection of the environmental variables will be done to identify which influence the community
+#' composition of Orthoptera in the Pyrenees. The variables will be ordered according to the variation
+#' they explain, then a Monte Carlo permutation test will be used to test the significance of the
+#' variation explained by the highest-ranking variable. If the permutation test is significant, then the
+#' variable will be selected (and used in the next step as a covariate). PERMANOVA will be used to test
+#' for variation between the groups. Beforehand, the dispersion within groups will be tested to ensure
+#' that a false difference in means is not found [@wartonDistancebasedMultivariateAnalyses2012].

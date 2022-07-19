@@ -226,7 +226,7 @@ create_df_of_terrain_values_for_sites <- function(sites_transect_files, sites_df
   sites <- rename_site_with_elevation(sites_df)
   terrain_df <- left_join(terrain_df, sites, by = "site_name")
   terrain_df <- terrain_df %>%
-    dplyr::select(site_name, site_elevation, elevational_band_m, slope, aspect)
+    dplyr::select(site_name, area, site_elevation, elevational_band_m, slope, aspect)
 
   return(terrain_df)
 }
