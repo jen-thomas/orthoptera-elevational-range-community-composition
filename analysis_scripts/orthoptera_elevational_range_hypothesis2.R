@@ -408,6 +408,23 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' maximum elevational range ($ER$) of 1044 m was predicted at an elevation ($E$) of 1,760 m a.s.l ($ER =
 #' -6700 + 8.8E - 0.0025 ER^2$).
 #'
+#' **TODO**: scatterplot of elevational range against elevation.
+#'
+#' ## Grouping species by elevational range
+#'
+#' **TODO**: Species which have their elevational range midpoint within the same altitude band, will be
+#' grouped. The mean and standard deviations of the elevational ranges of these groups will be calculated
+#' and plotted against elevation. This will give an idea of the spread of the elevational range of species
+#' groups that occur at similar elevations.
+#'
+#' ## Compare elevational range to climatic conditions
+#'
+#' **TODO**: In order to better understand the outcomes of these tests, it would be useful to compare the
+#' elevational range of Orthoptera species to climatic conditions (humidity, temperature and
+#' precipitation). It is unlikely there are such data available from the study region with sufficient
+#' resolution (i.e ~100-m altitudinal resolution) but these could be used to instead to provide a
+#' description of the conditions in this area. Sources of such data will be investigated.
+#'
 #' ## TODO / questions
 #' <ol>
 #' <li>This analysis has been done with only the identifications to species. This reduces the number of
