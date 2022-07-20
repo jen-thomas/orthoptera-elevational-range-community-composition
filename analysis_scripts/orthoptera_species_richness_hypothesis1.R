@@ -18,7 +18,7 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -498,6 +498,84 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan (<em>r</em> = -0.98; <em>F</em> = 141.2;
 #' <em>df</em> = 1, 5; <em>p</em> = < 0.001>).
 #'
+#'
+#' ## Generalised linear model
+
+#' Predict species richness using elevation. Include area and sampling effort as covariates.
+
+#' Fit the full model with all covariates. Area will be used as a factor and no offset will be used.
+#' Sampling effort will instead be included as a factor.
+
+glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + as.factor(area) + sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+# Check to see the importance of each covariate.
+summary(glm_species_richness_full_poiss)
+Anova(glm_species_richness_full_poiss)
+
+#' Elevation and sampling effort are both significant; area is almost significant (p = 0.05 if rounded
+#' down). No individual areas have a significant effect.
+#'
+#' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
+#' overdispersed.
+
+ratio_dispersion <- summary(glm_species_richness_full_poiss)$deviance / summary(glm_species_richness_full_poiss)$df.residual
+ratio_dispersion
+
+#' Given that the ratio < 1.5, then there is no overdispersion.
+
+#' Fit a quasipoisson distribution to see if there is a problem with overdispersion. A poisson
+#' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
+#' greater than 1, then we have this problem with the Poisson distribution. (This part is not needed as
+#' we have already shown that there is no overdispersion).
+
+glm_species_richness_full_quasipoiss <- glm(species_richness ~ elevational_band_m + as.factor(area) + sampling_effort_index,
+    family = quasipoisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_full_quasipoiss)
+Anova(glm_species_richness_full_quasipoiss)
+
+#' Try removing sampling effort as a factor and including it in the model as an offset.
+
+glm_species_richness_full_samplingoffset <- glm(species_richness ~ elevational_band_m + as.factor(area),
+    family = poisson(link = "log"),
+    offset = log(sampling_effort_index),
+    data = species_richness_sites)
+summary(glm_species_richness_full_samplingoffset)
+Anova(glm_species_richness_full_samplingoffset)
+
+#' Removing sampling effort makes area become a significant parameter. However, it has been included in
+#' the other models as a factor because species richness does not depend on sampling effect by a fixed
+#' amount.
+
+#' Model selection.
+
+#' Try step-wise selection.
+glm_species_richness_full_poiss_step <- step(glm_species_richness_full_poiss)
+glm_species_richness_full_poiss_step
+
+#' This shows us that AIC gets worse as covariates are removed from the model, so the model should retain
+#' the parameters that were included to begin with.
+
+#' Model assessment
+
+par(mfrow = c(1,2))
+plot(species_richness_sites$species_richness, fitted(glm_species_richness_full_poiss), xlab = "Observed values", ylab = "Fitted values")
+abline(0,1)
+plot(fitted(glm_species_richness_full_poiss), residuals(glm_species_richness_full_poiss, type = "pearson"))
+abline(h = 0)
+
+#' Test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
+#' the p-value for the model where the deviance and degrees of freedom are used.
+p_model_test <- 1-pchisq(21.452, 21)
+p_model_test
+
+#' As p is large, we have no evidence against the hypothesis that the model is adequate, therefore we
+#' accept the model is satisfactory.
+
+
 #' ## Results
 #'
 #' <br>A simple linear regression was used to investigate the relationship between elevation and species richness.
