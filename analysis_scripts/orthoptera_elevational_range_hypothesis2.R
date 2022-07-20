@@ -77,8 +77,10 @@ observations_without_singletons <- get_observations_of_particular_species(all_ob
 #+ message=FALSE, warning=FALSE
 
 calculate_elevational_range <- function(observations) {
-      #' Calculate the minimum, maximum and mid-point of the elevational range for each taxa. Assume here that
-      #' all specimens are identified to species.
+      #' Calculate the minimum, maximum and mid-point of the elevational range for each taxa. Assume here
+      #' that all specimens are identified to species.
+      #'
+      #' Return a dataframe of each species with the elevational range parameters.
 
   elevational_ranges_species <- observations %>%
     distinct(species, suborder, elevational_band_m) %>%
