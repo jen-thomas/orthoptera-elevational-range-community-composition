@@ -29,7 +29,7 @@ sites_file <- "../data/sites.csv"
 
 #' See exploratory data analysis and hypothesis 1 for an explanation of confirmed and finalised
 #' observations. Get all observations.
-#'
+
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
 
@@ -37,40 +37,40 @@ finalised_identifications <- create_finalised_observations(finalised_observation
 
 finalised_identifications_conservative <- finalised_identifications[[1]]
 
-all_observations_conservative <- join_observations(confirmed_observations, finalised_identifications_conservative)
+all_observations_conservative <- join_observations(confirmed_observations,
+                                                   finalised_identifications_conservative)
 
-#' Get all observations to species only. **TODO**: consider if this should also be done to genus, or
-#' include those that add another taxa (if there are enough observations).
+#' The functions below do the preparation of the data ready for the analysis.
+#+ message=FALSE, warning=FALSE
 
-observations_species <- get_observations_to_species(all_observations_conservative)
+get_species_observed_more_than_once <- function(observations_df) {
+  #' Count the number of observations of each species then get the species that do not occur once (known
+  #' as singletons).
+  #'
+  #' Return a dataframe of these species.
 
-#' Count the number of observations of each species to see if they should be included in the analysis.
+  observations_count_species <- count_observations_of_species(observations_df)
+  species_without_singletons <- observations_count_species[
+                                (observations_count_species$number_observations > 1), ]
 
-observations_count_species <- count_observations_of_species(observations_species)
-observations_count_species
+  return(species_without_singletons)
+}
 
-#' Count the number of sites at which each species has been observed.
+#' Get all observations to species only. For this part of the analysis, it is not meaningful to use those
+#' only identified to genus unless this is a morphospecies that can be said to be so across all of the
+#' sites. None of these cases occurred in this study.
 
-observations_species_sites <- count_sites_where_species_observed(observations_species)
-observations_species_sites
+all_observations_species <- get_observations_to_species(all_observations_conservative)
 
-#' Subset the species considered, by selecting those where they were observed at three or more, and five
-#' or more sites.
+#' Count the number of observations of each species to see if they should be included in the analysis. The
+#' analysis will first be done for all observations, then excluding those only observed once.
+
+species_without_singletons <- get_species_observed_more_than_once(all_observations_species)
+species_for_analysis <- unique(species_without_singletons["species"])
+observations_without_singletons <- get_observations_of_particular_species(all_observations_species,
+                                                                          species_for_analysis)
+#' **TODO**: do the analysis without singletons
 #'
-#' Three sites:
-species_three_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 3),]
-species_three_or_more_sites
-
-#' Five sites:
-species_five_or_more_sites <- observations_species_sites[(observations_species_sites$number_sites >= 5),]
-species_five_or_more_sites
-
-#' Species that were observed at three or more sites will be used for this analysis. **TODO**: do I need
-#' to show why, statistically?
-
-species_for_analysis <- unique(species_three_or_more_sites["species"])
-observations_to_use <- get_observations_of_particular_species(observations_species, species_for_analysis)
-
 #' ## Calculate elevational range for each taxa
 
 #' The functions below, calculate the elevational range of each taxa.
@@ -100,7 +100,7 @@ plot_elevrange_elevation_species <- function(observations) {
     theme_classic()
 }
 
-elevational_ranges_species <- calculate_elevational_range(observations_to_use)
+elevational_ranges_species <- calculate_elevational_range(all_observations_species)
 elevational_ranges_species
 plot_elevrange_elevation_species(elevational_ranges_species)
 
@@ -366,7 +366,7 @@ plot_elevrange_elevation_suborder(elevational_ranges_species)
 
 #' Get the Caelifera observations to use.
 
-caelifera_observations_to_use <- get_caelifera_observations(observations_to_use)
+caelifera_observations_to_use <- get_caelifera_observations(all_observations_species)
 
 #' Calculate the elevational ranges (and elevation-related parameters).
 #+ message=FALSE, warning=FALSE
