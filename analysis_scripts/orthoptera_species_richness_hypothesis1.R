@@ -502,6 +502,51 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' ## Generalised linear model
 
 #' Predict species richness using elevation. Include area and sampling effort as covariates.
+#'
+#' Fit the basic model.
+
+glm_species_richness_basic_poiss <- glm(species_richness ~ elevational_band_m,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_poiss)
+Anova(glm_species_richness_basic_poiss)
+
+#' Add just sampling effort
+
+glm_species_richness_basic_sampling_poiss <- glm(species_richness ~ elevational_band_m + sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_sampling_poiss)
+Anova(glm_species_richness_basic_sampling_poiss)
+
+#' Add just area as factor
+
+glm_species_richness_basic_areafac_poiss <- glm(species_richness ~ elevational_band_m + as.factor(area),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_areafac_poiss)
+Anova(glm_species_richness_basic_areafac_poiss)
+
+#' Add just area
+
+glm_species_richness_basic_area_poiss <- glm(species_richness ~ elevational_band_m + area,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_area_poiss)
+Anova(glm_species_richness_basic_area_poiss)
+
+#' Do full model with area not as a factor
+glm_species_richness_full_area_notfac_poiss <- glm(species_richness ~ elevational_band_m + area + sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+# Check to see the importance of each covariate.
+summary(glm_species_richness_full_area_notfac_poiss)
+Anova(glm_species_richness_full_area_notfac_poiss)
 
 #' Fit the full model with all covariates. Area will be used as a factor and no offset will be used.
 #' Sampling effort will instead be included as a factor.
@@ -513,6 +558,23 @@ glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + a
 # Check to see the importance of each covariate.
 summary(glm_species_richness_full_poiss)
 Anova(glm_species_richness_full_poiss)
+
+print("*****************************************************")
+logLik(glm_species_richness_basic_poiss)
+logLik(glm_species_richness_basic_sampling_poiss)
+logLik(glm_species_richness_full_poiss)
+logLik(glm_species_richness_full_area_notfac_poiss)
+logLik(glm_species_richness_basic_areafac_poiss)
+logLik(glm_species_richness_basic_area_poiss)
+
+AIC(glm_species_richness_basic_poiss)
+AIC(glm_species_richness_basic_sampling_poiss)
+AIC(glm_species_richness_full_poiss)
+AIC(glm_species_richness_full_area_notfac_poiss)
+AIC(glm_species_richness_basic_areafac_poiss)
+AIC(glm_species_richness_basic_area_poiss)
+print("*****************************************************")
+
 
 #' Elevation and sampling effort are both significant; area is almost significant (p = 0.05 if rounded
 #' down). No individual areas have a significant effect.
