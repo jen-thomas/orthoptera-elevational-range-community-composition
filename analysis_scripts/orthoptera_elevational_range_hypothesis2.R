@@ -160,6 +160,25 @@ plot_elevrange_elevation <- function(dataframe) {
   plot(y_param ~ mean_elevation, data = dataframe, xlab = "Mean elevation (m a.s.l)", ylab = ylab)
 }
 
+plot_elevrange_meanelevation <- function(dataframe) {
+  #' Plot the elevational range as a function of the mean elevation.
+
+  y_param <- dataframe$elevational_range
+  ylab <- "Elevational range (m)"
+
+  plot(y_param ~ mean_elevation, data = dataframe, xlab = "Mean elevation (m a.s.l)", ylab = ylab)
+}
+
+plot_elevrange_midpointelevation <- function(dataframe) {
+  #' Plot the elevational range as a function of the measures of elevation.
+
+  y_param <- dataframe$elevational_range
+  ylab <- "Elevational range (m)"
+
+  plot(y_param ~ elevational_range_midpoint, data = dataframe,
+       xlab = "Elevational range midpoint (m a.s.l)", ylab = ylab)
+}
+
 linear_regression_elevrange_elevation <- function(dataframe, elevation_parameter) {
   #' Do a linear regression of elevational range as a function of elevation. Plot and summarise the
   #' regression.
@@ -257,7 +276,8 @@ plot_histograms_elevational_range(elevational_ranges_species)
 #' Plot the relationships between the measures of elevation and the elevational range at which each
 #' species was observed.
 
-plot_elevrange_elevation(elevational_ranges_species)
+plot_elevrange_meanelevation(elevational_ranges_species)
+plot_elevrange_midpointelevation(elevational_ranges_species)
 
 #' From these plots, we can see that the relationship does not appear to be linear.
 #'
