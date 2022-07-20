@@ -614,8 +614,19 @@ Anova(glm_species_richness_full_samplingoffset)
 
 #' Model selection.
 
+#' Set up the null model for the stepwise selection process.
+glm_species_richness_null = glm(species_richness ~ 1,
+                 data = species_richness_sites,
+                 family = poisson(link = "log")
+                 )
+
 #' Try step-wise selection.
-glm_species_richness_full_poiss_step <- step(glm_species_richness_full_poiss)
+glm_species_richness_full_poiss_step <- step(glm_species_richness_null,
+                                             scope = list(upper = glm_species_richness_full_poiss),
+                                             direction = "both",
+                                             test="Chisq",
+                                             data = species_richness_sites)
+print("--------Stepwise selection-----------------")
 glm_species_richness_full_poiss_step
 
 #' This shows us that AIC gets worse as covariates are removed from the model, so the model should retain
