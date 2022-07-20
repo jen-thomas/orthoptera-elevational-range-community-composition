@@ -56,21 +56,32 @@ get_species_observed_more_than_once <- function(observations_df) {
   return(species_without_singletons)
 }
 
+remove_observations_chorthippus_biguttulus_mollis <- function(observations_df) {
+  #' Some observations could not be separated between Chorthippus biguttulus and Chorthippus mollis. These
+  #' species have been identified at other sites and therefore are not a morphospecies. These observations
+  #' will be removed from the analysis.
+  #'
+  #' Return the observations dataframe without these observations.
+
+  observations_without_chorthippus_biguttulus_mollis <- observations_df[(observations_df$species !=
+    "Chorthippus biguttulus / Chorthippus mollis"), ]
+
+  return(observations_without_chorthippus_biguttulus_mollis)
+}
+
 #' Get all observations to species only. For this part of the analysis, it is not meaningful to use those
 #' only identified to genus unless this is a morphospecies that can be said to be so across all of the
 #' sites. None of these cases occurred in this study.
+#'
+#' All species that were observed only once, will be removed from the analysis.
 
 all_observations_species <- get_observations_to_species(all_observations_conservative)
-
-#' Count the number of observations of each species to see if they should be included in the analysis. The
-#' analysis will first be done for all observations, then excluding those only observed once.
-
 species_without_singletons <- get_species_observed_more_than_once(all_observations_species)
 species_for_analysis <- unique(species_without_singletons["species"])
 observations_without_singletons <- get_observations_of_particular_species(all_observations_species,
                                                                           species_for_analysis)
-#' **TODO**: do the analysis without singletons
-#'
+number_observations <- nrow(observations_without_singletons)
+
 #' ## Calculate elevational range for each taxa
 
 #' The functions below, calculate the elevational range of each taxa.
@@ -102,8 +113,10 @@ plot_elevrange_elevation_species <- function(observations) {
     theme_classic()
 }
 
-elevational_ranges_species <- calculate_elevational_range(all_observations_species)
+elevational_ranges_species <- calculate_elevational_range(observations_without_singletons)
 elevational_ranges_species
+
+par(mfrow = c(1,1))
 plot_elevrange_elevation_species(elevational_ranges_species)
 
 #' This plot isn't particularly useful in itself, it was just helpful to pick out some of the different
@@ -278,13 +291,14 @@ plot_histograms_elevational_range(elevational_ranges_species)
 #' Plot the relationships between the measures of elevation and the elevational range at which each
 #' species was observed.
 
+par(mfrow = c(1,1))
 plot_elevrange_meanelevation(elevational_ranges_species)
 plot_elevrange_midpointelevation(elevational_ranges_species)
 
 #' From these plots, we can see that the relationship does not appear to be linear.
 #'
-#' There is a clear non-linear relationship between the elevational range and both measures of elevation
-#' (mean and mid-point) as seen on both of the plots. The relationship seems to be quadratic. Test the
+#' There seems to be a non-linear relationship between the elevational range and both measures of elevation
+#' (mean and mid-point) as seen on both of the plots. The relationship could be quadratic. Test the
 #' quadratic, cubic and quartic models. Calculate these parameters first.
 
 elevational_ranges_species <- calculate_polynomials_elevation(elevational_ranges_species)
@@ -319,6 +333,7 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 summary(nonlin_reg_quadratic)
 
+par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
 
 #' ### Check model assumptions
@@ -327,9 +342,9 @@ check_model_assumptions(nonlin_reg_quadratic)
 
 #' There appears to be one data point which is skewing the residuals. Including this point, the residuals
 #' do not appear to be distributed normally and there is a trend in the residuals with the
-#' fitted values, suggesting that it violates the assumption of heteroscedasticity. However, without this
-#' point, the assumption of heteroscedasticity does not appear to be violated. **TODO**: how
-#' sensitive is this model to violation of the assumptions?
+#' fitted values, suggesting that it violates the assumption of heteroscedasticity. **TODO**: how
+#' sensitive is this model to violation of the assumptions? The data appeared to be bimodal to begin with.
+#' Perhaps this should be corrected?
 #'
 #' ## Test Rapoport's Rule for Caelifera only
 #'
@@ -360,15 +375,20 @@ plot_elevrange_elevation_suborder <- function(dataframe) {
 
 plot_elevrange_elevation_suborder(elevational_ranges_species)
 
-#' Only five Ensifera species were considered to have enough data to be used in the analysis above. There
-#' are too few data points to extract a pattern, but is there potentially a peak as there is in Caelifera,
-#' but at a lower elevation? This would be an interesting point to explore if there were more specimens.
+#' Six Ensifera species were used in the analysis above. There are too few data points to extract a
+#' pattern, or  do a regression. There are notably two species that do not follow the general pattern of
+#' the overall model. These species may have been harder to catch given their life history, and therefore
+#' they may be undersampled. The Ensifera often occurred at elevations which had a higher species richness
+#'  and therefore, it is possible that they were undersampled (there is a reference for this somewhere).
+#' It is also possible that these and some Caelifera species require certain habitats which were not found
+#' in the vicinity of where they were caught, thereby limiting their elevational range compared to what is
+#' suggested by the model.
 #'
 #' For this part of the analysis, consider only Caelifera.
 
 #' Get the Caelifera observations to use.
 
-caelifera_observations_to_use <- get_caelifera_observations(all_observations_species)
+caelifera_observations_to_use <- get_caelifera_observations(observations_without_singletons)
 
 #' Calculate the elevational ranges (and elevation-related parameters).
 #+ message=FALSE, warning=FALSE
@@ -378,13 +398,14 @@ elevational_ranges_caelifera <- calculate_elevational_range(caelifera_observatio
 #' Check the distribution of the Caelifera species elevational range with elevation.
 
 transform_elevational_range(elevational_ranges_caelifera)
+par(mfrow = c(1,1))
 plot_histograms_elevational_range(elevational_ranges_caelifera)
 
 #' Plot elevational range against elevation for Caelifera only.
-
+par(mfrow = c(1,1))
 plot_elevrange_elevation(elevational_ranges_caelifera)
 
-#' The relationship between elevation and elevational range again appears to be an inverse quadratic. Run
+#' The relationship between elevation and elevational range again appears to be a quadratic. Run
 #' model for polynomials up to the fourth order and do model selection to choose the most parsimonious
 #' model.
 
@@ -403,6 +424,7 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 summary(nonlin_reg_quadratic_caelifera)
 
+par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_caelifera, nonlin_reg_quadratic_caelifera)
 
 #' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
