@@ -51,7 +51,6 @@ format_theme_ggplot <- function(plot_with_ggplot) {
   #' Return the plot.
 
   formatted_plot <- plot_with_ggplot +
-                    theme_bw() +
                     theme(axis.text = element_text(size = 8),
                           axis.title = element_text(size = 10),
                           legend.position = "none",

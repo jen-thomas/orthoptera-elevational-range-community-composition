@@ -540,14 +540,15 @@ elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, 
 elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
 save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
 
-species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted, aes(x = species, y = mean_elevation)) +
+species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
+                                        aes(x = reorder(species, -mean_elevation), y = mean_elevation)) +
   geom_point(size = 2) +
   geom_segment(aes(x = species, xend = species, y = min_elevation, yend = max_elevation)) +
-  scale_y_discrete(limits = c(min(elevational_ranges_species_predicted$min_elevation),
-                              max(elevational_ranges_species_predicted$max_elevation))) +
-  scale_x_discrete(limits = unique(elevational_ranges_species_predicted$species)) +
-  theme_bw()
-species_elevationalrange_plot
+  ylim(min(elevational_ranges_species_predicted$min_elevation),
+       max(elevational_ranges_species_predicted$max_elevation)) +
+  theme(axis.text.x = element_text(angle = 90))
+species_elevationalrange_plot <- format_theme_ggplot(species_elevationalrange_plot)
+save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
 
 #' ## Results
 #' **TODO**: results need updating here.
