@@ -214,7 +214,7 @@ env_var_matrix <- create_env_var_matrix(site_env_var_data)
 
 #' Calculate Bray-Curtis distance among samples
 
-species_bc_dist <- vegdist(site_species_matrix, method = "bray")
+species_bc_dist <- vegdist(site_species_matrix, method = "jaccard", binary = TRUE)
 
 #' Cluster communities using average-linkage algorithm
 
