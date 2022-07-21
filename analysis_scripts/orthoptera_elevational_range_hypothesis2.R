@@ -540,8 +540,14 @@ elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, 
 elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
 save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
 
-#' **TODO**: do plot of vertical lines for elevational ranges for each species with mean / midpoint
-#' marked. Order by decreasing mean / midpoint. As in Fleischman et al.
+species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted, aes(x = species, y = mean_elevation)) +
+  geom_point(size = 2) +
+  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = max_elevation)) +
+  scale_y_discrete(limits = c(min(elevational_ranges_species_predicted$min_elevation),
+                              max(elevational_ranges_species_predicted$max_elevation))) +
+  scale_x_discrete(limits = unique(elevational_ranges_species_predicted$species)) +
+  theme_bw()
+species_elevationalrange_plot
 
 #' ## Results
 #' **TODO**: results need updating here.
