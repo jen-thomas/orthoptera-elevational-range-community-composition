@@ -624,3 +624,10 @@ save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.
 #' concern is there will not be enough observations within each study area to consider them
 #' separately.</li>
 #' </ol>
+#'
+#' ## Questions after new version after meeting
+#' <ol>
+#' <li>Wasn't convinced of removing the points for Tor and the other smaller sites. Removes quite a lot of
+#' data and then other species are removed because they become singletons. Maybe this could just be
+#' discussed.</li>
+#' <li>Consider if the plot with the elevational ranges plotted for each species is necessary.</li>
