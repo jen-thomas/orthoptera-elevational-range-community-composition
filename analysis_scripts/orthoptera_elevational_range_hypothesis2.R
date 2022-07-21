@@ -540,9 +540,11 @@ elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, 
 elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
 save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
 
+#' **TODO**: do plot of vertical lines for elevational ranges for each species with mean / midpoint
+#' marked. Order by decreasing mean / midpoint. As in Fleischman et al.
 
 #' ## Results
-
+#' **TODO**: results need updating here.
 #' There was a significant relationship between elevation and elevational range (<em>R<sup>2</sup></em> =
 #' 0.60; <em>df</em> = 2, 19; <em>p</em> = < 0.001). A maximum elevational range ($ER$) of 857 m was
 #' predicted at an elevation ($E$) of 1,739 m a.s.l ($ER = -6100 + 8E - 0.0023 ER^2$).
