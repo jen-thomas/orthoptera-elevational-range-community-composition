@@ -44,3 +44,17 @@ replace_na_with_zero <- function(dataframe, column) {
 
   return(dataframe)
 }
+
+format_theme_ggplot <- function(plot_with_ggplot) {
+  #' Add the following format to the theme of a plot made with ggplot.
+  #'
+  #' Return the plot.
+
+  formatted_plot <- plot_with_ggplot +
+                    theme_bw() +
+                    theme(axis.text = element_text(size = 14),
+                          axis.title = element_text(size = 16),
+                          legend.position = "none")
+
+  return(formatted_plot)
+}

@@ -348,6 +348,10 @@ summary(nonlin_reg_quadratic)
 par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
 
+#' Get the predicted values for this model
+
+elevational_ranges_species_predicted <- cbind(elevational_ranges_species, predict(nonlin_reg_quadratic, interval = "confidence"))
+
 #' ### Check model assumptions
 
 check_model_assumptions(nonlin_reg_quadratic)
@@ -514,6 +518,28 @@ summary(nonlin_reg_quadratic_tav_mol)
 
 par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
+
+#' For the observations just from Tavascan and La Molinassa, there was a similar quadratic relationship.
+#' I'm not sure if this is worth showing at the moment in the results. **TODO**: decide if this
+#' relationship is worth displaying on a plot with the main result and the observations from all sites.
+#'
+#' ## Plots
+#'
+#' Plot the elevational ranges from all observations that are used in the main results (this excludes
+#' the singletons). Points should be different shapes for Caelifera and Ensifera. Overlay the overall
+#' model. Consider overlaying the models just for Caelifera and just for Tavascan and La Molinassa.
+
+elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, aes(mean_elevation, elevational_range)) +
+  geom_point(aes(shape = suborder), size = 3) +
+  scale_shape_manual(values = c(1, 4)) +
+  geom_line(aes(mean_elevation, fit)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
+  labs(x = "Mean elevation (m a.s.l.)",
+       y = "Elevational range (m)")
+
+elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
+elevationalrange_elevation_plot
+
 
 #' ## Results
 
