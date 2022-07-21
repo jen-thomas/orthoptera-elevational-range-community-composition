@@ -51,7 +51,26 @@ format_theme_ggplot <- function(plot_with_ggplot) {
   #' Return the plot.
 
   formatted_plot <- plot_with_ggplot +
+                    theme_bw() +
                     theme(axis.text = element_text(size = 8),
+                          axis.title = element_text(size = 10),
+                          legend.position = "none",
+                          axis.line = element_line(),
+                          panel.grid = element_blank(),
+                          panel.border = element_blank())
+
+  return(formatted_plot)
+}
+
+format_theme_ggplot_vertical_xaxis_labels <- function(plot_with_ggplot) {
+  #' Add the following format to the theme of a plot made with ggplot.
+  #'
+  #' Return the plot.
+
+  formatted_plot <- plot_with_ggplot +
+                    theme_bw() +
+                    theme(axis.text.x = element_text(size = 5, face = "italic", hjust = 1, vjust = 1, angle = 90),
+                          axis.text.y = element_text(size = 8),
                           axis.title = element_text(size = 10),
                           legend.position = "none",
                           axis.line = element_line(),
@@ -69,6 +88,6 @@ save_plot <- function(plot_name, filename) {
   filepath <- "../analysis_plots/"
 
   ggsave(filename, plot_name, path = filepath, device = "png",
-         scale = 1, width = 800, height = 600, units = "px", dpi = 300,
+         scale = 1, width = 1000, height = 1000, units = "px", dpi = 300,
          bg = NULL)
 }
