@@ -52,9 +52,21 @@ format_theme_ggplot <- function(plot_with_ggplot) {
 
   formatted_plot <- plot_with_ggplot +
                     theme_bw() +
-                    theme(axis.text = element_text(size = 14),
-                          axis.title = element_text(size = 16),
+                    theme(axis.text = element_text(size = 8),
+                          axis.title = element_text(size = 10),
                           legend.position = "none")
 
   return(formatted_plot)
+}
+
+save_plot <- function(plot_name, filename) {
+  #' Save a specified ggplot to a specific filename.
+  #'
+  #' This function will provide the filepath and concatenate it with the filename.
+
+  filepath <- "../analysis_plots/"
+
+  ggsave(filename, plot_name, path = filepath, device = "png",
+         scale = 1, width = 800, height = 600, units = "px", dpi = 300,
+         bg = NULL)
 }

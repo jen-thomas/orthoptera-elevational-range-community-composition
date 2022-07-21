@@ -9,6 +9,7 @@ analysis_scripts/Rplots.pdf
 
 renv/
 
+analysis_plots/
 analysis_outputs/
 data/
 metadata/

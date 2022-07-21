@@ -530,7 +530,7 @@ plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
 #' model. Consider overlaying the models just for Caelifera and just for Tavascan and La Molinassa.
 
 elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, aes(mean_elevation, elevational_range)) +
-  geom_point(aes(shape = suborder), size = 3) +
+  geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(1, 4)) +
   geom_line(aes(mean_elevation, fit)) +
   geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
@@ -538,7 +538,7 @@ elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, 
        y = "Elevational range (m)")
 
 elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
-elevationalrange_elevation_plot
+save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
 
 
 #' ## Results
