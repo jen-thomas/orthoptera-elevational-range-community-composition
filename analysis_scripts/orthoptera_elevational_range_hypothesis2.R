@@ -69,6 +69,18 @@ remove_observations_chorthippus_biguttulus_mollis <- function(observations_df) {
   return(observations_without_chorthippus_biguttulus_mollis)
 }
 
+only_observations_tav_mol <- function(observations_df) {
+  #' Remove observations from Tor, Besan and Bordes de Viros to see if there is any difference in the
+  #' relationship at the more semi-natural sites.
+  #'
+  #' Return dataframe of this subset of observations.
+
+  observations_to_use <- observations_df[(observations_df$area == "La Molinassa" |
+                                          observations_df$area == "Tavascan"), ]
+
+  return(observations_to_use)
+}
+
 #' Get all observations to species only. For this part of the analysis, it is not meaningful to use those
 #' only identified to genus unless this is a morphospecies that can be said to be so across all of the
 #' sites. None of these cases occurred in this study.
@@ -441,6 +453,68 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' It is hard to tell if the assumption of heteroscedasticity is violated or not because there are many
 #' more data points for higher fitted values. The residuals have a left-skewed distribution.
 #'
+#' ## Remove Tor observations from analysis
+#'
+#' When looking at the relationship of species richness with elevation, there was a difference between
+#' the relationships at the different sites, in particular, Tor. Here, we will remove observations from
+#' Tor, Besan and les Bordes de Viros for the analysis and fit the model without these observations.
+#' The two additional sites will then remove observations from lower elevations which were covered in
+#' these areas. Furthermore, this will then leave only the observations at the semi-natural sites of
+#' La Molinassa and Tavascan.
+#'
+#' ### Get observations to use
+#'
+#' Get all observations and select only those from Tavascan and La Molinassa
+observations_tav_mol <- only_observations_tav_mol(all_observations_species)
+
+#' Remove those that were only found at one site
+species_without_singletons_tav_mol <- get_species_observed_more_than_once(observations_tav_mol)
+species_for_analysis_tav_mol <- unique(species_without_singletons_tav_mol["species"])
+observations_without_singletons_tav_mol <- get_observations_of_particular_species(observations_tav_mol,
+                                                                          species_for_analysis_tav_mol)
+number_observations_tav_mol <- nrow(observations_without_singletons_tav_mol)
+
+#' ### Calculate elevational ranges and associated parameters
+
+elevational_ranges_tav_mol <- calculate_elevational_range(observations_without_singletons_tav_mol)
+
+par(mfrow = c(1,1))
+plot_elevrange_meanelevation(elevational_ranges_tav_mol)
+
+#' ### Create models
+
+#' Calculate the polynomials then compare the models
+
+elevational_ranges_tav_mol <- calculate_polynomials_elevation(elevational_ranges_tav_mol)
+
+lin_regs_polynomial_tav_mol <- linear_regression_elevrange_elevation_polynomial(elevational_ranges_tav_mol)
+
+lin_reg_tav_mol <- lin_regs_polynomial_tav_mol[[1]]
+nonlin_reg_quadratic_tav_mol <- lin_regs_polynomial_tav_mol[[2]]
+nonlin_reg_cubic_tav_mol <- lin_regs_polynomial_tav_mol[[3]]
+nonlin_reg_quartic_tav_mol <- lin_regs_polynomial_tav_mol[[4]]
+
+#' Compare the models to look at the AIC and adjusted R-squared.
+
+compareLM(lin_reg_tav_mol, nonlin_reg_quadratic_tav_mol,
+          nonlin_reg_cubic_tav_mol, nonlin_reg_quartic_tav_mol)
+
+#' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
+#' This model also has the largest adjusted R-squared.
+#'
+#' Do a direct comparison of the difference between the models using ANOVA.
+#' <br>H<sub>0</sub>: there is no difference between the models.
+#' <br>H<sub>1</sub>: there is a difference between the models.
+#+ message=FALSE, warning=FALSE
+
+anova(lin_reg_tav_mol, nonlin_reg_quadratic_tav_mol, nonlin_reg_cubic_tav_mol,
+      nonlin_reg_quartic_tav_mol)
+
+summary(nonlin_reg_quadratic_tav_mol)
+
+par(mfrow = c(1,1))
+plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
+
 #' ## Results
 
 #' There was a significant relationship between elevation and elevational range (<em>R<sup>2</sup></em> =
