@@ -232,7 +232,7 @@ create_df_of_terrain_values_for_sites <- function(sites_transect_files, sites_df
 }
 
 convert_aspect_to_cardinal_direction <- function(row) {
-  #' Convert aspect in degrees to cardinal directions, N and S.
+  #' Convert aspect in degrees to cardinal directions, North, South, East and West.
   #'
   #' Return value.
 
