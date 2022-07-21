@@ -50,7 +50,7 @@ create_env_var_matrix <- function(env_var_df) {
   rownames(env_var_df) <- env_var_df$site_elevation
 
     #' select only a subset of the parameters to use in the analysis
-  env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect,
+  env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect, area,
                                   mean_perc_veg_cover, mean_height_75percent, mean_density)
 
   return(env_var_matrix)
@@ -127,10 +127,10 @@ get_overview_dem(dem_study_areas)
 #' Look at the data for each study area separately to make sure there are no bad elevation values.
 #+ message=FALSE, warning=FALSE
 
-par(mfrow = c(2, 2))
-hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", main ="Tavascan")
-hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
-hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
+# par(mfrow = c(2, 2))
+# hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", main ="Tavascan")
+# hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
+# hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
 
 #' Calculate the slope and aspect along each transect.
 #'
@@ -209,6 +209,67 @@ check_collinearity(site_env_var_data)
 #' site elevation, aspect, slope, vegetation height, vegetation ground cover and vegetation density.
 
 env_var_matrix <- create_env_var_matrix(site_env_var_data)
+
+#' ## Bray-Curtis and NMDS
+
+#' Calculate Bray-Curtis distance among samples
+
+species_bc_dist <- vegdist(site_species_matrix, method = "bray")
+
+#' Cluster communities using average-linkage algorithm
+
+species_bc_dist_cluster <- hclust(species_bc_dist, method = "average")
+
+#' Plot cluster diagram
+
+plot(species_bc_dist_cluster, ylab = "Bray-Curtis dissimilarity")
+
+#' The metaMDS function automatically transforms data, runs the NMDS and checks solution robustness
+
+species_bc_dist_mds <- metaMDS(site_species_matrix, dist = "bray")
+
+#' A stress plot can then be used to assess goodness of ordination fit
+
+stressplot(species_bc_dist_mds)
+
+#plot site scores as text
+ordiplot(species_bc_dist_mds, display = "sites", type = "text")
+
+#use automated plotting of results to try and eliminate overlapping labels
+#this may take a while to run
+
+ordipointlabel(species_bc_dist_mds)
+
+#the previous plot isn’t easy to understand but ordination plots are highly customizable
+#set up the plotting area but don't plot anything yet
+
+mds_fig <- ordiplot(species_bc_dist_mds, type = "none")
+#plot just the samples
+#colour by habitat
+#pch=19 means plot a circle
+# points(mds_fig, "sites", pch = 19, col = "green", select = site_species_matrix[str_detect(site_species_matrix$site, "TAV"), ])
+# points(mds_fig, "sites", pch = 19, col = "blue", select = site_species_matrix[str_detect(site_species_matrix$site, "TOR"), ])
+# points(mds_fig, "sites", pch = 19, col = "red", select = site_species_matrix[str_detect(site_species_matrix$site, "MOL"), ])
+
+points(mds_fig, "sites", pch = 19, col = "green", select = env_var_matrix$area == "Tor")
+points(mds_fig, "sites", pch = 19, col = "blue", select = env_var_matrix$area == "Tavascan")
+points(mds_fig, "sites", pch = 19, col = "red", select = env_var_matrix$area == "La Molinassa")
+points(mds_fig, "sites", pch = 19, col = "black", select = env_var_matrix$area == "Besan")
+points(mds_fig, "sites", pch = 19, col = "black", select = env_var_matrix$area == "Bordes de Viros")
+
+# add confidence ellipses around habitat types
+ordiellipse(species_bc_dist_mds, env_var_matrix$area, conf = 0.95, label = TRUE)
+# overlay the cluster results we calculated earlier
+ordicluster(species_bc_dist_mds, species_bc_dist_cluster, col = "gray")
+
+#' Add environmental data
+#'
+#' #begin by plotting the ordination
+ordiplot(species_bc_dist_mds)
+#calculate and plot environmental variable correlations with the axes
+#use the subset of metadata that are environmental data
+
+plot(envfit(species_bc_dist_mds, env_var_matrix[, c("slope", "aspect", "mean_perc_veg_cover", "mean_perc_veg_cover", "mean_density")]))
 
 #' ## Detrended canonical correspondance analysis
 #'
