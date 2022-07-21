@@ -532,7 +532,7 @@ plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
 elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, aes(mean_elevation, elevational_range)) +
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(1, 4)) +
-  geom_line(aes(mean_elevation, fit)) +
+  geom_line(aes(mean_elevation, fit), colour = "black") +
   geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
   labs(x = "Mean elevation (m a.s.l.)",
        y = "Elevational range (m)")

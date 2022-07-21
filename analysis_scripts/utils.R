@@ -54,7 +54,10 @@ format_theme_ggplot <- function(plot_with_ggplot) {
                     theme_bw() +
                     theme(axis.text = element_text(size = 8),
                           axis.title = element_text(size = 10),
-                          legend.position = "none")
+                          legend.position = "none",
+                          axis.line = element_line(),
+                          panel.grid = element_blank(),
+                          panel.border = element_blank())
 
   return(formatted_plot)
 }
