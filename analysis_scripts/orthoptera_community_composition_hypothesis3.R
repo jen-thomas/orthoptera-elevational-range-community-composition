@@ -21,7 +21,7 @@ source("prepare_vegetation_data.R")
 source("get_physical_site_data.R")
 
 vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp",
-                     "maptools", "leaflet", "rgeos", "corrplot", "psych", "vegan")
+                     "maptools", "leaflet", "rgeos", "corrplot", "psych", "vegan", "goeveg", "phytools")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -63,6 +63,7 @@ sites_file <- "../data/sites.csv"
 vegetation_file <- "../data/vegetation_plots.csv"
 
 sites_df <- read_csv_data_file(sites_file)
+sites_df <- rename_site_with_elevation(sites_df)
 
 observations_sites_df <- import_all_observations(observations_file, sites_file)
 confirmed_observations <- get_confirmed_observations(observations_sites_df)
@@ -210,40 +211,68 @@ check_collinearity(site_env_var_data)
 
 env_var_matrix <- create_env_var_matrix(site_env_var_data)
 
-#' ## Bray-Curtis and NMDS
+#' ## Hierarchical cluster analysis
 
-#' Calculate Bray-Curtis distance among samples
+#' Calculate a dissimilarity matrix using the Jaccard distance. This is used because it excludes double
+#' zeros whilst giving equal weight to non-zero agreements and disagreements. Data are already binary so
+#' there is no need to convert the matrix to presence-absence before calculating the matrix.
 
-species_bc_dist <- vegdist(site_species_matrix, method = "jaccard", binary = TRUE)
+species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 
-#' Cluster communities using average-linkage algorithm
+#' Cluster communities using the average-linkage algorithm. This is a standard method to use in ecology
+#' and particularly in biogeography. It "links sites and species by considering the distances to a
+#' subgroup's arithmetic average".
 
-species_bc_dist_cluster <- hclust(species_bc_dist, method = "average")
+species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "average")
+
+#' Do some kind of bootstrapping (this doesn't seem to be used for presence-absence data) or resampling
+#' to assess the stability of the clustering solution.
 
 #' Plot cluster diagram
 
-plot(species_bc_dist_cluster, ylab = "Bray-Curtis dissimilarity")
+plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
+
+#' Split into the subgroups using the nodes
+
+species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, k = 4)
+species_jaccard_dist_cluster_average_groups
+
+plot(x = species_jaccard_dist_cluster_average, labels =  row.names(species_jaccard_dist_cluster_average), cex = 0.5)
+rect.hclust(tree = species_jaccard_dist_cluster_average, k = 4, which = 1:4, border = 1:4, cluster = species_jaccard_dist_cluster_average_groups)
+
+sites_df$cluster_group <- species_jaccard_dist_cluster_average_groups[sites_df$site_elevation]
+
+
+map(xlim = c(1.2, 1.4), ylim = c(42.5, 42.75))  # setting the lat and long limits on our map
+map.axes()
+points(sites_df$longitude_start_e, sites_df$latitude_start_n, pch = 100, col = sites_df$group)
 
 #' The metaMDS function automatically transforms data, runs the NMDS and checks solution robustness
 
-species_bc_dist_mds <- metaMDS(site_species_matrix, dist = "bray")
+set.seed(10)
+species_jaccard_dist_mds <- metaMDS(site_species_matrix, distance = "jaccard", trymax = 1000, trace = TRUE)
 
-#' A stress plot can then be used to assess goodness of ordination fit
+#' A stress plot can then be used to assess goodness of ordination fit.
+#'
+par(mfrow=c(1,1))
+stressplot(species_jaccard_dist_mds)
 
-stressplot(species_bc_dist_mds)
+#' As we have a
+par(mfrow=c(1,1))
+dimcheckMDS(site_species_matrix, dist = "jaccard")
 
 #plot site scores as text
-ordiplot(species_bc_dist_mds, display = "sites", type = "text")
+ordiplot(species_jaccard_dist_mds, display = "sites", type = "text")
 
 #use automated plotting of results to try and eliminate overlapping labels
 #this may take a while to run
 
-ordipointlabel(species_bc_dist_mds)
+#ordipointlabel(species_jaccard_dist_mds)
 
 #the previous plot isn’t easy to understand but ordination plots are highly customizable
 #set up the plotting area but don't plot anything yet
 
-mds_fig <- ordiplot(species_bc_dist_mds, type = "none")
+mds_fig <- ordiplot(species_jaccard_dist_mds, type = "none")
 #plot just the samples
 #colour by habitat
 #pch=19 means plot a circle
@@ -258,18 +287,24 @@ points(mds_fig, "sites", pch = 19, col = "black", select = env_var_matrix$area =
 points(mds_fig, "sites", pch = 19, col = "black", select = env_var_matrix$area == "Bordes de Viros")
 
 # add confidence ellipses around habitat types
-ordiellipse(species_bc_dist_mds, env_var_matrix$area, conf = 0.95, label = TRUE)
+ordiellipse(species_jaccard_dist_mds, env_var_matrix$area, conf = 0.95, label = TRUE)
 # overlay the cluster results we calculated earlier
-ordicluster(species_bc_dist_mds, species_bc_dist_cluster, col = "gray")
+ordicluster(species_jaccard_dist_mds, species_jaccard_dist_cluster_average, col = "gray")
 
-#' Add environmental data
-#'
-#' #begin by plotting the ordination
-ordiplot(species_bc_dist_mds)
 #calculate and plot environmental variable correlations with the axes
-#use the subset of metadata that are environmental data
 
-plot(envfit(species_bc_dist_mds, env_var_matrix[, c("slope", "aspect", "mean_perc_veg_cover", "mean_perc_veg_cover", "mean_density")]))
+env_data_fit <- envfit(species_jaccard_dist_mds,
+                       choices = 1:2,
+                       env_var_matrix[, c("elevational_band_m", "slope", "aspect", "mean_perc_veg_cover", "mean_height_75percent", "mean_density")],
+                       scaling = "sites",
+                       permutations = 1000)
+env_data_fit
+plot(env_data_fit)
+
+ordisurf(species_jaccard_dist_mds ~ elevational_band_m, site_species_matrix, isotropic = TRUE, main = NULL, cex = 3)
+
+#' The lengths of the arrows represent the strength of the correlation of the environmental variable with
+#' the axis.
 
 #' ## Detrended canonical correspondance analysis
 #'
