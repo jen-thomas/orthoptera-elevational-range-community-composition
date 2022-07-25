@@ -506,7 +506,7 @@ check_collinearity(site_env_var_data)
 
 cor_veg_height <- cor.test(site_env_var_data$mean_height_75percent, site_env_var_data$mean_max_height, method = "spearman")
 cor_slope_vegcover <- cor.test(site_env_var_data$mean_perc_veg_cover, site_env_var_data$slope, method = "spearman")
-cor_vegheight_density <- cor.test(site_env_var_data$mean_max_height, site_env_var_data$mean_density, method = "spearman")
+cor_vegheight_density <- cor.test(site_env_var_data$mean_height_75percent, site_env_var_data$mean_density, method = "spearman")
 cor_veg_height
 cor_slope_vegcover
 cor_vegheight_density
