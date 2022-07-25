@@ -253,3 +253,72 @@ convert_aspect_to_cardinal_direction <- function(row) {
 
   return(aspect_cardinal)
 }
+
+get_dem_data <- function() {
+  #' Get the DEM data for each site and merge it into one raster. The DEM data were provided by the
+  #' Institut Cartogràfic i Geològic de Catalunya (ICGC) with a resolution of 2x2m.
+  #'
+  #' Return a raster of the DEM data.
+
+  dem_data_besan <- "../data/dem/besan_20220601_165822.tif"
+  dem_data_bordes <- "../data/dem/bordes_de_viros_20220601_165754.tif"
+  dem_data_molinassa <- "../data/dem/la_molinassa_20220601_165849.tif"
+  dem_data_tavascan <- "../data/dem/tavascan_20220601_170011.tif"
+  dem_data_tor <- "../data/dem/tor_20220715_171056.tif"
+
+  dem_raster_besan <- raster(dem_data_besan)
+  dem_raster_bordes <- raster(dem_data_bordes)
+  dem_raster_molinassa <- raster(dem_data_molinassa)
+  dem_raster_tavascan <- raster(dem_data_tavascan)
+  dem_raster_tor <- raster(dem_data_tor)
+
+  dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan,
+                           dem_raster_tor)
+
+  return(dem_study_areas)
+}
+
+get_site_topography <- function(sites_df) {
+  #' Get the transects for each site and calculate the slope and aspect at each site. Convert the aspect
+  #' to a cardinal coordinate.
+  #'
+  #' Return the dataframe of sites and topography.
+
+  #' Use a dictionary of site names and filenames to get the transect data for each site.
+  #+ message=FALSE, warning=FALSE
+
+  sites_transects_files <- c("BES01" = "../metadata/Besan site 01.gpx",
+                             "BES02" = "../metadata/Besan site 02.gpx",
+                             "BOR02" = "../metadata/Bordes de Viros site 02.gpx",
+                             "MOL01" = "../metadata/La Molinassa site 01.gpx",
+                             "MOL02" = "../metadata/La Molinassa site 02.gpx",
+                             "MOL03" = "../metadata/La Molinassa site 03.gpx",
+                             "MOL04" = "../metadata/La Molinassa site 04.gpx",
+                             "MOL05" = "../metadata/La Molinassa site 05.gpx",
+                             "MOL06" = "../metadata/La Molinassa site 06.gpx",
+                             "MOL08" = "../metadata/La Molinassa site 08.gpx",
+                             "MOL09" = "../metadata/La Molinassa site 09.gpx",
+                             "TAV01" = "../metadata/Tavascan site 01.gpx",
+                             "TAV03" = "../metadata/Tavascan site 03.gpx",
+                             "TAV05" = "../metadata/Tavascan site 05.gpx",
+                             "TAV06" = "../metadata/Tavascan site 06.gpx",
+                             "TAV07" = "../metadata/Tavascan site 07.gpx",
+                             "TAV08" = "../metadata/Tavascan site 08.gpx",
+                             "TAV09" = "../metadata/Tavascan site 09.gpx",
+                             "TOR01" = "../metadata/Tor site 01.gpx",
+                             "TOR02" = "../metadata/Tor site 02.gpx",
+                             "TOR03" = "../metadata/Tor site 03.gpx",
+                             "TOR04" = "../metadata/Tor site 04.gpx",
+                             "TOR05" = "../metadata/Tor site 05.gpx",
+                             "TOR06" = "../metadata/Tor site 06.gpx",
+                             "TOR07" = "../metadata/Tor site 07.gpx",
+                             "TOR08" = "../metadata/Tor site 08.gpx",
+                             "TOR09" = "../metadata/Tor site 09.gpx",
+                             "TOR10" = "../metadata/Tor site 10.gpx"
+  )
+
+  site_topography <- create_df_of_terrain_values_for_sites(sites_transects_files, sites_df)
+  site_topography$aspect_cardinal <- apply(site_topography, 1, convert_aspect_to_cardinal_direction)
+
+  return(site_topography)
+}

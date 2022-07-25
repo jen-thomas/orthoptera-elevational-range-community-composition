@@ -144,6 +144,7 @@ plot_lin_reg_sampling_effort_elevation <- function(dataframe, linear_regression)
 
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
+vegetation_file <- "../data/vegetation_plots.csv"
 
 sites_df <- read_csv_data_file(sites_file)
 
@@ -353,25 +354,19 @@ print(corr_test_sampling_effort)
 #' Sampling effort will be incorporated into the generalised linear mixed models to see if it affected the
 #' species richness.
 #'
-#' ## Generalised linear mixed model
-#' Given that species richness seems to have a Poisson distribution and we would like to include random
-#' factors (study area and sampling effort) in the model, we will used generalised linear mixed models,
-#' rather than linear mixed models (for adding random effects) or generalised linear models (for Gaussian
-#' distributed data). This will also mean that we do not have to transform the species richness data as we
-#' no longer have to get it to conform to a Gaussian distribution (Bolker et al 2009).
-
+#' ## Generalised linear model
+#'
 #' Look at the distribution of the species richness.
 
 par(mfrow=c(1,1))
 hist(species_richness_sites$species_richness)
 
-#' Species richness is effectively count data and can only be positive integers. It seems to have a
-#' Poisson distribution. Predict species richness using elevation (fixed effect). Include area and
-#' sampling effort as random factors.
-#'
-#' Fit the GLMM.
+#' Species richness has a fairly Gaussian distribution, although it is slightly skewed. Fit a GLM to the
+#' data using species richness as the response variable and the environmental variables as predictor
+#' variables.
 
-glm_species_richness_full_poiss <- glmer(species_richness ~ elevational_band_m + (1 | area) +
+glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+  as.factor()
                                                             (1 | sampling_effort_index),
     family = poisson(link = "log"),
     data = species_richness_sites)
