@@ -18,7 +18,7 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -350,14 +350,34 @@ print(corr_test_sampling_effort)
 #' 0.14; <em>p</em> = 0.05), but only 40% of the variation in the sampling effort index was explained by
 #' the elevation.
 #'
-#' ## Generalised linear model
+#' Sampling effort will be incorporated into the generalised linear mixed models to see if it affected the
+#' species richness.
+#'
+#' ## Generalised linear mixed model
+#' Given that species richness seems to have a Poisson distribution and we would like to include random
+#' factors (study area and sampling effort) in the model, we will used generalised linear mixed models,
+#' rather than linear mixed models (for adding random effects) or generalised linear models (for Gaussian
+#' distributed data). This will also mean that we do not have to transform the species richness data as we
+#' no longer have to get it to conform to a Gaussian distribution (Bolker et al 2009).
 
 #' Look at the distribution of the species richness.
+
 par(mfrow=c(1,1))
 hist(species_richness_sites$species_richness)
-#' Predict species richness using elevation (fixed effect). Include area and sampling effort as random factors.
+
+#' Species richness is effectively count data and can only be positive integers. It seems to have a
+#' Poisson distribution. Predict species richness using elevation (fixed effect). Include area and
+#' sampling effort as random factors.
 #'
-#' Fit the basic model.
+#' Fit the GLMM.
+
+glm_species_richness_full_poiss <- glmer(species_richness ~ elevational_band_m + (1 | area) +
+                                                            (1 | sampling_effort_index),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_full_poiss)
+Anova(glm_species_richness_full_poiss)
 
 glm_species_richness_basic_poiss <- glm(species_richness ~ elevational_band_m,
     family = poisson(link = "log"),
@@ -368,65 +388,33 @@ Anova(glm_species_richness_basic_poiss)
 
 #' Add just sampling effort
 
-glm_species_richness_basic_sampling_poiss <- glm(species_richness ~ elevational_band_m + (1 | sampling_effort_index),
+glm_species_richness_basic_sampling_poiss <- glmer(species_richness ~ elevational_band_m + (1 | sampling_effort_index),
     family = poisson(link = "log"),
     data = species_richness_sites)
 
 summary(glm_species_richness_basic_sampling_poiss)
 Anova(glm_species_richness_basic_sampling_poiss)
 
-#' Add just area as factor
-
-glm_species_richness_basic_areafac_poiss <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)),
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_areafac_poiss)
-Anova(glm_species_richness_basic_areafac_poiss)
-
 #' Add just area
 
-glm_species_richness_basic_area_poiss <- glm(species_richness ~ elevational_band_m + (1 | area),
+glm_species_richness_basic_area_poiss <- glmer(species_richness ~ elevational_band_m + (1 | area),
     family = poisson(link = "log"),
     data = species_richness_sites)
 
 summary(glm_species_richness_basic_area_poiss)
 Anova(glm_species_richness_basic_area_poiss)
 
-#' Do full model with area not as a factor
-glm_species_richness_full_area_notfac_poiss <- glm(species_richness ~ elevational_band_m + (1 | area) + (1 | sampling_effort_index),
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-# Check to see the importance of each covariate.
-summary(glm_species_richness_full_area_notfac_poiss)
-Anova(glm_species_richness_full_area_notfac_poiss)
-
-#' Fit the full model with all covariates. Area will be used as a factor and no offset will be used.
-#' Sampling effort will instead be included as a factor.
-
-glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)) + (1 | sampling_effort_index),
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-# Check to see the importance of each covariate.
-summary(glm_species_richness_full_poiss)
-Anova(glm_species_richness_full_poiss)
-
 print("*****************************************************")
 logLik(glm_species_richness_basic_poiss)
 logLik(glm_species_richness_basic_sampling_poiss)
-logLik(glm_species_richness_full_poiss)
-logLik(glm_species_richness_full_area_notfac_poiss)
-logLik(glm_species_richness_basic_areafac_poiss)
 logLik(glm_species_richness_basic_area_poiss)
+logLik(glm_species_richness_full_poiss)
 
 AIC(glm_species_richness_basic_poiss)
 AIC(glm_species_richness_basic_sampling_poiss)
-AIC(glm_species_richness_full_poiss)
-AIC(glm_species_richness_full_area_notfac_poiss)
-AIC(glm_species_richness_basic_areafac_poiss)
 AIC(glm_species_richness_basic_area_poiss)
+AIC(glm_species_richness_full_poiss)
+
 print("*****************************************************")
 
 
@@ -434,37 +422,12 @@ print("*****************************************************")
 #' down). No individual areas have a significant effect.
 #'
 #' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
-#' overdispersed.
+#' overdispersed. Use the formula from overdisp_fun at https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#testing-for-overdispersioncomputing-overdispersion-factor
 
-ratio_dispersion <- summary(glm_species_richness_full_poiss)$deviance / summary(glm_species_richness_full_poiss)$df.residual
+ratio_dispersion <- sum((residuals(glm_species_richness_full_poiss, type = "pearson"))^2)/df.residual(glm_species_richness_full_poiss)
 ratio_dispersion
 
 #' Given that the ratio < 1.5, then there is no overdispersion.
-
-#' Fit a quasipoisson distribution to see if there is a problem with overdispersion. A poisson
-#' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
-#' greater than 1, then we have this problem with the Poisson distribution. (This part is not needed as
-#' we have already shown that there is no overdispersion).
-
-glm_species_richness_full_quasipoiss <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)) + (1 | sampling_effort_index),
-    family = quasipoisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoiss)
-Anova(glm_species_richness_full_quasipoiss)
-
-#' Try removing sampling effort as a factor and including it in the model as an offset.
-
-glm_species_richness_full_samplingoffset <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)),
-    family = poisson(link = "log"),
-    offset = log(sampling_effort_index),
-    data = species_richness_sites)
-summary(glm_species_richness_full_samplingoffset)
-Anova(glm_species_richness_full_samplingoffset)
-
-#' Removing sampling effort makes area become a significant parameter. However, it has been included in
-#' the other models as a factor because species richness does not depend on sampling effect by a fixed
-#' amount.
 
 #' Model selection.
 
@@ -474,12 +437,13 @@ glm_species_richness_null <- glm(species_richness ~ 1,
                  family = poisson(link = "log")
                  )
 
-#' Try step-wise selection.
+#' Try step-wise selection. Step used backward elimination from the full model including the random and fixed effects.
 glm_species_richness_full_poiss_step <- step(glm_species_richness_null,
                                              scope = list(upper = glm_species_richness_full_poiss),
                                              direction = "both",
                                              test="Chisq",
                                              data = species_richness_sites)
+
 print("--------Stepwise selection-----------------")
 glm_species_richness_full_poiss_step
 

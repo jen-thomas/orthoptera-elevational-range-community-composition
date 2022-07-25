@@ -186,7 +186,9 @@ site_env_var_data <- left_join(site_terrain, vegetation_averaged_df, by = "site_
 
 check_collinearity <- function(env_var_df) {
     #' Select the environmental variables to check against one another for collinearity. Plot histogram,
-    #' scatterplot and correlation coefficient (Pearson's) for each combination.
+    #' scatterplot and correlation coefficient (Spearman's rank) for each combination. This measure was
+    #' used in preference to Pearson's correlation coefficient because it does not make any assumptions
+    #' about the distribution of the variables.
 
   veg_params_to_compare <- env_var_df %>%
     dplyr::select(elevational_band_m, slope, aspect, mean_perc_veg_cover, mean_perc_bare_ground,
@@ -194,7 +196,7 @@ check_collinearity <- function(env_var_df) {
                   mean_density)
 
   pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
-               lm = FALSE, method = "pearson", factor = 2)
+               lm = FALSE, method = "spearman", factor = 2)
 }
 
 check_collinearity(site_env_var_data)
@@ -301,7 +303,7 @@ env_data_fit <- envfit(species_jaccard_dist_mds,
 env_data_fit
 plot(env_data_fit)
 
-ordisurf(species_jaccard_dist_mds ~ elevational_band_m, site_species_matrix, isotropic = TRUE, main = NULL, cex = 3)
+#ordisurf(species_jaccard_dist_mds ~ elevational_band_m, site_species_matrix, isotropic = TRUE, main = NULL, cex = 3)
 
 #' The lengths of the arrows represent the strength of the correlation of the environmental variable with
 #' the axis.
