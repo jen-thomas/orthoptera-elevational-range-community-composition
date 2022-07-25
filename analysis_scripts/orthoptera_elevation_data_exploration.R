@@ -13,6 +13,8 @@
 source("data_preparation.R")
 source("utils.R")
 source("get_finalised_observations_species_richness_conservative.R")
+source("get_physical_site_data.R")
+source("prepare_vegetation_data.R")
 
 vector_packages <- c("fossil", "stringr", "dplyr", "plyr")
 get_packages(vector_packages)
@@ -24,6 +26,7 @@ get_packages(vector_packages)
 observations_file <- "../data/observations.csv"
 sites_file <- "../data/sites.csv"
 surveys_file <- "../data/surveys.csv"
+vegetation_file <- "../data/vegetation_plots.csv"
 
 sites_df <- read_csv_data_file(sites_file)
 surveys_df <- read_csv_data_file(surveys_file)
@@ -439,3 +442,120 @@ get_elevation_summary_data <- function(site_elevations, site_summary_data) {
 
 site_elevations <- get_site_elevation(site_survey_df)
 get_elevation_summary_data(site_elevations, joined_survey_summary_data)
+
+#' ## Environmental variables
+#'
+#' The following functions prepare the environmental data.
+
+check_collinearity <- function(env_var_df) {
+    #' Select the environmental variables to check against one another for collinearity. Plot histogram,
+    #' scatterplot and correlation coefficient (Spearman's rank) for each combination. This measure was
+    #' used in preference to Pearson's correlation coefficient because it does not make any assumptions
+    #' about the distribution of the variables.
+
+  veg_params_to_compare <- env_var_df %>%
+    dplyr::select(elevational_band_m, slope, aspect, mean_perc_veg_cover, mean_perc_bare_ground,
+                  mean_per_rock, mean_max_height, mean_height_75percent,
+                  mean_density)
+
+  pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
+               lm = FALSE, method = "spearman", factor = 2)
+}
+
+#' ### Vegetation data
+
+vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
+
+#' ### Site topography
+
+#' Get digital elevation model (DEM) data for the study areas and calculate slope and aspect at each site.
+#' These parameters were calculated along each transect and averaged to get one value per site. The DEM
+#' data were provided by the Institut Cartogràfic i Geològic de Catalunya (ICGC) with a resolution of
+#' 2x2m.
+
+dem_data_besan <- "../data/dem/besan_20220601_165822.tif"
+dem_data_bordes <- "../data/dem/bordes_de_viros_20220601_165754.tif"
+dem_data_molinassa <- "../data/dem/la_molinassa_20220601_165849.tif"
+dem_data_tavascan <- "../data/dem/tavascan_20220601_170011.tif"
+dem_data_tor <- "../data/dem/tor_20220715_171056.tif"
+
+dem_raster_besan <- raster(dem_data_besan)
+dem_raster_bordes <- raster(dem_data_bordes)
+dem_raster_molinassa <- raster(dem_data_molinassa)
+dem_raster_tavascan <- raster(dem_data_tavascan)
+dem_raster_tor <- raster(dem_data_tor)
+
+dem_study_areas <- merge(dem_raster_besan, dem_raster_bordes, dem_raster_molinassa, dem_raster_tavascan,
+                         dem_raster_tor)
+
+#' Plot DEM to get an overview. Only the areas of the DEM files are displayed. Also look at the number of
+#' layers within the raster, the coordinate system and get an overview of the data.
+
+get_overview_dem(dem_study_areas)
+
+#' Look at the data for each study area separately to make sure there are no bad elevation values.
+#+ message=FALSE, warning=FALSE
+
+# par(mfrow = c(2, 2))
+# hist(dem_raster_tavascan, xlab = "Elevation (m a.s.l)", main ="Tavascan")
+# hist(dem_raster_molinassa, xlab = "Elevation (m a.s.l)", main = "La Molinassa")
+# hist(dem_raster_tor, xlab = "Elevation (m a.s.l)", main = "Tor")
+
+#' Calculate the slope and aspect along each transect.
+#'
+#' Each transect was recorded as a number of points. These transects were imported into R
+#' and using the sp package, were extrapolated into a line. Using the rgeos and terra packages, slope and
+#' aspect values were averaged from the four nearest raster cells, every 2m along the transect. These
+#' values of slope and aspect were then averaged, to get one value for each site.
+
+terrain_study_areas <- calculate_terrain_features(dem_study_areas)
+
+#' Use a dictionary of site names and filenames to get the transect data for each site.
+#+ message=FALSE, warning=FALSE
+
+sites_transects_files <- c("BES01" = "../metadata/Besan site 01.gpx",
+                           "BES02" = "../metadata/Besan site 02.gpx",
+                           "BOR02" = "../metadata/Bordes de Viros site 02.gpx",
+                           "MOL01" = "../metadata/La Molinassa site 01.gpx",
+                           "MOL02" = "../metadata/La Molinassa site 02.gpx",
+                           "MOL03" = "../metadata/La Molinassa site 03.gpx",
+                           "MOL04" = "../metadata/La Molinassa site 04.gpx",
+                           "MOL05" = "../metadata/La Molinassa site 05.gpx",
+                           "MOL06" = "../metadata/La Molinassa site 06.gpx",
+                           "MOL08" = "../metadata/La Molinassa site 08.gpx",
+                           "MOL09" = "../metadata/La Molinassa site 09.gpx",
+                           "TAV01" = "../metadata/Tavascan site 01.gpx",
+                           "TAV03" = "../metadata/Tavascan site 03.gpx",
+                           "TAV05" = "../metadata/Tavascan site 05.gpx",
+                           "TAV06" = "../metadata/Tavascan site 06.gpx",
+                           "TAV07" = "../metadata/Tavascan site 07.gpx",
+                           "TAV08" = "../metadata/Tavascan site 08.gpx",
+                           "TAV09" = "../metadata/Tavascan site 09.gpx",
+                           "TOR01" = "../metadata/Tor site 01.gpx",
+                           "TOR02" = "../metadata/Tor site 02.gpx",
+                           "TOR03" = "../metadata/Tor site 03.gpx",
+                           "TOR04" = "../metadata/Tor site 04.gpx",
+                           "TOR05" = "../metadata/Tor site 05.gpx",
+                           "TOR06" = "../metadata/Tor site 06.gpx",
+                           "TOR07" = "../metadata/Tor site 07.gpx",
+                           "TOR08" = "../metadata/Tor site 08.gpx",
+                           "TOR09" = "../metadata/Tor site 09.gpx",
+                           "TOR10" = "../metadata/Tor site 10.gpx"
+)
+
+site_terrain <- create_df_of_terrain_values_for_sites(sites_transects_files, sites_df)
+site_terrain$aspect_cardinal <- apply(site_terrain, 1, convert_aspect_to_cardinal_direction)
+
+#' Put vegetation and terrain data into one dataframe.
+
+site_env_var_data <- left_join(site_terrain, vegetation_averaged_df, by = "site_elevation")
+#'
+#' Check correlation of the environmental parameters.
+
+check_collinearity(site_env_var_data)
+
+#' Test if there is a significant difference between the highly correlated parameters.
+
+cor_veg_height <- cor.test(site_env_var_data$mean_height_75percent, site_env_var_data$mean_max_height, method = "spearman")
+cor_slope_vegcover <- cor.test(site_env_var_data$mean_perc_veg_cover, site_env_var_data$slope, method = "spearman")
+cor_vegheight_density <- cor.test(site_env_var_data$mean_max_height, site_env_var_data$mean_density, method = "spearman")

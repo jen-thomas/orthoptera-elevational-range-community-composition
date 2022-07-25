@@ -184,21 +184,6 @@ site_env_var_data <- left_join(site_terrain, vegetation_averaged_df, by = "site_
 
 #' ### Check for collinearity between environmental variables
 
-check_collinearity <- function(env_var_df) {
-    #' Select the environmental variables to check against one another for collinearity. Plot histogram,
-    #' scatterplot and correlation coefficient (Spearman's rank) for each combination. This measure was
-    #' used in preference to Pearson's correlation coefficient because it does not make any assumptions
-    #' about the distribution of the variables.
-
-  veg_params_to_compare <- env_var_df %>%
-    dplyr::select(elevational_band_m, slope, aspect, mean_perc_veg_cover, mean_perc_bare_ground,
-                  mean_per_rock, mean_max_height, mean_height_75percent,
-                  mean_density)
-
-  pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
-               lm = FALSE, method = "spearman", factor = 2)
-}
-
 check_collinearity(site_env_var_data)
 
 #' Looking at the previous plots we can see that there seems to be some collinearity between the two
