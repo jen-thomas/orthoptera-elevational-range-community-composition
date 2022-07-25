@@ -192,6 +192,26 @@ both_species_richness
 #' will only use conservative identifications until the regression is compared to see if there is any
 #' statistical difference in the relationship between species richness and elevation.
 #'
+#' ### Get environmental data
+
+#' Get vegetation data.
+
+vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
+
+#' Calculate the slope and aspect along each transect.
+#+ message=FALSE, warning=FALSE
+
+site_topography <- get_site_topography(sites_df)
+
+#' Put vegetation and terrain data into one dataframe.
+#+ message=FALSE, warning=FALSE
+
+site_env_var_data <- left_join(site_topography, vegetation_averaged_df, by = "site_elevation")
+
+#' Join environmental data onto species richness dataframe.
+species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
+                                    by = c("site_elevation", "area", "elevational_band_m"))
+
 #' ### Correlate species richness and elevation
 #' Do a correlation test between the species richness at each site and elevation.
 #' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
@@ -365,62 +385,43 @@ hist(species_richness_sites$species_richness)
 #' data using species richness as the response variable and the environmental variables as predictor
 #' variables.
 
-glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
-  as.factor()
-                                                            (1 | sampling_effort_index),
-    family = poisson(link = "log"),
+glm_species_richness_full_gauss <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = gaussian(link = "identity"),
     data = species_richness_sites)
 
-summary(glm_species_richness_full_poiss)
-Anova(glm_species_richness_full_poiss)
+summary(glm_species_richness_full_gauss)
+Anova(glm_species_richness_full_gauss)
+logLik(glm_species_richness_full_gauss)
+AIC(glm_species_richness_full_gauss)
 
-glm_species_richness_basic_poiss <- glm(species_richness ~ elevational_band_m,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_poiss)
-Anova(glm_species_richness_basic_poiss)
-
-#' Add just sampling effort
-
-glm_species_richness_basic_sampling_poiss <- glmer(species_richness ~ elevational_band_m + (1 | sampling_effort_index),
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_sampling_poiss)
-Anova(glm_species_richness_basic_sampling_poiss)
-
-#' Add just area
-
-glm_species_richness_basic_area_poiss <- glmer(species_richness ~ elevational_band_m + (1 | area),
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_area_poiss)
-Anova(glm_species_richness_basic_area_poiss)
-
-print("*****************************************************")
-logLik(glm_species_richness_basic_poiss)
-logLik(glm_species_richness_basic_sampling_poiss)
-logLik(glm_species_richness_basic_area_poiss)
-logLik(glm_species_richness_full_poiss)
-
-AIC(glm_species_richness_basic_poiss)
-AIC(glm_species_richness_basic_sampling_poiss)
-AIC(glm_species_richness_basic_area_poiss)
-AIC(glm_species_richness_full_poiss)
-
-print("*****************************************************")
-
-
-#' Elevation and sampling effort are both significant; area is almost significant (p = 0.05 if rounded
-#' down). No individual areas have a significant effect.
+#' Elevation was almost significant (P = 0.053). Study area, slope, sampling effort and percentage
+#' vegetation cover were all significant (P < 0.05). Predictive power of the full model AIC = 125.
 #'
+#' Test an interaction between slope and vegetation cover, given that they are significantly correlated.
+
+glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        slope*mean_perc_veg_cover + mean_max_height + mean_density,
+    family = gaussian(link = "identity"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_inter_slope_vegcover)
+Anova(glm_species_richness_inter_slope_vegcover)
+logLik(glm_species_richness_inter_slope_vegcover)
+AIC(glm_species_richness_inter_slope_vegcover)
+
+#' Including the interaction of slope and vegetation cover slighlty increases the predictive power of the
+#' model (AIC = 123), but in this case, slope, vegetation cover and the interaction are all not
+#' statisitcally significant.
+
 #' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
 #' overdispersed. Use the formula from overdisp_fun at https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#testing-for-overdispersioncomputing-overdispersion-factor
-
-ratio_dispersion <- sum((residuals(glm_species_richness_full_poiss, type = "pearson"))^2)/df.residual(glm_species_richness_full_poiss)
-ratio_dispersion
+#
+# ratio_dispersion <- sum((residuals(glm_species_richness_full_poiss, type = "pearson"))^2) /
+#                         df.residual(glm_species_richness_full_poiss)
+# ratio_dispersion
 
 #' Given that the ratio < 1.5, then there is no overdispersion.
 
