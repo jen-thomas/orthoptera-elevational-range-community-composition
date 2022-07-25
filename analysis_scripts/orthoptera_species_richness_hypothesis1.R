@@ -501,6 +501,9 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #'
 #' ## Generalised linear model
 
+#' Look at the distribution of the species richness.
+par(mfrow=c(1,1))
+hist(species_richness_sites$species_richness)
 #' Predict species richness using elevation. Include area and sampling effort as covariates.
 #'
 #' Fit the basic model.
