@@ -350,8 +350,158 @@ print(corr_test_sampling_effort)
 #' 0.14; <em>p</em> = 0.05), but only 40% of the variation in the sampling effort index was explained by
 #' the elevation.
 #'
-#' **TODO**: I had thought about including sampling effort as a random factor here, but as it is a
-#' continuous variable, I am not sure how to go about this.
+#' ## Generalised linear model
+
+#' Look at the distribution of the species richness.
+par(mfrow=c(1,1))
+hist(species_richness_sites$species_richness)
+#' Predict species richness using elevation (fixed effect). Include area and sampling effort as random factors.
+#'
+#' Fit the basic model.
+
+glm_species_richness_basic_poiss <- glm(species_richness ~ elevational_band_m,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_poiss)
+Anova(glm_species_richness_basic_poiss)
+
+#' Add just sampling effort
+
+glm_species_richness_basic_sampling_poiss <- glm(species_richness ~ elevational_band_m + (1 | sampling_effort_index),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_sampling_poiss)
+Anova(glm_species_richness_basic_sampling_poiss)
+
+#' Add just area as factor
+
+glm_species_richness_basic_areafac_poiss <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_areafac_poiss)
+Anova(glm_species_richness_basic_areafac_poiss)
+
+#' Add just area
+
+glm_species_richness_basic_area_poiss <- glm(species_richness ~ elevational_band_m + (1 | area),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_basic_area_poiss)
+Anova(glm_species_richness_basic_area_poiss)
+
+#' Do full model with area not as a factor
+glm_species_richness_full_area_notfac_poiss <- glm(species_richness ~ elevational_band_m + (1 | area) + (1 | sampling_effort_index),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+# Check to see the importance of each covariate.
+summary(glm_species_richness_full_area_notfac_poiss)
+Anova(glm_species_richness_full_area_notfac_poiss)
+
+#' Fit the full model with all covariates. Area will be used as a factor and no offset will be used.
+#' Sampling effort will instead be included as a factor.
+
+glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)) + (1 | sampling_effort_index),
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+# Check to see the importance of each covariate.
+summary(glm_species_richness_full_poiss)
+Anova(glm_species_richness_full_poiss)
+
+print("*****************************************************")
+logLik(glm_species_richness_basic_poiss)
+logLik(glm_species_richness_basic_sampling_poiss)
+logLik(glm_species_richness_full_poiss)
+logLik(glm_species_richness_full_area_notfac_poiss)
+logLik(glm_species_richness_basic_areafac_poiss)
+logLik(glm_species_richness_basic_area_poiss)
+
+AIC(glm_species_richness_basic_poiss)
+AIC(glm_species_richness_basic_sampling_poiss)
+AIC(glm_species_richness_full_poiss)
+AIC(glm_species_richness_full_area_notfac_poiss)
+AIC(glm_species_richness_basic_areafac_poiss)
+AIC(glm_species_richness_basic_area_poiss)
+print("*****************************************************")
+
+
+#' Elevation and sampling effort are both significant; area is almost significant (p = 0.05 if rounded
+#' down). No individual areas have a significant effect.
+#'
+#' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
+#' overdispersed.
+
+ratio_dispersion <- summary(glm_species_richness_full_poiss)$deviance / summary(glm_species_richness_full_poiss)$df.residual
+ratio_dispersion
+
+#' Given that the ratio < 1.5, then there is no overdispersion.
+
+#' Fit a quasipoisson distribution to see if there is a problem with overdispersion. A poisson
+#' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
+#' greater than 1, then we have this problem with the Poisson distribution. (This part is not needed as
+#' we have already shown that there is no overdispersion).
+
+glm_species_richness_full_quasipoiss <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)) + (1 | sampling_effort_index),
+    family = quasipoisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_full_quasipoiss)
+Anova(glm_species_richness_full_quasipoiss)
+
+#' Try removing sampling effort as a factor and including it in the model as an offset.
+
+glm_species_richness_full_samplingoffset <- glm(species_richness ~ elevational_band_m + (1 | as.factor(area)),
+    family = poisson(link = "log"),
+    offset = log(sampling_effort_index),
+    data = species_richness_sites)
+summary(glm_species_richness_full_samplingoffset)
+Anova(glm_species_richness_full_samplingoffset)
+
+#' Removing sampling effort makes area become a significant parameter. However, it has been included in
+#' the other models as a factor because species richness does not depend on sampling effect by a fixed
+#' amount.
+
+#' Model selection.
+
+#' Set up the null model for the stepwise selection process.
+glm_species_richness_null <- glm(species_richness ~ 1,
+                 data = species_richness_sites,
+                 family = poisson(link = "log")
+                 )
+
+#' Try step-wise selection.
+glm_species_richness_full_poiss_step <- step(glm_species_richness_null,
+                                             scope = list(upper = glm_species_richness_full_poiss),
+                                             direction = "both",
+                                             test="Chisq",
+                                             data = species_richness_sites)
+print("--------Stepwise selection-----------------")
+glm_species_richness_full_poiss_step
+
+#' This shows us that AIC gets worse as covariates are removed from the model, so the model should retain
+#' the parameters that were included to begin with.
+
+#' Model assessment
+
+par(mfrow = c(1,2))
+plot(species_richness_sites$species_richness, fitted(glm_species_richness_full_poiss), xlab = "Observed values", ylab = "Fitted values")
+abline(0,1)
+plot(fitted(glm_species_richness_full_poiss), residuals(glm_species_richness_full_poiss, type = "pearson"))
+abline(h = 0)
+
+#' Test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
+#' the p-value for the model where the deviance and degrees of freedom are used.
+p_model_test <- 1-pchisq(21.452, 21)
+p_model_test
+
+#' As p is large, we have no evidence against the hypothesis that the model is adequate, therefore we
+#' accept the model is satisfactory.
+
 #'
 #' ## Check for effect of study area
 
@@ -499,157 +649,6 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' <em>df</em> = 1, 5; <em>p</em> = < 0.001>).
 #'
 #'
-#' ## Generalised linear model
-
-#' Look at the distribution of the species richness.
-par(mfrow=c(1,1))
-hist(species_richness_sites$species_richness)
-#' Predict species richness using elevation. Include area and sampling effort as covariates.
-#'
-#' Fit the basic model.
-
-glm_species_richness_basic_poiss <- glm(species_richness ~ elevational_band_m,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_poiss)
-Anova(glm_species_richness_basic_poiss)
-
-#' Add just sampling effort
-
-glm_species_richness_basic_sampling_poiss <- glm(species_richness ~ elevational_band_m + sampling_effort_index,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_sampling_poiss)
-Anova(glm_species_richness_basic_sampling_poiss)
-
-#' Add just area as factor
-
-glm_species_richness_basic_areafac_poiss <- glm(species_richness ~ elevational_band_m + as.factor(area),
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_areafac_poiss)
-Anova(glm_species_richness_basic_areafac_poiss)
-
-#' Add just area
-
-glm_species_richness_basic_area_poiss <- glm(species_richness ~ elevational_band_m + area,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_basic_area_poiss)
-Anova(glm_species_richness_basic_area_poiss)
-
-#' Do full model with area not as a factor
-glm_species_richness_full_area_notfac_poiss <- glm(species_richness ~ elevational_band_m + area + sampling_effort_index,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-# Check to see the importance of each covariate.
-summary(glm_species_richness_full_area_notfac_poiss)
-Anova(glm_species_richness_full_area_notfac_poiss)
-
-#' Fit the full model with all covariates. Area will be used as a factor and no offset will be used.
-#' Sampling effort will instead be included as a factor.
-
-glm_species_richness_full_poiss <- glm(species_richness ~ elevational_band_m + as.factor(area) + sampling_effort_index,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-# Check to see the importance of each covariate.
-summary(glm_species_richness_full_poiss)
-Anova(glm_species_richness_full_poiss)
-
-print("*****************************************************")
-logLik(glm_species_richness_basic_poiss)
-logLik(glm_species_richness_basic_sampling_poiss)
-logLik(glm_species_richness_full_poiss)
-logLik(glm_species_richness_full_area_notfac_poiss)
-logLik(glm_species_richness_basic_areafac_poiss)
-logLik(glm_species_richness_basic_area_poiss)
-
-AIC(glm_species_richness_basic_poiss)
-AIC(glm_species_richness_basic_sampling_poiss)
-AIC(glm_species_richness_full_poiss)
-AIC(glm_species_richness_full_area_notfac_poiss)
-AIC(glm_species_richness_basic_areafac_poiss)
-AIC(glm_species_richness_basic_area_poiss)
-print("*****************************************************")
-
-
-#' Elevation and sampling effort are both significant; area is almost significant (p = 0.05 if rounded
-#' down). No individual areas have a significant effect.
-#'
-#' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
-#' overdispersed.
-
-ratio_dispersion <- summary(glm_species_richness_full_poiss)$deviance / summary(glm_species_richness_full_poiss)$df.residual
-ratio_dispersion
-
-#' Given that the ratio < 1.5, then there is no overdispersion.
-
-#' Fit a quasipoisson distribution to see if there is a problem with overdispersion. A poisson
-#' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
-#' greater than 1, then we have this problem with the Poisson distribution. (This part is not needed as
-#' we have already shown that there is no overdispersion).
-
-glm_species_richness_full_quasipoiss <- glm(species_richness ~ elevational_band_m + as.factor(area) + sampling_effort_index,
-    family = quasipoisson(link = "log"),
-    data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoiss)
-Anova(glm_species_richness_full_quasipoiss)
-
-#' Try removing sampling effort as a factor and including it in the model as an offset.
-
-glm_species_richness_full_samplingoffset <- glm(species_richness ~ elevational_band_m + as.factor(area),
-    family = poisson(link = "log"),
-    offset = log(sampling_effort_index),
-    data = species_richness_sites)
-summary(glm_species_richness_full_samplingoffset)
-Anova(glm_species_richness_full_samplingoffset)
-
-#' Removing sampling effort makes area become a significant parameter. However, it has been included in
-#' the other models as a factor because species richness does not depend on sampling effect by a fixed
-#' amount.
-
-#' Model selection.
-
-#' Set up the null model for the stepwise selection process.
-glm_species_richness_null = glm(species_richness ~ 1,
-                 data = species_richness_sites,
-                 family = poisson(link = "log")
-                 )
-
-#' Try step-wise selection.
-glm_species_richness_full_poiss_step <- step(glm_species_richness_null,
-                                             scope = list(upper = glm_species_richness_full_poiss),
-                                             direction = "both",
-                                             test="Chisq",
-                                             data = species_richness_sites)
-print("--------Stepwise selection-----------------")
-glm_species_richness_full_poiss_step
-
-#' This shows us that AIC gets worse as covariates are removed from the model, so the model should retain
-#' the parameters that were included to begin with.
-
-#' Model assessment
-
-par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_richness_full_poiss), xlab = "Observed values", ylab = "Fitted values")
-abline(0,1)
-plot(fitted(glm_species_richness_full_poiss), residuals(glm_species_richness_full_poiss, type = "pearson"))
-abline(h = 0)
-
-#' Test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
-#' the p-value for the model where the deviance and degrees of freedom are used.
-p_model_test <- 1-pchisq(21.452, 21)
-p_model_test
-
-#' As p is large, we have no evidence against the hypothesis that the model is adequate, therefore we
-#' accept the model is satisfactory.
 
 
 #' ## Results
