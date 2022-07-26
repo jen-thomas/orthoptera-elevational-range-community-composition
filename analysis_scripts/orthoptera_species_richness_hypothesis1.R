@@ -486,15 +486,27 @@ visreg(glm_species_best_dredge, xvar = "sampling_effort_index")
 
 Anova(glm_species_best_dredge, type = 3)
 
+#' Both parameters in the dredged model are the same as those in the stepwise reduced model that was
+#' obtained after removing area. They are both significant (P < 0.01).
 
 #' ### Model assessment
+#'
+#' Plot the observed against fitted values for the full model and each of the final reduced models. Also
+#' plot the residuals.
+#'
+#' Also test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
+#' the p-value for the model where the deviance and degrees of freedom are used.
 
+#'
 #' Test the outcome of the manual stepwise selection
 par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_step2), xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
 plot(fitted(glm_species_richness_step2), residuals(glm_species_richness_step2, type = "pearson"))
 abline(h = 0)
+
+p_model_test_glm_species_richness_step2 <- 1-pchisq(13.92499, 18)
+p_model_test_glm_species_richness_step2
 
 #' Test the outcome of the R stepwise selection for the reduced model
 par(mfrow = c(1,2))
@@ -503,12 +515,18 @@ abline(0,1)
 plot(fitted(glm_species_richness_step), residuals(glm_species_richness_step, type = "pearson"))
 abline(h = 0)
 
+p_model_test_glm_species_richness_step <- 1-pchisq(13.92499, 18)
+p_model_test_glm_species_richness_step
+
 #' Test the outcome of the R stepwise selection for the reduced model after removing area
 par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_remove_area_step3), xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
 plot(fitted(glm_species_richness_remove_area_step3), residuals(glm_species_richness_remove_area_step3, type = "pearson"))
 abline(h = 0)
+
+p_model_test_glm_species_richness_remove_area_step3 <- 1-pchisq(30.7226, 25)
+p_model_test_glm_species_richness_remove_area_step3
 
 #' Test the outcome of the dredged reduced model
 par(mfrow = c(1,2))
@@ -517,10 +535,9 @@ abline(0,1)
 plot(fitted(glm_species_best_dredge), residuals(glm_species_best_dredge, type = "pearson"))
 abline(h = 0)
 
-#' Test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
-#' the p-value for the model where the deviance and degrees of freedom are used.
-p_model_test <- 1-pchisq(21.452, 21)
-p_model_test
+p_model_test_glm_species_best_dredge <- 1-pchisq(30.7226, 25)
+p_model_test_glm_species_best_dredge
+
 
 #' As p is large, we have no evidence against the hypothesis that the model is adequate, therefore we
 #' accept the model is satisfactory.
