@@ -367,6 +367,7 @@ glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.fac
     family = poisson(link = "log"),
     data = species_richness_sites)
 
+summary(glm_species_richness_step1)
 Anova(glm_species_richness_step1)
 AICcmodavg::AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE)
 
@@ -377,6 +378,7 @@ glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.fac
     family = poisson(link = "log"),
     data = species_richness_sites)
 
+summary(glm_species_richness_step2)
 Anova(glm_species_richness_step2)
 AICcmodavg::AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
 
