@@ -233,7 +233,7 @@ species_richness_sites <- left_join(species_richness_sites, sampling_effort, by 
 #' It is likely that the number of species recorded will depend on the number of specimens captured, and
 #' given this varied across sites, it should be accounted for.
 #'
-#' <br>Look at the relationship between species richness and sampling effort,
+#' <br>Look at the relationship between species richness and sampling effort
 #+ message=FALSE, warning=FALSE
 
 corr_test_samplingeffort_speciesrichness <- correlation_test(species_richness_sites, "sampling_effort_index",
@@ -241,6 +241,9 @@ corr_test_samplingeffort_speciesrichness <- correlation_test(species_richness_si
 corr_test_samplingeffort_speciesrichness
 corr_test_samplingeffort_speciesrichness_rho <- corr_test_samplingeffort_speciesrichness$estimate
 print(corr_test_samplingeffort_speciesrichness)
+
+#' and elevation and sampling effort.
+#+ message=FALSE, warning=FALSE
 
 corr_test_samplingeffort_elevation <- correlation_test(species_richness_sites, "elevational_band_m",
                                               "sampling_effort_index")
