@@ -295,7 +295,7 @@ plot_elevation_species_richness(species_richness_sites)
 #'
 #' ## Generalised linear model
 #'
-#' Look at the distribution of the species richness.
+#' Look at the distribution of the species richness including all sites and separately in each study area.
 
 par(mfrow=c(1,1))
 hist(species_richness_sites$species_richness)
@@ -303,16 +303,17 @@ hist(species_richness_sites$species_richness)
 species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor",]
 species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa",]
 species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan",]
+
 par(mfrow=c(2,2))
 hist(species_richness_tor$species_richness)
 hist(species_richness_mol$species_richness)
 hist(species_richness_tav$species_richness)
 
-
-
-#' Species richness has a fairly Gaussian distribution, although it is slightly skewed. Fit a GLM to the
-#' data using species richness as the response variable and the environmental variables as predictor
-#' variables.
+#' Species richness at all sites has a fairly Gaussian distribution, although it is slightly skewed.
+#' Species richness in each of the three main study areas do not conform to a Gaussian distribution. Fit
+#' a GLM to the data using species richness as the response variable and the environmental variables as
+#' predictor variables. It looks as though a Poisson distribution might be the best distrbution to use for
+#' species richness overall.
 
 glm_species_richness_full_gauss <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
