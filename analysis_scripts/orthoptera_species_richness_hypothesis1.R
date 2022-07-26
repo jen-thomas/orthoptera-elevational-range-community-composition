@@ -488,6 +488,9 @@ Anova(glm_species_best_dredge, type = 3)
 
 #' Both parameters in the dredged model are the same as those in the stepwise reduced model that was
 #' obtained after removing area. They are both significant (P < 0.01).
+#'
+#' ### Remove outliers of sampling effort
+#' **TODO**
 
 #' ### Model assessment
 #'
@@ -497,7 +500,6 @@ Anova(glm_species_best_dredge, type = 3)
 #' Also test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
 #' the p-value for the model where the deviance and degrees of freedom are used.
 
-#'
 #' Test the outcome of the manual stepwise selection
 par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_step2), xlab = "Observed values", ylab = "Fitted values")
@@ -538,11 +540,10 @@ abline(h = 0)
 p_model_test_glm_species_best_dredge <- 1-pchisq(30.7226, 25)
 p_model_test_glm_species_best_dredge
 
-
-#' As p is large, we have no evidence against the hypothesis that the model is adequate, therefore we
+#' As P is large, we have no evidence against the hypothesis that the model is adequate, therefore we
 #' accept the model is satisfactory.
 
-#' ### Linear regression
+#' ### Linear regression - NOT CHANGED
 #' Create a linear model of species richness against elevation and look at the model output.
 linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites,
                                                                                    "species_richness", "elevational_band_m")
