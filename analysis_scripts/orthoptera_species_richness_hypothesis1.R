@@ -18,7 +18,7 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMin")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -316,10 +316,10 @@ glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.fact
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-paste0("Model summary: ", summary(glm_species_richness_full))
-paste0("ANOVA; ", Anova(glm_species_richness_full))
+summary(glm_species_richness_full)
+Anova(glm_species_richness_full)
 logLik(glm_species_richness_full)
-paste0("AICC": AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE))
+AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
 
 #' Elevation was almost significant (P = 0.053). Study area, slope, sampling effort and percentage
 #' vegetation cover were all significant (P < 0.05). Predictive power of the full model AIC = 125.
@@ -346,18 +346,18 @@ glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_ban
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
-paste0("Model summary: ", summary(glm_species_richness_full_quasipoisson))
-paste0("ANOVA; ", Anova(glm_species_richness_full_quasipoisson))
+summary(glm_species_richness_full_quasipoisson)
+Anova(glm_species_richness_full_quasipoisson)
 
 #' ### Model selection
 #'
 #' Attempt stepwise selection to reduce the number of parameters in the model.
 
 glm_species_richness_step <- step(glm_species_richness_full)
-paste0("Model summary: ", summary(glm_species_richness_step))
-paste0("ANOVA; ", Anova(glm_species_richness_step))
+summary(glm_species_richness_step)
+Anova(glm_species_richness_step)
 logLik(glm_species_richness_step)
-paste0("AICC": AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE))
+AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
 
 #' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
 #' Drop aspect
@@ -367,8 +367,8 @@ glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.fac
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-paste0("ANOVA; ", Anova(glm_species_richness_step1))
-paste0("AICC": AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE))
+Anova(glm_species_richness_step1)
+AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE)
 
 #' Drop max vegetation height
 
@@ -377,10 +377,12 @@ glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.fac
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-paste0("ANOVA; ", Anova(glm_species_richness_step2))
-paste0("AICC": AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE))
+Anova(glm_species_richness_step2)
+AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
 
 #' All parameters are now significant. Let this be the reduced model.
+#'
+#' ### Test interaction slope and vegetation cover
 #'
 #' Test an interaction between slope and vegetation cover, given that they are significantly correlated.
 
@@ -389,16 +391,83 @@ glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-paste0("Model summary: ", summary(glm_species_richness_inter_slope_vegcover))
-paste0("ANOVA; ", Anova(glm_species_richness_inter_slope_vegcover))
+summary(glm_species_richness_inter_slope_vegcover)
+Anova(glm_species_richness_inter_slope_vegcover)
 logLik(glm_species_richness_inter_slope_vegcover)
-paste0("AICC": AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE))
+AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
 
 #' Including the interaction of slope and vegetation cover slighlty increases the predictive power of the
 #' model (AIC = 123), but in this case, slope, vegetation cover and the interaction are all not
 #' statisitcally significant.
+#'
+#' ### Test removal of area from model
+#'
+#' Area was a significant parameter in the model and we wanted to test this because it looked like there
+#' would be some effect of study area on species richness.
 
-#' Model assessment
+glm_species_richness_remove_area <- glm(species_richness ~ elevational_band_m + sampling_effort_index +
+                                        slope + mean_perc_veg_cover + mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_remove_area)
+Anova(glm_species_richness_remove_area)
+logLik(glm_species_richness_remove_area)
+AICc(glm_species_richness_remove_area, return.K = FALSE, second.ord = TRUE)
+
+#' Removing area makes the two vegetation parameters insignificant (P = 0.08 and P = 0.06). Slope also
+#' becomes insignificant (P = 0.07). It does improve the AICC score though (AICC = 140.17).
+#'
+#' Try removing the insignificant parameters now in a stepwise selection according to the biggest p-values
+#' first.
+#'
+#' Remove vegetation cover
+
+glm_species_richness_remove_area_step1 <- glm(species_richness ~ elevational_band_m +
+                                              sampling_effort_index + slope + mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_remove_area_step1)
+Anova(glm_species_richness_remove_area_step1)
+logLik(glm_species_richness_remove_area_step1)
+AICc(glm_species_richness_remove_area_step1, return.K = FALSE, second.ord = TRUE)
+
+#' Remove slope
+
+glm_species_richness_remove_area_step2 <- glm(species_richness ~ elevational_band_m +
+                                              sampling_effort_index + mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_remove_area_step2)
+Anova(glm_species_richness_remove_area_step2)
+logLik(glm_species_richness_remove_area_step2)
+AICc(glm_species_richness_remove_area_step2, return.K = FALSE, second.ord = TRUE)
+
+#' Remove vegetation density
+
+glm_species_richness_remove_area_step3 <- glm(species_richness ~ elevational_band_m +
+                                              sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_remove_area_step3)
+Anova(glm_species_richness_remove_area_step3)
+logLik(glm_species_richness_remove_area_step3)
+AICc(glm_species_richness_remove_area_step3, return.K = FALSE, second.ord = TRUE)
+
+#' removing area from the model caused other parameters to become insignificant, therefore stepwise
+#' selection was done for the remaining parameters. Each parameter was removed in turn beginning with
+#' the one that had the largest p-value. Parameters were removed until all remaining parameters were
+#' statistically significant and the AICC improved. The reduced model included only elevation and sampling
+#' effort (AICC = 136.1) and was improved on the model that we began with which included area (AICC =
+#' 140.17).
+#'
+#' Dredge for best model fit
+#'
+
+#' ### Model assessment
 
 #' Test the outcome of the manual stepwise selection
 par(mfrow = c(1,2))
