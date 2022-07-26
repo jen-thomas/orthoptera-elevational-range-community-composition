@@ -21,6 +21,7 @@ get_packages(vector_packages)
 
 #' The following functions prepare the raster DEM files and calculate the parameters, slope and aspect, of
 #' the study areas and sites.
+#+ message=FALSE, warning=FALSE
 
 get_overview_dem <- function(raster_dem) {
       #' Look at the summary information about a raster DEM. Look at the number of layers of data in the

@@ -382,7 +382,6 @@ get_number_sites_area(site_survey_df)
 #' <br>Summarise the number of visits to each site and how many observations were seen at each site during
 #' the whole season. Finally, add the number of species observed at each site (note that the number of
 #' species only considers those observations that have been identified to species).
-
 #+ message=FALSE, warning=FALSE
 
 number_visits_site <- get_number_visits_site(site_survey_df)
@@ -404,6 +403,7 @@ joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
 #'
 #' The following functions create the summaries of observations and survey details within each
 #' elevational band.
+#+ message=FALSE, warning=FALSE
 
 join_site_summary_data_with_elevation <- function(site_elevations, site_summary_data) {
   #' Join the site summary data with the elevational bands so that the data can be summarised.
@@ -446,6 +446,7 @@ get_elevation_summary_data(site_elevations, joined_survey_summary_data)
 #' ## Environmental variables
 #'
 #' The following functions prepare the environmental data.
+#+ message=FALSE, warning=FALSE
 
 check_collinearity <- function(env_var_df) {
     #' Select the environmental variables to check against one another for collinearity. Plot histogram,
@@ -463,6 +464,7 @@ check_collinearity <- function(env_var_df) {
 }
 
 #' ### Vegetation data
+#+ message=FALSE, warning=FALSE
 
 vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
 
@@ -472,6 +474,7 @@ vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
 #' These parameters were calculated along each transect and averaged to get one value per site. The DEM
 #' data were provided by the Institut Cartogràfic i Geològic de Catalunya (ICGC) with a resolution of
 #' 2x2m.
+#+ message=FALSE, warning=FALSE
 
 dem_study_areas <- get_dem_data()
 
