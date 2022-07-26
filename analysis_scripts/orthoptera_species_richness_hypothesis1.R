@@ -236,38 +236,27 @@ species_richness_sites <- left_join(species_richness_sites, sampling_effort, by 
 #' <br>Look at the relationship between species richness and sampling effort,
 #+ message=FALSE, warning=FALSE
 
-lin_reg_species_richness_sampling_effort <- lm(species_richness_sites[["species_richness"]] ~
-                                                 species_richness_sites[["sampling_effort_index"]],
-                                               data = species_richness_sites)
-summary(lin_reg_species_richness_sampling_effort)
-plot_lin_reg_sampling_effort_species_richness(species_richness_sites,
-                                              lin_reg_species_richness_sampling_effort)
+corr_test_samplingeffort_speciesrichness <- correlation_test(species_richness_sites, "sampling_effort_index",
+                                              "species_richness")
+corr_test_samplingeffort_speciesrichness <- corr_test_samplingeffort_speciesrichness$estimate
+print(corr_test_samplingeffort_speciesrichness)
 
-#' and how the sampling effort varied across the elevational range.
-#+ message=FALSE, warning=FALSE
-
-lin_reg_elevation_sampling_effort <- lm(species_richness_sites[["sampling_effort_index"]] ~
-                                          species_richness_sites[["elevational_band_m"]],
-                                        data = species_richness_sites)
-summary(lin_reg_elevation_sampling_effort)
-plot_lin_reg_sampling_effort_elevation(species_richness_sites,
-                                       lin_reg_elevation_sampling_effort)
-
-corr_test_sampling_effort <- correlation_test(species_richness_sites, "elevational_band_m",
+corr_test_samplingeffort_elevation <- correlation_test(species_richness_sites, "elevational_band_m",
                                               "sampling_effort_index")
-corr_coeff_sampling_effort <- corr_test_sampling_effort$estimate
-print(corr_test_sampling_effort)
+corr_test_samplingeffort_elevation <- corr_test_samplingeffort_elevation$estimate
+print(corr_test_samplingeffort_elevation)
 
 #' As expected, species richness significantly increases with sampling effort (<em>R<sup>2</sup></em> =
 #' 0.41; <em>p</em> = 0.0003). Sampling effort was lower at higher elevations (<em>R<sup>2</sup></em> =
 #' 0.14; <em>p</em> = 0.05), but only 40% of the variation in the sampling effort index was explained by
 #' the elevation.
-#'
+
 #' Sampling effort will be incorporated into the generalised linear mixed models to see if it affected the
 #' species richness.
 #'
-#' ## Correlate species richness and elevation using Spearman's rank correlation.
-#' Do a correlation test between the species richness at each site and elevation.
+#' ## Correlate species richness and elevation
+#' Do a correlation test between the species richness at each site and elevation using Spearman's rank
+#' correlation.
 #' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
 #' <br>H<sub>1</sub>: the correlation coefficient is different from 0.
 #'
