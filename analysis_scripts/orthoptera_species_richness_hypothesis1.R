@@ -316,8 +316,8 @@ glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.fact
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-summary(glm_species_richness_full)
-Anova(glm_species_richness_full)
+paste0("Model summary: ", summary(glm_species_richness_full))
+paste0("ANOVA; ", Anova(glm_species_richness_full))
 logLik(glm_species_richness_full)
 paste0("AICC": AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE))
 
@@ -346,16 +346,16 @@ glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_ban
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
-summary(glm_species_richness_full_quasipoisson)
-Anova(glm_species_richness_full_quasipoisson)
+paste0("Model summary: ", summary(glm_species_richness_full_quasipoisson))
+paste0("ANOVA; ", Anova(glm_species_richness_full_quasipoisson))
 
 #' ### Model selection
 #'
 #' Attempt stepwise selection to reduce the number of parameters in the model.
 
 glm_species_richness_step <- step(glm_species_richness_full)
-summary(glm_species_richness_step)
-Anova(glm_species_richness_step)
+paste0("Model summary: ", summary(glm_species_richness_step))
+paste0("ANOVA; ", Anova(glm_species_richness_step))
 logLik(glm_species_richness_step)
 paste0("AICC": AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE))
 
@@ -367,7 +367,7 @@ glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.fac
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-Anova(glm_species_richness_step1)
+paste0("ANOVA; ", Anova(glm_species_richness_step1))
 paste0("AICC": AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE))
 
 #' Drop max vegetation height
@@ -377,7 +377,7 @@ glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.fac
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-Anova(glm_species_richness_step2)
+paste0("ANOVA; ", Anova(glm_species_richness_step2))
 paste0("AICC": AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE))
 
 #' All parameters are now significant. Let this be the reduced model.
@@ -389,8 +389,8 @@ glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_
     family = poisson(link = "log"),
     data = species_richness_sites)
 
-summary(glm_species_richness_inter_slope_vegcover)
-Anova(glm_species_richness_inter_slope_vegcover)
+paste0("Model summary: ", summary(glm_species_richness_inter_slope_vegcover))
+paste0("ANOVA; ", Anova(glm_species_richness_inter_slope_vegcover))
 logLik(glm_species_richness_inter_slope_vegcover)
 paste0("AICC": AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE))
 
