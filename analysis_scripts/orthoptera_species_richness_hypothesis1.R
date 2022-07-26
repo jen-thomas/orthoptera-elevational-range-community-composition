@@ -18,7 +18,7 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn", "stats")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -353,7 +353,7 @@ Anova(glm_species_richness_full_quasipoisson)
 #'
 #' Attempt stepwise selection to reduce the number of parameters in the model.
 
-glm_species_richness_step <- step(glm_species_richness_full)
+glm_species_richness_step <- stats::step(glm_species_richness_full)
 
 #' Show the summary of the reduced model as found by R's stepwise selection.
 
@@ -364,6 +364,34 @@ summary(glm_species_richness_step)
 Anova(glm_species_richness_step)
 logLik(glm_species_richness_step)
 AICcmodavg::AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
+
+#' Test forward stepwise
+
+glm_species_richness_step_forward <- stats::step(glm_species_richness_full, direction = "forward")
+
+#' Show the summary of the reduced model as found by R's stepwise selection.
+
+summary(glm_species_richness_step_forward)
+
+#' Generate an ANOVA table for the model.
+
+Anova(glm_species_richness_step_forward)
+logLik(glm_species_richness_step_forward)
+AICcmodavg::AICc(glm_species_richness_step_forward, return.K = FALSE, second.ord = TRUE)
+
+#' Test backward stepwise
+#'
+glm_species_richness_step_backward <- stats::step(glm_species_richness_full, direction = "backward")
+
+#' Show the summary of the reduced model as found by R's stepwise selection.
+
+summary(glm_species_richness_step_backward)
+
+#' Generate an ANOVA table for the model.
+
+Anova(glm_species_richness_step_backward)
+logLik(glm_species_richness_step_backward)
+AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.ord = TRUE)
 
 #' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
 #' Drop aspect
@@ -389,13 +417,68 @@ Anova(glm_species_richness_step2)
 AICcmodavg::AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
 
 #' All parameters are now significant. Let this be the reduced model.
+
+#' Try one more reduction by removing mean density which is borderline significant. If it improves the
+#' model fit, then leave it in the model, otherwise remove it.
 #'
+glm_species_richness_step3 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        sampling_effort_index + mean_perc_veg_cover,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_step3)
+Anova(glm_species_richness_step3)
+AICcmodavg::AICc(glm_species_richness_step3, return.K = FALSE, second.ord = TRUE)
+
+#' Removing vegetation density then makes percentage vegetation cover non-significant. Drop vegetation
+#' cover.
+
+glm_species_richness_step4 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_step4)
+Anova(glm_species_richness_step4)
+AICcmodavg::AICc(glm_species_richness_step4, return.K = FALSE, second.ord = TRUE)
+
+#' Slope now becomes non-significant. Drop slope.
+
+glm_species_richness_step5 <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_step5)
+Anova(glm_species_richness_step5)
+AICcmodavg::AICc(glm_species_richness_step5, return.K = FALSE, second.ord = TRUE)
+
+#' Area now becomes borderline significant according to the ANOVA and as a factor, all of the area
+#' parameters are non-significant. Drop area from the model.
+
+glm_species_richness_step6 <- glm(species_richness ~ elevational_band_m + sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_step6)
+Anova(glm_species_richness_step6)
+AICcmodavg::AICc(glm_species_richness_step6, return.K = FALSE, second.ord = TRUE)
+
+glm_species_richness_reduced <- glm_species_richness_step6
+
+#' ### Test for overdispersion on reduced model
+
+ratio_dispersion_reduced <- summary(glm_species_richness_reduced)$deviance /
+                    summary(glm_species_richness_reduced)$df.residual
+paste0("ratio: ", ratio_dispersion_reduced)
+
 #' ### Test interaction slope and vegetation cover
 #'
-#' Test an interaction between slope and vegetation cover, given that they are significantly correlated.
+#' Test an interaction between slope and vegetation cover as an addition to the reduced model, given that
+#' they are significantly correlated.
 
-glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        sampling_effort_index + slope*mean_perc_veg_cover + mean_density,
+glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m +
+                                                 sampling_effort_index + slope*mean_perc_veg_cover,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
