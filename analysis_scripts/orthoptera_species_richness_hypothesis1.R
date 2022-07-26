@@ -307,6 +307,8 @@ hist(species_richness_tav$species_richness)
 #' a GLM to the data using species richness as the response variable and the environmental variables as
 #' predictor variables. It looks as though a Poisson distribution might be the best distrbution to use for
 #' species richness overall.
+#'
+#' ### Fit full model
 
 glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
@@ -317,10 +319,37 @@ glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.fact
 summary(glm_species_richness_full)
 Anova(glm_species_richness_full)
 logLik(glm_species_richness_full)
-AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
+paste0("AICC": AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE))
 
 #' Elevation was almost significant (P = 0.053). Study area, slope, sampling effort and percentage
 #' vegetation cover were all significant (P < 0.05). Predictive power of the full model AIC = 125.
+#'
+#' ### Test for overdispersion
+#'
+#' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
+#' overdispersed.
+
+ratio_dispersion <- summary(glm_species_richness_full)$deviance /
+                    summary(glm_species_richness_full)$df.residual
+paste0("ratio: ", ratio_dispersion)
+
+#' Given that the ratio < 1.5, then there is no overdispersion.
+
+#' Fit a quasipoisson distribution to double-check that there is no problem with overdispersion. A poisson
+#' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
+#' greater than 1, then we have this problem with the Poisson distribution. (This part is not needed as
+#' we have already shown that there is no overdispersion).
+
+glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = quasipoisson(link = "log"),
+    data = species_richness_sites)
+
+summary(glm_species_richness_full_quasipoisson)
+Anova(glm_species_richness_full_quasipoisson)
+
+#' ### Model selection
 #'
 #' Attempt stepwise selection to reduce the number of parameters in the model.
 
@@ -328,11 +357,10 @@ glm_species_richness_step <- step(glm_species_richness_full)
 summary(glm_species_richness_step)
 Anova(glm_species_richness_step)
 logLik(glm_species_richness_step)
-AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
+paste0("AICC": AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE))
 
 #' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
 #' Drop aspect
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height + mean_density,
@@ -340,7 +368,7 @@ glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.fac
     data = species_richness_sites)
 
 Anova(glm_species_richness_step1)
-AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE)
+paste0("AICC": AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE))
 
 #' Drop max vegetation height
 
@@ -350,7 +378,7 @@ glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.fac
     data = species_richness_sites)
 
 Anova(glm_species_richness_step2)
-AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
+paste0("AICC": AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE))
 
 #' All parameters are now significant. Let this be the reduced model.
 #'
@@ -364,7 +392,7 @@ glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_
 summary(glm_species_richness_inter_slope_vegcover)
 Anova(glm_species_richness_inter_slope_vegcover)
 logLik(glm_species_richness_inter_slope_vegcover)
-AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
+paste0("AICC": AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE))
 
 #' Including the interaction of slope and vegetation cover slighlty increases the predictive power of the
 #' model (AIC = 123), but in this case, slope, vegetation cover and the interaction are all not
@@ -373,7 +401,7 @@ AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = T
 #' Model assessment
 
 #' Test the outcome of the manual stepwise selection
-  par(mfrow = c(1,2))
+par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_step2), xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
 plot(fitted(glm_species_richness_step2), residuals(glm_species_richness_step2, type = "pearson"))
