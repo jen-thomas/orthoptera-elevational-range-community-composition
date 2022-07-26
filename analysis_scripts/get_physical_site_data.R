@@ -201,7 +201,7 @@ get_gpx_filename <- function(site) {
   return(gpx_filename)
 }
 
-create_df_of_terrain_values_for_sites <- function(sites_transect_files, sites_df) {
+create_df_of_terrain_values_for_sites <- function(terrain_study_areas, sites_transect_files, sites_df) {
       #' For each site, get the data file and calculate the terrain values along the transect.
       #'
       #' Put site name and values into data frame.
@@ -284,6 +284,13 @@ get_site_topography <- function(sites_df) {
   #'
   #' Return the dataframe of sites and topography.
 
+  #' Each transect was recorded as a number of points. These transects were imported into R
+  #' and using the sp package, were extrapolated into a line. Using the rgeos and terra packages, slope and
+  #' aspect values were averaged from the four nearest raster cells, every 2m along the transect. These
+  #' values of slope and aspect were then averaged, to get one value for each site.
+
+  terrain_study_areas <- calculate_terrain_features(dem_study_areas)
+
   #' Use a dictionary of site names and filenames to get the transect data for each site.
   #+ message=FALSE, warning=FALSE
 
@@ -317,7 +324,7 @@ get_site_topography <- function(sites_df) {
                              "TOR10" = "../metadata/Tor site 10.gpx"
   )
 
-  site_topography <- create_df_of_terrain_values_for_sites(sites_transects_files, sites_df)
+  site_topography <- create_df_of_terrain_values_for_sites(terrain_study_areas, sites_transects_files, sites_df)
   site_topography$aspect_cardinal <- apply(site_topography, 1, convert_aspect_to_cardinal_direction)
 
   return(site_topography)

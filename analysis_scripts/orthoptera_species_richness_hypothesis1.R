@@ -18,7 +18,7 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -394,64 +394,73 @@ glm_species_richness_full_gauss <- glm(species_richness ~ elevational_band_m + a
 summary(glm_species_richness_full_gauss)
 Anova(glm_species_richness_full_gauss)
 logLik(glm_species_richness_full_gauss)
-AIC(glm_species_richness_full_gauss)
+AICc(glm_species_richness_full_gauss, return.K = FALSE, second.ord = TRUE)
 
 #' Elevation was almost significant (P = 0.053). Study area, slope, sampling effort and percentage
 #' vegetation cover were all significant (P < 0.05). Predictive power of the full model AIC = 125.
 #'
+#' Attempt stepwise selection to reduce the numebr of parameters in the model.
+
+glm_species_richness_step <- step(glm_species_richness_full_gauss)
+summary(glm_species_richness_step)
+Anova(glm_species_richness_step)
+logLik(glm_species_richness_step)
+AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
+
+#' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
+#' Drop maximum vegetation height
+
+glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_density,
+    family = gaussian(link = "identity"),
+    data = species_richness_sites)
+
+Anova(glm_species_richness_step1)
+AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE)
+
+#' Drop aspect
+
+glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_density,
+    family = gaussian(link = "identity"),
+    data = species_richness_sites)
+
+Anova(glm_species_richness_step2)
+AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
+
+#' All parameters are now significant. Let this be the reduced model.
+#'
 #' Test an interaction between slope and vegetation cover, given that they are significantly correlated.
 
 glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        slope*mean_perc_veg_cover + mean_max_height + mean_density,
+                                        sampling_effort_index + slope*mean_perc_veg_cover + mean_density,
     family = gaussian(link = "identity"),
     data = species_richness_sites)
 
 summary(glm_species_richness_inter_slope_vegcover)
 Anova(glm_species_richness_inter_slope_vegcover)
 logLik(glm_species_richness_inter_slope_vegcover)
-AIC(glm_species_richness_inter_slope_vegcover)
+AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
 
 #' Including the interaction of slope and vegetation cover slighlty increases the predictive power of the
 #' model (AIC = 123), but in this case, slope, vegetation cover and the interaction are all not
 #' statisitcally significant.
 
-#' If the ratio of the residual deviance to the residual degrees of freedom exceeds 1.5, then the model is
-#' overdispersed. Use the formula from overdisp_fun at https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#testing-for-overdispersioncomputing-overdispersion-factor
-#
-# ratio_dispersion <- sum((residuals(glm_species_richness_full_poiss, type = "pearson"))^2) /
-#                         df.residual(glm_species_richness_full_poiss)
-# ratio_dispersion
-
-#' Given that the ratio < 1.5, then there is no overdispersion.
-
-#' Model selection.
-
-#' Set up the null model for the stepwise selection process.
-glm_species_richness_null <- glm(species_richness ~ 1,
-                 data = species_richness_sites,
-                 family = poisson(link = "log")
-                 )
-
-#' Try step-wise selection. Step used backward elimination from the full model including the random and fixed effects.
-glm_species_richness_full_poiss_step <- step(glm_species_richness_null,
-                                             scope = list(upper = glm_species_richness_full_poiss),
-                                             direction = "both",
-                                             test="Chisq",
-                                             data = species_richness_sites)
-
-print("--------Stepwise selection-----------------")
-glm_species_richness_full_poiss_step
-
-#' This shows us that AIC gets worse as covariates are removed from the model, so the model should retain
-#' the parameters that were included to begin with.
-
 #' Model assessment
 
+#' Test the outcome of the manual stepwise selection
 par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_richness_full_poiss), xlab = "Observed values", ylab = "Fitted values")
+plot(species_richness_sites$species_richness, fitted(glm_species_richness_step2), xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
-plot(fitted(glm_species_richness_full_poiss), residuals(glm_species_richness_full_poiss, type = "pearson"))
+plot(fitted(glm_species_richness_step2), residuals(glm_species_richness_step2, type = "pearson"))
+abline(h = 0)
+
+#' Test the outcome of the R stepwise selection
+par(mfrow = c(1,2))
+plot(species_richness_sites$species_richness, fitted(glm_species_richness_step), xlab = "Observed values", ylab = "Fitted values")
+abline(0,1)
+plot(fitted(glm_species_richness_step), residuals(glm_species_richness_step, type = "pearson"))
 abline(h = 0)
 
 #' Test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
