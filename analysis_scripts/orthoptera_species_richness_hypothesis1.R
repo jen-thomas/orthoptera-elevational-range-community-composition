@@ -238,18 +238,19 @@ species_richness_sites <- left_join(species_richness_sites, sampling_effort, by 
 
 corr_test_samplingeffort_speciesrichness <- correlation_test(species_richness_sites, "sampling_effort_index",
                                               "species_richness")
-corr_test_samplingeffort_speciesrichness <- corr_test_samplingeffort_speciesrichness$estimate
+corr_test_samplingeffort_speciesrichness
+corr_test_samplingeffort_speciesrichness_rho <- corr_test_samplingeffort_speciesrichness$estimate
 print(corr_test_samplingeffort_speciesrichness)
 
 corr_test_samplingeffort_elevation <- correlation_test(species_richness_sites, "elevational_band_m",
                                               "sampling_effort_index")
-corr_test_samplingeffort_elevation <- corr_test_samplingeffort_elevation$estimate
+corr_test_samplingeffort_elevation
+corr_test_samplingeffort_elevation_rho <- corr_test_samplingeffort_elevation$estimate
 print(corr_test_samplingeffort_elevation)
 
-#' As expected, species richness significantly increases with sampling effort (<em>R<sup>2</sup></em> =
-#' 0.41; <em>p</em> = 0.0003). Sampling effort was lower at higher elevations (<em>R<sup>2</sup></em> =
-#' 0.14; <em>p</em> = 0.05), but only 40% of the variation in the sampling effort index was explained by
-#' the elevation.
+#' As expected, species richness significantly increases with sampling effort (<em>r<sub>S</sub></em> =
+#' 0.77, <em>p</em> < 0.001). Sampling effort was lower at higher elevations (<em>r<sub>S</sub></em> =
+#' -0.56, <em>p</em> = 0.002).
 
 #' Sampling effort will be incorporated into the generalised linear mixed models to see if it affected the
 #' species richness.
