@@ -114,7 +114,7 @@ get_number_observations_suborder <- function(observations) {
 #' <br>The total number of observations was
 get_number_observations(observations_sites_df)
 
-#' <br>The total number of taxa observed from confirmed observations was
+#' <br>The total number of taxa observed from conservative observations was
 unique_confirmed_taxa <- get_unique_taxa(all_observations_conservative)
 nrow(unique_confirmed_taxa)
 
@@ -122,7 +122,8 @@ nrow(unique_confirmed_taxa)
 unique_confirmed_taxa[order(unique_confirmed_taxa$species, unique_confirmed_taxa$genus, unique_confirmed_taxa$subfamily),]
 
 #' <br>Note that although this summary suggests that 41 taxa were observed, two of the possibilities
-#' listed here have been included separately in the rest of the list, so this number is actually 39.
+#' listed here have been included separately in the rest of the list, so this number is actually 39. Of
+#' these, 9 were Ensifera and 30 Caelifera.
 
 #' The following number of individuals were identified per suborder
 get_number_observations_suborder(all_observations_conservative)

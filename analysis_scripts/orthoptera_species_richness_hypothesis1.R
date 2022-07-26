@@ -24,7 +24,8 @@ get_packages(vector_packages)
 #' ## Investigate effects of elevation on species richness
 #+ message=FALSE, warning=FALSE
 
-#' The following functions calculate the species richness and do the statistics for the analysis of this hypothesis.
+#' The following functions calculate the species richness and do the statistics for the analysis of this
+#' hypothesis.
 
 plot_elevation_species_richness <- function(species_richness_elevation) {
     #' Plot elevation band against species richness.
@@ -58,7 +59,7 @@ correlation_test <- function(dataframe, para1, para2) {
     #'
     #' Return the coefficient.
 
-  corr_test <- cor.test(x = dataframe[[para1]], y = dataframe[[para2]])
+  corr_test <- cor.test(x = dataframe[[para1]], y = dataframe[[para2]], method = "spearman")
 
   return(corr_test)
 }
@@ -191,6 +192,7 @@ both_species_richness
 #' Eight sites had a higher species richness when using the conservative identifications. The analysis
 #' will only use conservative identifications until the regression is compared to see if there is any
 #' statistical difference in the relationship between species richness and elevation.
+
 #'
 #' ### Get environmental data
 
@@ -227,10 +229,10 @@ print(corr_test)
 coeff_det <- calculate_coefficient_of_determination(corr_coeff)
 print(coeff_det)
 
-#' <br>The relationship between species richness and elevation was tested using a Pearson's correlation.
-#' There was evidence to suggest a significant negative relationship between species richness and
-#' elevation (<em>r</em> = -0.64, <em>t<sub>26</sub></em> = -4.29, <em>p</em> = 0.0002), however only
-#' 41% of the variation in species richness is explained by the elevation.
+#' <br>The relationship between species richness and elevation was tested using a Spearman's rank
+#' correlation. There was evidence to suggest a significant negative relationship between species richness
+#' and elevation (<em>r</em> = -0.66, <em>P</em> = 0.0001), however only
+#' 44% of the variation in species richness is explained by the elevation.
 #'
 #' ### Plot species richness against elevation
 
