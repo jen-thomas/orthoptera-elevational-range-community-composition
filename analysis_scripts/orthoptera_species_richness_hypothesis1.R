@@ -241,89 +241,7 @@ plot_elevation_species_richness(species_richness_sites)
 #' The plot shows a general decreasing trend of species richness with elevation, which was confirmed by
 #' the correlation coefficient above.
 #'
-#' ### Linear regression
-#' Create a linear model of species richness against elevation and look at the model output.
-linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites,
-                                                                                   "species_richness", "elevational_band_m")
-summary(linear_regression_species_richness)
 
-#' The linear regression shows that both the intercept and slope are statistically significant. Species
-#' richness decreases by 6.1 with an increase in elevation of 1000 m (<em>t</em> = -4.29,
-#' <em>p</em> = 0.0002).
-#'
-#' ### Check the assumptions of linear regression
-
-#' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
-plot_model_residuals_species_richness_elev(linear_regression_species_richness, species_richness_sites,
-                                           "elevational_band_m")
-par(mfrow = c(2, 2))
-plot(linear_regression_species_richness)
-
-#' <br>Comments about assumptions:
-#' <ul>* <em>linear relationship between elevation band and species richness</em>: according to the
-#' scatterplot above, the relationship does not appear to be strongly linear, although there is not a
-#' strong non-linear relationship either.
-#' * <em>independence</em>: the plot of residuals shows a fairly random pattern indicating that a linear
-#' model could be suitable.
-#' * <em>heteroscedasticity</em>: looking at the Residuals vs Fitted plot above, there does not seem to be
-#' any trend of increasing residuals as the fitted values increase, therefore this assumption seems to be
-#' satisfied.
-#' * <em>normally-distributed residuals</em>: the residuals appear to have a normal distribution (Q-Q plot
-#' above) in general, but the point which corresponds to the highest species richness, seems to
-#' be a bit of an outlier, skewing the distribution somewhat.
-#' </ul>
-#'
-#' ### Plot linear regression
-#' The plot below shows the species richness at each site (blue dots). Upper and lower bounds of the
-#' predicted values are bounded within the grey area. The blue line represents the linear relationship
-#' between species richness ($SR$) and elevation ($E$), which can be represented by the equation,
-#' $SR = 17.76 - 0.0061E$.
-#+ message=FALSE, warning=FALSE
-
-plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
-
-#' ### Test linear regression using t-test
-#' Use a one-way t-test to check if there is a statistically significant relationship between the response
-#' and explanatory variables.
-#' <br>H<sub>0</sub>: the slope of the regression is equal to 0.
-#' <br>H<sub>1</sub>: the slope of the regression is not equal to 0.
-#'
-#' Looking again at the model output above, we can see that the slope is not equal to 0
-#' (<em>p</em> = 0.0002), therefore we can say there is a significant relationship between the species
-#' richness and elevation.
-#'
-#' ## Check the regression if non-conservative identifications are used
-
-#' Some specimens were identified to one of multiple species or genus, because of, for example, missing or
-#' contradictory features. These are used in a conservative way in the analysis above. This part of the
-#' analysis will check if there is any difference to the relationship between species richness and
-#' elevation, if the less conservative identifications are used.
-#'
-#' ### Linear regression
-
-#' Create a linear model of species richness against elevation and look at the model output.
-#+ message=FALSE, warning=FALSE
-
-linear_regression_species_richness_notconservative <- linear_regression_species_richness_elevation(species_richness_sites_notconservative,
-                                                                                                   "species_richness", "elevational_band_m")
-summary(linear_regression_species_richness_notconservative)
-
-plot_linear_regression_species_richness(species_richness_sites_notconservative, linear_regression_species_richness_notconservative)
-
-#' The linear regression shows that both the intercept and slope are statistically significant. Species
-#' richness decreases by 6.6 with an increase in elevation of 1000 m (<em>t</em> = -4.53,
-#' <em>p</em> = 0.0001).
-#'
-#' ### Test for statistical significance between regressions
-#'
-#' Use a hypothesis test to check for any statistical difference between the slopes of the regressions
-#' with the conservative and non-conservative identifications.
-#' <br>H<sub>0</sub>: regression lines are parallel.
-#' <br>H<sub>1</sub>: regression lines are not parallel.
-#'
-#' **TODO**: would it be valid to use ANCOVA for this? The values would not be independent because they are
-#' from the same sites.
-#'
 #' ## Account for the effects of sampling effort
 #'
 #' Due to logistical reasons and poor weather, the sampling effort varied a lot across the sampling sites.
@@ -473,6 +391,88 @@ p_model_test
 #' As p is large, we have no evidence against the hypothesis that the model is adequate, therefore we
 #' accept the model is satisfactory.
 
+#' ### Linear regression
+#' Create a linear model of species richness against elevation and look at the model output.
+linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites,
+                                                                                   "species_richness", "elevational_band_m")
+summary(linear_regression_species_richness)
+
+#' The linear regression shows that both the intercept and slope are statistically significant. Species
+#' richness decreases by 6.1 with an increase in elevation of 1000 m (<em>t</em> = -4.29,
+#' <em>p</em> = 0.0002).
+#'
+#' ### Check the assumptions of linear regression
+
+#' Plot the residuals to check if the assumptions of the residuals apply for this dataset.
+plot_model_residuals_species_richness_elev(linear_regression_species_richness, species_richness_sites,
+                                           "elevational_band_m")
+par(mfrow = c(2, 2))
+plot(linear_regression_species_richness)
+
+#' <br>Comments about assumptions:
+#' <ul>* <em>linear relationship between elevation band and species richness</em>: according to the
+#' scatterplot above, the relationship does not appear to be strongly linear, although there is not a
+#' strong non-linear relationship either.
+#' * <em>independence</em>: the plot of residuals shows a fairly random pattern indicating that a linear
+#' model could be suitable.
+#' * <em>heteroscedasticity</em>: looking at the Residuals vs Fitted plot above, there does not seem to be
+#' any trend of increasing residuals as the fitted values increase, therefore this assumption seems to be
+#' satisfied.
+#' * <em>normally-distributed residuals</em>: the residuals appear to have a normal distribution (Q-Q plot
+#' above) in general, but the point which corresponds to the highest species richness, seems to
+#' be a bit of an outlier, skewing the distribution somewhat.
+#' </ul>
+#'
+#' ### Plot linear regression
+#' The plot below shows the species richness at each site (blue dots). Upper and lower bounds of the
+#' predicted values are bounded within the grey area. The blue line represents the linear relationship
+#' between species richness ($SR$) and elevation ($E$), which can be represented by the equation,
+#' $SR = 17.76 - 0.0061E$.
+#+ message=FALSE, warning=FALSE
+
+plot_linear_regression_species_richness(species_richness_sites, linear_regression_species_richness)
+
+#' ### Test linear regression using t-test
+#' Use a one-way t-test to check if there is a statistically significant relationship between the response
+#' and explanatory variables.
+#' <br>H<sub>0</sub>: the slope of the regression is equal to 0.
+#' <br>H<sub>1</sub>: the slope of the regression is not equal to 0.
+#'
+#' Looking again at the model output above, we can see that the slope is not equal to 0
+#' (<em>p</em> = 0.0002), therefore we can say there is a significant relationship between the species
+#' richness and elevation.
+#'
+#' ## Check the regression if non-conservative identifications are used
+
+#' Some specimens were identified to one of multiple species or genus, because of, for example, missing or
+#' contradictory features. These are used in a conservative way in the analysis above. This part of the
+#' analysis will check if there is any difference to the relationship between species richness and
+#' elevation, if the less conservative identifications are used.
+#'
+#' ### Linear regression
+
+#' Create a linear model of species richness against elevation and look at the model output.
+#+ message=FALSE, warning=FALSE
+
+linear_regression_species_richness_notconservative <- linear_regression_species_richness_elevation(species_richness_sites_notconservative,
+                                                                                                   "species_richness", "elevational_band_m")
+summary(linear_regression_species_richness_notconservative)
+
+plot_linear_regression_species_richness(species_richness_sites_notconservative, linear_regression_species_richness_notconservative)
+
+#' The linear regression shows that both the intercept and slope are statistically significant. Species
+#' richness decreases by 6.6 with an increase in elevation of 1000 m (<em>t</em> = -4.53,
+#' <em>p</em> = 0.0001).
+#'
+#' ### Test for statistical significance between regressions
+#'
+#' Use a hypothesis test to check for any statistical difference between the slopes of the regressions
+#' with the conservative and non-conservative identifications.
+#' <br>H<sub>0</sub>: regression lines are parallel.
+#' <br>H<sub>1</sub>: regression lines are not parallel.
+#'
+#' **TODO**: would it be valid to use ANCOVA for this? The values would not be independent because they are
+#' from the same sites.
 #'
 #' ## Check for effect of study area
 
