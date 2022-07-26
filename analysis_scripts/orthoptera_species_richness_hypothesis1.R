@@ -354,7 +354,13 @@ Anova(glm_species_richness_full_quasipoisson)
 #' Attempt stepwise selection to reduce the number of parameters in the model.
 
 glm_species_richness_step <- step(glm_species_richness_full)
+
+#' Show the summary of the reduced model as found by R's stepwise selection.
+
 summary(glm_species_richness_step)
+
+#' Generate an ANOVA table for the model.
+
 Anova(glm_species_richness_step)
 logLik(glm_species_richness_step)
 AICcmodavg::AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
