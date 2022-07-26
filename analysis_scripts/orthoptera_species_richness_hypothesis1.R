@@ -302,51 +302,51 @@ hist(species_richness_tor$species_richness)
 hist(species_richness_mol$species_richness)
 hist(species_richness_tav$species_richness)
 
-#' Species richness at all sites has a fairly Gaussian distribution, although it is slightly skewed.
+#' Species richness at all sites has a Poisson distribution.
 #' Species richness in each of the three main study areas do not conform to a Gaussian distribution. Fit
 #' a GLM to the data using species richness as the response variable and the environmental variables as
 #' predictor variables. It looks as though a Poisson distribution might be the best distrbution to use for
 #' species richness overall.
 
-glm_species_richness_full_gauss <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height + mean_density,
-    family = gaussian(link = "identity"),
+    family = poisson(link = "log"),
     data = species_richness_sites)
 
-summary(glm_species_richness_full_gauss)
-Anova(glm_species_richness_full_gauss)
-logLik(glm_species_richness_full_gauss)
-AICc(glm_species_richness_full_gauss, return.K = FALSE, second.ord = TRUE)
+summary(glm_species_richness_full)
+Anova(glm_species_richness_full)
+logLik(glm_species_richness_full)
+AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
 
 #' Elevation was almost significant (P = 0.053). Study area, slope, sampling effort and percentage
 #' vegetation cover were all significant (P < 0.05). Predictive power of the full model AIC = 125.
 #'
-#' Attempt stepwise selection to reduce the numebr of parameters in the model.
+#' Attempt stepwise selection to reduce the number of parameters in the model.
 
-glm_species_richness_step <- step(glm_species_richness_full_gauss)
+glm_species_richness_step <- step(glm_species_richness_full)
 summary(glm_species_richness_step)
 Anova(glm_species_richness_step)
 logLik(glm_species_richness_step)
 AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
 
 #' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
-#' Drop maximum vegetation height
-
+#' Drop aspect
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_density,
-    family = gaussian(link = "identity"),
+                                        sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = poisson(link = "log"),
     data = species_richness_sites)
 
 Anova(glm_species_richness_step1)
 AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE)
 
-#' Drop aspect
+#' Drop max vegetation height
 
 glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         sampling_effort_index + mean_perc_veg_cover + mean_density,
-    family = gaussian(link = "identity"),
+    family = poisson(link = "log"),
     data = species_richness_sites)
 
 Anova(glm_species_richness_step2)
@@ -358,7 +358,7 @@ AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
 
 glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
                                         sampling_effort_index + slope*mean_perc_veg_cover + mean_density,
-    family = gaussian(link = "identity"),
+    family = poisson(link = "log"),
     data = species_richness_sites)
 
 summary(glm_species_richness_inter_slope_vegcover)
@@ -373,7 +373,7 @@ AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = T
 #' Model assessment
 
 #' Test the outcome of the manual stepwise selection
-par(mfrow = c(1,2))
+  par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_step2), xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
 plot(fitted(glm_species_richness_step2), residuals(glm_species_richness_step2, type = "pearson"))
