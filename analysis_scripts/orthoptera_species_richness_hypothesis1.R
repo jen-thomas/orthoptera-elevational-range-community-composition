@@ -193,7 +193,6 @@ both_species_richness
 #' will only use conservative identifications until the regression is compared to see if there is any
 #' statistical difference in the relationship between species richness and elevation.
 
-#'
 #' ### Get environmental data
 
 #' Get vegetation data.
@@ -211,38 +210,11 @@ site_topography <- get_site_topography(sites_df)
 site_env_var_data <- left_join(site_topography, vegetation_averaged_df, by = "site_elevation")
 
 #' Join environmental data onto species richness dataframe.
+
 species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
                                     by = c("site_elevation", "area", "elevational_band_m"))
 
-#' ### Correlate species richness and elevation
-#' Do a correlation test between the species richness at each site and elevation.
-#' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
-#' <br>H<sub>1</sub>: the correlation coefficient is different from 0.
-#'
-#' View the test
-corr_test <- correlation_test(species_richness_sites, "elevational_band_m",
-                              "species_richness")
-corr_coeff <- corr_test$estimate
-print(corr_test)
-
-#' <br>and calculate the coefficient of determination (R<sup>2</sup>).
-coeff_det <- calculate_coefficient_of_determination(corr_coeff)
-print(coeff_det)
-
-#' <br>The relationship between species richness and elevation was tested using a Spearman's rank
-#' correlation. There was evidence to suggest a significant negative relationship between species richness
-#' and elevation (<em>r</em> = -0.66, <em>P</em> = 0.0001), however only
-#' 44% of the variation in species richness is explained by the elevation.
-#'
-#' ### Plot species richness against elevation
-
-plot_elevation_species_richness(species_richness_sites)
-
-#' The plot shows a general decreasing trend of species richness with elevation, which was confirmed by
-#' the correlation coefficient above.
-#'
-
-#' ## Account for the effects of sampling effort
+#' ### Account for the effects of sampling effort
 #'
 #' Due to logistical reasons and poor weather, the sampling effort varied a lot across the sampling sites.
 #' Additionally, both and hand and net sampling were used. In order to account for the difference in
@@ -294,12 +266,49 @@ print(corr_test_sampling_effort)
 #' Sampling effort will be incorporated into the generalised linear mixed models to see if it affected the
 #' species richness.
 #'
+#' ## Correlate species richness and elevation using Spearman's rank correlation.
+#' Do a correlation test between the species richness at each site and elevation.
+#' <br>H<sub>0</sub>: the correlation coefficient is equal to 0.
+#' <br>H<sub>1</sub>: the correlation coefficient is different from 0.
+#'
+#' View the test
+corr_test <- correlation_test(species_richness_sites, "elevational_band_m",
+                              "species_richness")
+corr_coeff <- corr_test$estimate
+print(corr_test)
+
+#' <br>and calculate the coefficient of determination (R<sup>2</sup>).
+coeff_det <- calculate_coefficient_of_determination(corr_coeff)
+print(coeff_det)
+
+#' <br>The relationship between species richness and elevation was tested using a Spearman's rank
+#' correlation. There was evidence to suggest a significant negative relationship between species richness
+#' and elevation (<em>r</em> = -0.66, <em>P</em> = 0.0001), however only
+#' 44% of the variation in species richness is explained by the elevation.
+#'
+#' ### Plot species richness against elevation
+
+plot_elevation_species_richness(species_richness_sites)
+
+#' The plot shows a general decreasing trend of species richness with elevation, which was confirmed by
+#' the correlation coefficient above.
+#'
 #' ## Generalised linear model
 #'
 #' Look at the distribution of the species richness.
 
 par(mfrow=c(1,1))
 hist(species_richness_sites$species_richness)
+
+species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor",]
+species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa",]
+species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan",]
+par(mfrow=c(2,2))
+hist(species_richness_tor$species_richness)
+hist(species_richness_mol$species_richness)
+hist(species_richness_tav$species_richness)
+
+
 
 #' Species richness has a fairly Gaussian distribution, although it is slightly skewed. Fit a GLM to the
 #' data using species richness as the response variable and the environmental variables as predictor
