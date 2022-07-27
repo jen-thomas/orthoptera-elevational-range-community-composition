@@ -925,7 +925,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #'
 
 
-#' ## Results
+#' ## Results - NOT UPDATED
 #'
 #' <br>A simple linear regression was used to investigate the relationship between elevation and species richness.
 #' Overall species richness and elevation were negatively correlated (Pearson's correlation coefficient
@@ -955,7 +955,7 @@ plot_linear_regression_species_richness(caelifera_species_richness_tav, lin_reg_
 #' (<em>r</em> = -0.82; <em>F</em> = 12.35; <em>df</em> = 1, 6; <em>p</em> = 0.01) and Tavascan
 #' (<em>r</em> = -0.98; <em>F</em> = 141.2; <em>df</em> = 1, 5; <em>p</em> = < 0.001).
 #'
-#' ## Questions
+#' ## Questions - NOT UPDATED
 #' <ol>
 #'  <li>When reporting the decrease in species richness with elevation and variation explained (first
 #' paragraph of results above), should both t and F be reported? Should the p-value only be reported
