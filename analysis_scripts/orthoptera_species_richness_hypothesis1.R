@@ -445,7 +445,7 @@ AICcmodavg::AICc(glm_species_best_dredge, return.K = FALSE, second.ord = TRUE)
 #' The dredge results in a simpler model than using backwards selection. AICC is reduced to 136.10 (from
 #' 145.24) but given that the other parameters are significant in the model and they are biologically
 #' important, the reduced model obtained through backwards selection is retained.
-
+#'
 #' #### Define reduced model
 
 glm_species_richness_reduced <- glm_species_richness_step2
@@ -649,10 +649,24 @@ points(species_richness ~ elevational_band_m, data = species_richness_sites, pch
 
 #' ### Output tables for report
 #'
+#' Reduced model for overall species richness
+
 glm_species_richness_reduced_table <- xtable(glm_species_richness_reduced)
 glm_species_richness_reduced_table
 print(glm_species_richness_reduced_table)
-knitr::kable(glm_species_richness_reduced_table, caption = "Test caption")
+knitr::kable(glm_species_richness_reduced_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness (AICc = 145.24)")
+
+#' Reduced model for Caelifera species richness
+
+glm_species_richness_reduced_caelifera_table <- xtable(glm_species_richness_caelifera_reduced)
+glm_species_richness_reduced_caelifera_table
+print(glm_species_richness_reduced_caelifera_table)
+knitr::kable(glm_species_richness_reduced_caelifera_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P < 0.05) for variables included in the reduced
+ GLM for Caelifera species richness (AIC = 132.0)")
+
 #'
 #'
 #' ## Linear regression - NOT CHANGED
