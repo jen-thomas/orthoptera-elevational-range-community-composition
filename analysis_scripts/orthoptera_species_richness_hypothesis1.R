@@ -472,6 +472,8 @@ ratio_dispersion_reduced <- summary(glm_species_richness_reduced)$deviance /
                     summary(glm_species_richness_reduced)$df.residual
 paste0("ratio: ", ratio_dispersion_reduced)
 
+#' Given that this ratio < 1.5, we can say that the model does not suffer from overdispersion.
+
 #' ### Test interaction slope and vegetation cover
 #'
 #' Test an interaction between slope and vegetation cover as an addition to the reduced model, given that
