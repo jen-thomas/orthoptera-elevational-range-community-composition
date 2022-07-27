@@ -552,6 +552,8 @@ AICcmodavg::AICc(glm_species_richness_full_mol_step, return.K = FALSE, second.or
 #'
 #' ### Test species richness of Caelifera in GLM
 
+#' Calculate the species richness for only Caelifera at each site.
+
 caelifera_observations <- get_caelifera_only(all_observations_conservative)
 
 caelifera_species_richness <- calculate_species_richness_sites(caelifera_observations)
@@ -561,23 +563,46 @@ caelifera_species_richness_sites <- left_join(caelifera_species_richness, site_e
 
 caelifera_species_richness_sites <- left_join(caelifera_species_richness_sites, sampling_effort, by = "site_elevation")
 
+#' GLM of Caelifera species richness with the set of parameters as used in the full model of overall
+#' species richness.
+
 glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height + mean_density,
     family = poisson(link = "log"),
     data = caelifera_species_richness_sites)
 
+#' Summarise the GLM
+
 summary(glm_species_richness_full_caelifera)
+
+#' Do ANOVA of GLM
+
 Anova(glm_species_richness_full_caelifera)
 logLik(glm_species_richness_full_caelifera)
+
+#' Get AICC of GLM
+
 AICcmodavg::AICc(glm_species_richness_full_caelifera, return.K = FALSE, second.ord = TRUE)
+
+#' Do backwards stepwise selection on the GLM to get the reduced model
 
 glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_caelifera, direction = "backward")
 
+#' Summarise the reduced GLM
+
 summary(glm_species_richness_caelifera_step)
+
+#' Do ANOVA of reduced GLM
+
 Anova(glm_species_richness_caelifera_step)
 logLik(glm_species_richness_caelifera_step)
+
+#' Get AICC of reduced GLM
+
 AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
+
+#' Define the reduced model for Caelifera species richness
 
 glm_species_richness_caelifera_reduced <- glm_species_richness_caelifera_step
 
