@@ -430,7 +430,7 @@ summary(glm_species_richness_step3)
 Anova(glm_species_richness_step3)
 AICcmodavg::AICc(glm_species_richness_step3, return.K = FALSE, second.ord = TRUE)
 
-#' Removing vegetation density then makes percentage vegetation cover non-significant. Drop vegetation
+#' **TODO** check what the change in AICC is here. Removing vegetation density then makes percentage vegetation cover non-significant. Drop vegetation
 #' cover.
 
 glm_species_richness_step4 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
@@ -664,6 +664,7 @@ Anova(glm_species_best_dredge, type = 3)
 #' the p-value for the model where the deviance and degrees of freedom are used.
 
 #' Test the reduced model which was the outcome of the manual stepwise selection
+
 par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_reduced),
      xlab = "Observed values", ylab = "Fitted values")
@@ -671,15 +672,23 @@ abline(0,1)
 plot(fitted(glm_species_richness_reduced), residuals(glm_species_richness_reduced, type = "pearson"))
 abline(h = 0)
 
-glm_species_richness_reduced <- 1-pchisq(13.92499, 18)
-glm_species_richness_reduced
+reduced_test <- 1-pchisq(30.723, 25)
+reduced_test
 
-
-
-#' As P is large, we have no evidence against the hypothesis that the model is adequate, therefore we
+#' **TODO** As P is large, we have no evidence against the hypothesis that the model is adequate, therefore we
 #' accept the model is satisfactory.
+#' ### Plot the GLM
+par(mfrow = c(1,1))
+visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
+                                     scale = "response",
+                                     rug = FALSE,
+                                     line = list(col = "black"),
+                                     xlab = "Elevation (m a.s.l)",
+                                     ylab = "Species richness", ylim(0, 17))
+points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1, col = "black", lwd = 1.5)
 
-#' ### Linear regression - NOT CHANGED
+
+#' ## Linear regression - NOT CHANGED
 #' Create a linear model of species richness against elevation and look at the model output.
 linear_regression_species_richness <- linear_regression_species_richness_elevation(species_richness_sites,
                                                                                    "species_richness", "elevational_band_m")
