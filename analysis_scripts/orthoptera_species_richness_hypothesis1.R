@@ -562,7 +562,69 @@ Anova(glm_species_richness_reduced_mol)
 logLik(glm_species_richness_reduced_mol)
 AICcmodavg::AICc(glm_species_richness_reduced_mol, return.K = FALSE, second.ord = TRUE)
 
+#' ### Test full model at each study area
+#' #### Tor
 
+glm_species_richness_full_tor <- glm(species_richness ~ elevational_band_m + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_tor)
+
+summary(glm_species_richness_full_tor)
+Anova(glm_species_richness_full_tor)
+logLik(glm_species_richness_full_tor)
+AICcmodavg::AICc(glm_species_richness_full_tor, return.K = FALSE, second.ord = TRUE)
+
+#' Test stepwise selection for model at Tor
+glm_species_richness_full_tor_step <- stats::step(glm_species_richness_full_tor, direction = "backward")
+
+summary(glm_species_richness_full_tor_step)
+Anova(glm_species_richness_full_tor_step)
+logLik(glm_species_richness_full_tor_step)
+AICcmodavg::AICc(glm_species_richness_full_tor_step, return.K = FALSE, second.ord = TRUE)
+
+#' #### Tavascan
+
+glm_species_richness_full_tav <- glm(species_richness ~ elevational_band_m + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_tav)
+
+summary(glm_species_richness_full_tav)
+Anova(glm_species_richness_full_tav)
+logLik(glm_species_richness_full_tav)
+AICcmodavg::AICc(glm_species_richness_full_tav, return.K = FALSE, second.ord = TRUE)
+
+#' Test stepwise selection for model at Tavascan
+glm_species_richness_full_tav_step <- stats::step(glm_species_richness_full_tav, direction = "backward")
+
+summary(glm_species_richness_full_tav_step)
+Anova(glm_species_richness_full_tav_step)
+logLik(glm_species_richness_full_tav_step)
+AICcmodavg::AICc(glm_species_richness_full_tav_step, return.K = FALSE, second.ord = TRUE)
+
+#' #### La Molinassa
+
+glm_species_richness_full_mol <- glm(species_richness ~ elevational_band_m + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_mol)
+
+summary(glm_species_richness_full_mol)
+Anova(glm_species_richness_full_mol)
+logLik(glm_species_richness_full_mol)
+AICcmodavg::AICc(glm_species_richness_full_mol, return.K = FALSE, second.ord = TRUE)
+
+#' Test stepwise selection for model at Tavascan
+glm_species_richness_full_mol_step <- stats::step(glm_species_richness_full_mol, direction = "backward")
+
+summary(glm_species_richness_full_mol_step)
+Anova(glm_species_richness_full_mol_step)
+logLik(glm_species_richness_full_mol_step)
+AICcmodavg::AICc(glm_species_richness_full_mol_step, return.K = FALSE, second.ord = TRUE)
 
 #'
 #' ### Dredge for best model fit
@@ -601,45 +663,18 @@ Anova(glm_species_best_dredge, type = 3)
 #' Also test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
 #' the p-value for the model where the deviance and degrees of freedom are used.
 
-#' Test the outcome of the manual stepwise selection
+#' Test the reduced model which was the outcome of the manual stepwise selection
 par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_richness_step2), xlab = "Observed values", ylab = "Fitted values")
+plot(species_richness_sites$species_richness, fitted(glm_species_richness_reduced),
+     xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
-plot(fitted(glm_species_richness_step2), residuals(glm_species_richness_step2, type = "pearson"))
+plot(fitted(glm_species_richness_reduced), residuals(glm_species_richness_reduced, type = "pearson"))
 abline(h = 0)
 
-p_model_test_glm_species_richness_step2 <- 1-pchisq(13.92499, 18)
-p_model_test_glm_species_richness_step2
+glm_species_richness_reduced <- 1-pchisq(13.92499, 18)
+glm_species_richness_reduced
 
-#' Test the outcome of the R stepwise selection for the reduced model
-par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_richness_step), xlab = "Observed values", ylab = "Fitted values")
-abline(0,1)
-plot(fitted(glm_species_richness_step), residuals(glm_species_richness_step, type = "pearson"))
-abline(h = 0)
 
-p_model_test_glm_species_richness_step <- 1-pchisq(13.92499, 18)
-p_model_test_glm_species_richness_step
-
-#' Test the outcome of the R stepwise selection for the reduced model after removing area
-par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_richness_remove_area_step3), xlab = "Observed values", ylab = "Fitted values")
-abline(0,1)
-plot(fitted(glm_species_richness_remove_area_step3), residuals(glm_species_richness_remove_area_step3, type = "pearson"))
-abline(h = 0)
-
-p_model_test_glm_species_richness_remove_area_step3 <- 1-pchisq(30.7226, 25)
-p_model_test_glm_species_richness_remove_area_step3
-
-#' Test the outcome of the dredged reduced model
-par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_best_dredge), xlab = "Observed values", ylab = "Fitted values")
-abline(0,1)
-plot(fitted(glm_species_best_dredge), residuals(glm_species_best_dredge, type = "pearson"))
-abline(h = 0)
-
-p_model_test_glm_species_best_dredge <- 1-pchisq(30.7226, 25)
-p_model_test_glm_species_best_dredge
 
 #' As P is large, we have no evidence against the hypothesis that the model is adequate, therefore we
 #' accept the model is satisfactory.
