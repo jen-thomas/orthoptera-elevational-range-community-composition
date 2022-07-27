@@ -489,73 +489,81 @@ Anova(glm_species_richness_inter_slope_vegcover)
 logLik(glm_species_richness_inter_slope_vegcover)
 AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
 
-#' Including the interaction of slope and vegetation cover slighlty increases the predictive power of the
-#' model (AIC = 123), but in this case, slope, vegetation cover and the interaction are all not
-#' statisitcally significant.
+#' Including the interaction of slope and vegetation cover did not increase the predictive power of the
+#' model (AICC = 140) and neither the individual parameters nor the interaction were significant
+#' predictors.
 #'
-#' ### Test removal of area from model
+#' ### Test addition of area to reduced model
 #'
-#' Area was a significant parameter in the model and we wanted to test this because it looked like there
-#' would be some effect of study area on species richness.
+#' Area was almost a significant parameter in the model during the stepwise selection and we wanted to
+#' test this because it looked like there would be some effect of study area on species richness, given
+#' the difference of Tor from the other sites. Firstly, the sites at Besan and Bordes de Viros will be
+#' removed.
 
-glm_species_richness_remove_area <- glm(species_richness ~ elevational_band_m + sampling_effort_index +
-                                        slope + mean_perc_veg_cover + mean_density,
+species_richness_main_areas <- species_richness_sites[(species_richness_sites$area != "Besan" &
+                                                       species_richness_sites$area != "Bordes de Viros"),]
+
+#' Look at the reduced model, just for the sites in the main study areas.
+glm_species_richness_reduced_main_areas <- glm(species_richness ~ elevational_band_m +
+                                               sampling_effort_index,
     family = poisson(link = "log"),
-    data = species_richness_sites)
+    data = species_richness_main_areas)
 
-summary(glm_species_richness_remove_area)
-Anova(glm_species_richness_remove_area)
-logLik(glm_species_richness_remove_area)
-AICcmodavg::AICc(glm_species_richness_remove_area, return.K = FALSE, second.ord = TRUE)
+summary(glm_species_richness_reduced_main_areas)
+Anova(glm_species_richness_reduced_main_areas)
+logLik(glm_species_richness_reduced_main_areas)
+AICcmodavg::AICc(glm_species_richness_reduced_main_areas, return.K = FALSE, second.ord = TRUE)
 
-#' Removing area makes the two vegetation parameters insignificant (P = 0.08 and P = 0.06). Slope also
-#' becomes insignificant (P = 0.07). It does improve the AICC score though (AICC = 140.17).
-#'
-#' Try removing the insignificant parameters now in a stepwise selection according to the biggest p-values
-#' first.
-#'
-#' Remove vegetation cover
-
-glm_species_richness_remove_area_step1 <- glm(species_richness ~ elevational_band_m +
-                                              sampling_effort_index + slope + mean_density,
+#' Now test adding area to the model to see if the model fit improves and the parameter estimates change.
+glm_species_richness_reduced_main_areas_area <- glm(species_richness ~ elevational_band_m +
+                                               sampling_effort_index + as.factor(area),
     family = poisson(link = "log"),
-    data = species_richness_sites)
+    data = species_richness_main_areas)
 
-summary(glm_species_richness_remove_area_step1)
-Anova(glm_species_richness_remove_area_step1)
-logLik(glm_species_richness_remove_area_step1)
-AICcmodavg::AICc(glm_species_richness_remove_area_step1, return.K = FALSE, second.ord = TRUE)
+summary(glm_species_richness_reduced_main_areas_area)
+Anova(glm_species_richness_reduced_main_areas_area)
+logLik(glm_species_richness_reduced_main_areas_area)
+AICcmodavg::AICc(glm_species_richness_reduced_main_areas_area, return.K = FALSE, second.ord = TRUE)
 
-#' Remove slope
+#' Reducing the data to only that at the study areas, area becomes an important predictor of species
+#' richness. Parameter estimates of elevation and slope remained the same.
 
-glm_species_richness_remove_area_step2 <- glm(species_richness ~ elevational_band_m +
-                                              sampling_effort_index + mean_density,
+#' ### Test species richness in study areas separately
+#' #### Tor
+
+glm_species_richness_reduced_tor <- glm(species_richness ~ elevational_band_m + sampling_effort_index,
     family = poisson(link = "log"),
-    data = species_richness_sites)
+    data = species_richness_tor)
 
-summary(glm_species_richness_remove_area_step2)
-Anova(glm_species_richness_remove_area_step2)
-logLik(glm_species_richness_remove_area_step2)
-AICcmodavg::AICc(glm_species_richness_remove_area_step2, return.K = FALSE, second.ord = TRUE)
+summary(glm_species_richness_reduced_tor)
+Anova(glm_species_richness_reduced_tor)
+logLik(glm_species_richness_reduced_tor)
+AICcmodavg::AICc(glm_species_richness_reduced_tor, return.K = FALSE, second.ord = TRUE)
 
-#' Remove vegetation density
+#' #### Tavascan
 
-glm_species_richness_remove_area_step3 <- glm(species_richness ~ elevational_band_m +
-                                              sampling_effort_index,
+glm_species_richness_reduced_tav <- glm(species_richness ~ elevational_band_m + sampling_effort_index,
     family = poisson(link = "log"),
-    data = species_richness_sites)
+    data = species_richness_tav)
 
-summary(glm_species_richness_remove_area_step3)
-Anova(glm_species_richness_remove_area_step3)
-logLik(glm_species_richness_remove_area_step3)
-AICcmodavg::AICc(glm_species_richness_remove_area_step3, return.K = FALSE, second.ord = TRUE)
+summary(glm_species_richness_reduced_tav)
+Anova(glm_species_richness_reduced_tav)
+logLik(glm_species_richness_reduced_tav)
+AICcmodavg::AICc(glm_species_richness_reduced_tav, return.K = FALSE, second.ord = TRUE)
 
-#' Removing area from the model caused other parameters to become insignificant, therefore stepwise
-#' selection was done for the remaining parameters. Each parameter was removed in turn beginning with
-#' the one that had the largest p-value. Parameters were removed until all remaining parameters were
-#' statistically significant and the AICC improved. The reduced model included only elevation and sampling
-#' effort (AICC = 136.1) and was improved on the model that we began with which included area (AICC =
-#' 140.17).
+#' #### La Molinassa
+
+glm_species_richness_reduced_mol <- glm(species_richness ~ elevational_band_m + sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_mol)
+
+summary(glm_species_richness_reduced_mol)
+Anova(glm_species_richness_reduced_mol)
+logLik(glm_species_richness_reduced_mol)
+AICcmodavg::AICc(glm_species_richness_reduced_mol, return.K = FALSE, second.ord = TRUE)
+
+
+
 #'
 #' ### Dredge for best model fit
 #'
