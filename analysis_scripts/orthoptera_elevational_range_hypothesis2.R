@@ -175,18 +175,6 @@ plot_histograms_elevational_range <- function(dataframe) {
   }
 }
 
-plot_elevrange_elevation <- function(dataframe) {
-  #' Plot the elevational range as a function of the measures of elevation.
-
-  y_param <- dataframe$elevational_range
-  ylab <- "Elevational range (m)"
-
-  plot(y_param ~ elevational_range_midpoint, data = dataframe,
-       xlab = "Elevational range midpoint (m a.s.l)", ylab = ylab)
-
-  plot(y_param ~ mean_elevation, data = dataframe, xlab = "Mean elevation (m a.s.l)", ylab = ylab)
-}
-
 plot_elevrange_meanelevation <- function(dataframe) {
   #' Plot the elevational range as a function of the mean elevation.
 
@@ -266,7 +254,7 @@ plot_quadratic_model <- function(dataframe, model) {
   #'
   #' Get the parameters from the model output and add the equation of the line to the plot.
 
-  plot_elevrange_elevation(dataframe)
+  plot_elevrange_meanelevation(dataframe)
   i <- seq(min(dataframe$mean_elevation), max(dataframe$mean_elevation), len=100) #  x-value limits for line
   predicted_values <- predict(model, data.frame(mean_elevation=i, mean_elevation2=i*i)) #  fitted values
   lines(i, predicted_values, lty=1, lwd=2, col="blue")
@@ -418,8 +406,9 @@ par(mfrow = c(1,1))
 plot_histograms_elevational_range(elevational_ranges_caelifera)
 
 #' Plot elevational range against elevation for Caelifera only.
-par(mfrow = c(1,1))
-plot_elevrange_elevation(elevational_ranges_caelifera)
+par(mfrow = c(2,1))
+plot_elevrange_meanelevation(elevational_ranges_caelifera)
+plot_elevrange_midpointelevation(elevational_ranges_caelifera)
 
 #' The relationship between elevation and elevational range again appears to be a quadratic. Run
 #' model for polynomials up to the fourth order and do model selection to choose the most parsimonious
