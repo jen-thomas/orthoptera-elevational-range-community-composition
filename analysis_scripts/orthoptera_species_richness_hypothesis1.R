@@ -618,8 +618,8 @@ abline(h = 0)
 reduced_test <- 1-pchisq(13.92499, 18)
 reduced_test
 
-#' **TODO** As P is large, we have no evidence against the hypothesis that the model is adequate, therefore we
-#' accept the model is satisfactory.
+#' As P is large (0.77), we have no evidence against the hypothesis that the model is adequate, therefore
+#' we accept the model is satisfactory.
 #'
 #' ### Plot the GLM
 #'
