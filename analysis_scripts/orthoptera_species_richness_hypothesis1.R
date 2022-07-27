@@ -18,7 +18,8 @@ source("data_preparation.R")
 source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
-vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn", "stats", "knitr")
+vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn",
+                     "stats", "knitr", "tab")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -655,7 +656,9 @@ Anova(glm_species_best_dredge, type = 3)
 #' ### Remove outliers of sampling effort
 #' **TODO**
 #'
-#' ### **TODO** Do model just for Caelifera
+#' ### Test species richness of Caelifera in GLM
+
+glm_species_richness_full_caelifera <-
 
 #' ### Model assessment
 #'
@@ -685,9 +688,8 @@ visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
                                      scale = "response",
                                      rug = FALSE,
                                      line = list(col = "black"),
-                                     xlab = "Elevation (m a.s.l)",
-                                     ylab = "Species richness", ylim = c(0, 17),
-                                     gg = TRUE)
+                                     xlab = "Elevation (m a.s.l)", xlim = c(1000, 2600),
+                                     ylab = "Species richness", ylim = c(0, 17))
 points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 1.5)
 
 # elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
@@ -695,7 +697,9 @@ points(species_richness ~ elevational_band_m, data = species_richness_sites, pch
 
 #' ### Output tables for report
 #'
-knitr::kable(glm_species_richness_reduced, caption = "Test caption")
+glm_species_richness_reduced_table <- tablglm(glm_species_richness_reduced)
+glm_species_richness_reduced_table
+knitr::kable(glm_species_richness_reduced_table, caption = "Test caption")
 #'
 #'
 #' ## Linear regression - NOT CHANGED
