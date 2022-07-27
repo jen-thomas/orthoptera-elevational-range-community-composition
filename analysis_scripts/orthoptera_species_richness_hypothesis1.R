@@ -19,7 +19,7 @@ source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
 vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn",
-                     "stats", "knitr", "tab")
+                     "stats", "knitr", "tab", "xtable")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -658,7 +658,32 @@ Anova(glm_species_best_dredge, type = 3)
 #'
 #' ### Test species richness of Caelifera in GLM
 
-glm_species_richness_full_caelifera <-
+caelifera_observations <- get_caelifera_only(all_observations_conservative)
+
+caelifera_species_richness <- calculate_species_richness_sites(caelifera_observations)
+
+caelifera_species_richness_sites <- left_join(caelifera_species_richness, site_env_var_data,
+                                    by = c("site_elevation", "area", "elevational_band_m"))
+
+caelifera_species_richness_sites <- left_join(caelifera_species_richness_sites, sampling_effort, by = "site_elevation")
+
+glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height + mean_density,
+    family = poisson(link = "log"),
+    data = caelifera_species_richness_sites)
+
+summary(glm_species_richness_full_caelifera)
+Anova(glm_species_richness_full_caelifera)
+logLik(glm_species_richness_full_caelifera)
+AICcmodavg::AICc(glm_species_richness_full_caelifera, return.K = FALSE, second.ord = TRUE)
+
+glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_caelifera, direction = "backward")
+
+summary(glm_species_richness_caelifera_step)
+Anova(glm_species_richness_caelifera_step)
+logLik(glm_species_richness_caelifera_step)
+AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
 
 #' ### Model assessment
 #'
@@ -697,8 +722,9 @@ points(species_richness ~ elevational_band_m, data = species_richness_sites, pch
 
 #' ### Output tables for report
 #'
-glm_species_richness_reduced_table <- tablglm(glm_species_richness_reduced)
+glm_species_richness_reduced_table <- xtable(glm_species_richness_reduced)
 glm_species_richness_reduced_table
+print(glm_species_richness_reduced_table)
 knitr::kable(glm_species_richness_reduced_table, caption = "Test caption")
 #'
 #'
