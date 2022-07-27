@@ -100,7 +100,6 @@ vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
 
 #' ### Site topography
 
-
 #' Get digital elevation model (DEM) data for the study areas and calculate slope and aspect at each site.
 #' These parameters were calculated along each transect and averaged to get one value per site. The DEM
 #' data were provided by the Institut Cartogràfic i Geològic de Catalunya (ICGC) with a resolution of
@@ -155,7 +154,7 @@ species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 
 #' Cluster communities using the average-linkage algorithm. This is a standard method to use in ecology
 #' and particularly in biogeography. It "links sites and species by considering the distances to a
-#' subgroup's arithmetic average".
+#' subgroup's arithmetic average" (https://ourcodingclub.github.io/tutorials/data-clustering/).
 
 species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "average")
 
