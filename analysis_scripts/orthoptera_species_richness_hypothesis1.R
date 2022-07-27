@@ -685,6 +685,25 @@ Anova(glm_species_richness_caelifera_step)
 logLik(glm_species_richness_caelifera_step)
 AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
 
+glm_species_richness_caelifera_reduced <- glm_species_richness_caelifera_step
+
+#' Test removing elevation because it is not significant in the reduced model. See if it changes the
+#' predictive power of the model.
+
+glm_species_richness_caelifera_reduced_no_elevation <- glm(species_richness ~ slope +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_density,
+    family = poisson(link = "log"),
+    data = caelifera_species_richness_sites)
+
+summary(glm_species_richness_caelifera_reduced_no_elevation)
+Anova(glm_species_richness_caelifera_reduced_no_elevation)
+logLik(glm_species_richness_caelifera_reduced_no_elevation)
+AICcmodavg::AICc(glm_species_richness_caelifera_reduced_no_elevation, return.K = FALSE, second.ord = TRUE)
+
+#' Removing elevation from the model does not improve the predictive power of the model (AICC = 132 still)
+#' and the parameter estimates for the other variables remain the same, therefore we leave it in the
+#' reduced model.
+#' 
 #' ### Model assessment
 #'
 #' Plot the observed against fitted values for the full model and each of the final reduced models. Also
@@ -707,6 +726,7 @@ reduced_test
 
 #' **TODO** As P is large, we have no evidence against the hypothesis that the model is adequate, therefore we
 #' accept the model is satisfactory.
+#'
 #' ### Plot the GLM
 par(mfrow = c(1,1))
 visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
