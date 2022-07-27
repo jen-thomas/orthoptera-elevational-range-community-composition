@@ -248,16 +248,30 @@ linear_regression_elevrange_elevation_polynomial <- function(dataframe) {
   return(lin_regs_polynomial)
 }
 
+plot_elevrange_elevation_suborder <- function(dataframe) {
+  #' Plot the elevational range against elevation. Colour by the suborder.
+
+  ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
+    geom_point(size = 2) +
+    labs(x = "Mean elevation (m a.s.l)", y = "Elevational range (m)") +
+    theme_classic()
+}
+
 plot_quadratic_model <- function(dataframe, model) {
   #' Plot the elevational range as a function of elevation (data points) and include the line for the
   #' predicted values from the quadratic model.
   #'
   #' Get the parameters from the model output and add the equation of the line to the plot.
 
-  plot_elevrange_meanelevation(dataframe)
+  #' Plot real values
+  plot_elevrange_elevation_suborder(dataframe)
+
+  #' Get minimum and maximum values in the dataset
   i <- seq(min(dataframe$mean_elevation), max(dataframe$mean_elevation), len=100) #  x-value limits for line
+
+  #' Calculate the predicted values from the regression so they can be plotted as a line
   predicted_values <- predict(model, data.frame(mean_elevation=i, mean_elevation2=i*i)) #  fitted values
-  lines(i, predicted_values, lty=1, lwd=2, col="blue")
+  lines(i, predicted_values, lty=1, lwd=2, col="black")
 
   # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
   cf <- signif(coef(model), 2)
@@ -266,7 +280,7 @@ plot_quadratic_model <- function(dataframe, model) {
                      ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]), " E ",
                      ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " E^2 ")
 
-  mtext(equation, side = 3, line = -13)
+  mtext(equation, side = 3, line = -1)
 }
 
 check_model_assumptions <- function(model) {
@@ -365,15 +379,6 @@ get_caelifera_observations <- function(observations_df) {
   return(caelifera_observations)
 }
 
-plot_elevrange_elevation_suborder <- function(dataframe) {
-  #' Plot the elevational range against elevation. Colour by the suborder.
-
-  ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
-    geom_point(size = 2) +
-    labs(x = "Elevation (m a.s.l)", y = "Elevational range (m)") +
-    theme_classic()
-}
-
 #' Plot elevational range against elevation and colour the points by suborder. Only a small number of
 #' Ensifera are being used in this analysis, so it might be worth considering Caelifera only.
 
@@ -428,6 +433,10 @@ compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 summary(nonlin_reg_quadratic_caelifera)
+
+#' Get predicted values for this model
+
+elevational_ranges_caelifera_predicted <- cbind(elevational_ranges_caelifera, predict(nonlin_reg_quadratic_caelifera, interval = "confidence"))
 
 par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_caelifera, nonlin_reg_quadratic_caelifera)
@@ -520,18 +529,36 @@ plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
 
 elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, aes(mean_elevation, elevational_range)) +
   geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(1, 4)) +
+  scale_shape_manual(values = c(16, 4)) +
   geom_line(aes(mean_elevation, fit), colour = "black") +
   geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
   labs(x = "Mean elevation (m a.s.l.)",
-       y = "Elevational range (m)")
+       y = "Elevational range (m)") +
+  xlim(c(1000, 2600)) +
+  ylim(c(0, 1200))
 
 elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
 save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
+elevationalrange_elevation_plot
+
+elevationalrange_elevation_caelifera_plot <- ggplot(elevational_ranges_caelifera_predicted, aes(mean_elevation, elevational_range)) +
+  geom_point(aes(shape = suborder), size = 1.5) +
+  scale_shape_manual(values = c(16, 4)) +
+  geom_line(aes(mean_elevation, fit), colour = "black") +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
+  labs(x = "Mean elevation (m a.s.l.)",
+       y = "Elevational range (m)") +
+  xlim(c(1100, 2200)) +
+  ylim(c(0, 1150))
+
+elevationalrange_elevation_caelifera_plot <- format_theme_ggplot(elevationalrange_elevation_caelifera_plot)
+save_plot(elevationalrange_elevation_caelifera_plot, "hypothesis2_elevational_range_caelifera_model.png")
+elevationalrange_elevation_caelifera_plot
 
 species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
                                         aes(x = reorder(species, -mean_elevation), y = mean_elevation)) +
-  geom_point(size = 1.5) +
+  geom_point(aes(shape = suborder), size = 1.5) +
+  scale_shape_manual(values = c(16, 4)) +
   geom_segment(aes(x = species, xend = species, y = min_elevation, yend = max_elevation)) +
   ylim(min(elevational_ranges_species_predicted$min_elevation),
        max(elevational_ranges_species_predicted$max_elevation)) +
