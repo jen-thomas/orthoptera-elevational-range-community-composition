@@ -460,8 +460,10 @@ check_collinearity <- function(env_var_df) {
                   mean_per_rock, mean_max_height, mean_height_75percent,
                   mean_density)
 
-  pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
+  collinearity_comparison <- pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
                lm = FALSE, method = "spearman", factor = 2)
+
+  return(collinearity_comparison)
 }
 
 #' ### Vegetation data
