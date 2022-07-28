@@ -165,70 +165,79 @@ species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "a
 
 plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
 
+#' Try complete method
+species_jaccard_dist_cluster_complete <- hclust(species_jaccard_dist, method = "complete")
+
+#' Do some kind of bootstrapping (this doesn't seem to be used for presence-absence data) or resampling
+#' to assess the stability of the clustering solution.
+
+#' Plot cluster diagram
+
+plot(species_jaccard_dist_cluster_complete, ylab = "Jaccard distance", main = "Complete")
+
 #' Split into the subgroups using the nodes
 
 species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, k = 4)
 species_jaccard_dist_cluster_average_groups
 
-plot(x = species_jaccard_dist_cluster_average, labels =  row.names(species_jaccard_dist_cluster_average), cex = 0.5)
-rect.hclust(tree = species_jaccard_dist_cluster_average, k = 4, which = 1:4, border = 1:4, cluster = species_jaccard_dist_cluster_average_groups)
-
-sites_df$cluster_group <- species_jaccard_dist_cluster_average_groups[sites_df$site_elevation]
-
-
-map(xlim = c(1.2, 1.4), ylim = c(42.5, 42.75))  # setting the lat and long limits on our map
-map.axes()
-points(sites_df$longitude_start_e, sites_df$latitude_start_n, pch = 100, col = sites_df$group)
-
-#' The metaMDS function automatically transforms data, runs the NMDS and checks solution robustness
-
-set.seed(10)
-species_jaccard_dist_mds <- metaMDS(site_species_matrix, distance = "jaccard", trymax = 1000, trace = TRUE)
-
-#' A stress plot can then be used to assess goodness of ordination fit.
-#'
-par(mfrow=c(1,1))
-stressplot(species_jaccard_dist_mds)
+#' Plotting the subgroups when using the average linking method is not valid so do not include this
+# plot(x = species_jaccard_dist_cluster_average, labels =  row.names(species_jaccard_dist_cluster_average), cex = 0.5)
+# rect.hclust(tree = species_jaccard_dist_cluster_average, k = 4, which = 1:4, border = 1:4, cluster = species_jaccard_dist_cluster_average_groups)
+#
+# sites_df$cluster_group <- species_jaccard_dist_cluster_average_groups[sites_df$site_elevation]
+#
+#
+# map(xlim = c(1.2, 1.4), ylim = c(42.5, 42.75))  # setting the lat and long limits on our map
+# map.axes()
+# points(sites_df$longitude_start_e, sites_df$latitude_start_n, pch = 100, col = sites_df$group)
 
 #' As we have a
 par(mfrow=c(1,1))
 dimcheckMDS(site_species_matrix, dist = "jaccard")
+#' The results of this show there is still quite a change in stress between 2 and 3 dimensions so consider
+#' both.
+#' The metaMDS function automatically transforms data, runs the NMDS and checks solution robustness
 
-#plot site scores as text
-ordiplot(species_jaccard_dist_mds, display = "sites", type = "text")
+set.seed(10)
+species_jaccard_dist_mds_2dim <- metaMDS(site_species_matrix, k = 2, distance = "jaccard", trymax = 1000, trace = TRUE)
+species_jaccard_dist_mds_3dim <- metaMDS(site_species_matrix, k = 3, distance = "jaccard", trymax = 1000, trace = TRUE)
 
-#use automated plotting of results to try and eliminate overlapping labels
-#this may take a while to run
+#' Get the stress values for each of the NMDS with different number axes
+print(species_jaccard_dist_mds_2dim["stress"])
+print(species_jaccard_dist_mds_3dim["stress"])
 
-#ordipointlabel(species_jaccard_dist_mds)
 
-#the previous plot isn’t easy to understand but ordination plots are highly customizable
-#set up the plotting area but don't plot anything yet
+#' A Shepard plot can then be used to assess goodness of ordination fit.
+#'
+par(mfrow=c(1,2))
+stressplot(species_jaccard_dist_mds_2dim)
+stressplot(species_jaccard_dist_mds_3dim)
+#' There is not a lot of scatter around the line but there are lots of points where the dissimilarity is
+#' 1 (which is where we have lots of zeros in our matrix).
 
-mds_fig <- ordiplot(species_jaccard_dist_mds, type = "none")
-#plot just the samples
-#colour by habitat
-#pch=19 means plot a circle
-# points(mds_fig, "sites", pch = 19, col = "green", select = site_species_matrix[str_detect(site_species_matrix$site, "TAV"), ])
-# points(mds_fig, "sites", pch = 19, col = "blue", select = site_species_matrix[str_detect(site_species_matrix$site, "TOR"), ])
-# points(mds_fig, "sites", pch = 19, col = "red", select = site_species_matrix[str_detect(site_species_matrix$site, "MOL"), ])
+# ordipointlabel(species_jaccard_dist_mds)
 
-points(mds_fig, "sites", pch = 19, col = "green", select = env_var_matrix$area == "Tor")
-points(mds_fig, "sites", pch = 19, col = "blue", select = env_var_matrix$area == "Tavascan")
-points(mds_fig, "sites", pch = 19, col = "red", select = env_var_matrix$area == "La Molinassa")
-points(mds_fig, "sites", pch = 19, col = "black", select = env_var_matrix$area == "Besan")
-points(mds_fig, "sites", pch = 19, col = "black", select = env_var_matrix$area == "Bordes de Viros")
+#' Create a plot of the NMDS results. Colour the points by study area
+par(mfrow=c(1,1))
 
-# add confidence ellipses around habitat types
-ordiellipse(species_jaccard_dist_mds, env_var_matrix$area, conf = 0.95, label = TRUE)
+mds_fig_studyarea <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "text")
+
+points(mds_fig_studyarea, "sites", pch = 0, col = "black", select = env_var_matrix$area == "Tor")
+points(mds_fig_studyarea, "sites", pch = 1, col = "black", select = env_var_matrix$area == "Tavascan")
+points(mds_fig_studyarea, "sites", pch = 2, col = "black", select = env_var_matrix$area == "La Molinassa")
+points(mds_fig_studyarea, "sites", pch = 3, col = "black", select = env_var_matrix$area == "Besan")
+points(mds_fig_studyarea, "sites", pch = 4, col = "black", select = env_var_matrix$area == "Bordes de Viros")
+
+# add confidence ellipses around study areas
+#ordiellipse(species_jaccard_dist_mds, env_var_matrix$area, conf = 0.95, label = TRUE)
 # overlay the cluster results we calculated earlier
-ordicluster(species_jaccard_dist_mds, species_jaccard_dist_cluster_average, col = "gray")
+#ordicluster(species_jaccard_dist_mds, species_jaccard_dist_cluster_average, col = "gray")
 
 #calculate and plot environmental variable correlations with the axes
 
-env_data_fit <- envfit(species_jaccard_dist_mds,
+env_data_fit <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "aspect", "mean_perc_veg_cover", "mean_height_75percent", "mean_density")],
+                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
                        scaling = "sites",
                        permutations = 1000)
 env_data_fit
@@ -236,8 +245,84 @@ plot(env_data_fit)
 
 #ordisurf(species_jaccard_dist_mds ~ elevational_band_m, site_species_matrix, isotropic = TRUE, main = NULL, cex = 3)
 
-#' The lengths of the arrows represent the strength of the correlation of the environmental variable with
-#' the axis.
+#' Create a plot of the NMDS results. Colour the points by elevation
+mds_fig_elevation <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "text")
+
+points(mds_fig_elevation, "sites", pch = 19, col = "#004d40", select = env_var_matrix$elevational_band_m == "1100", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#1b5e20", select = env_var_matrix$elevational_band_m == "1200", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#4caf50", select = env_var_matrix$elevational_band_m == "1500", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#8bc34a", select = env_var_matrix$elevational_band_m == "1600", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#cddc39", select = env_var_matrix$elevational_band_m == "1700", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#ffeb3b", select = env_var_matrix$elevational_band_m == "1800", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#ffc107", select = env_var_matrix$elevational_band_m == "1900", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#ff9800", select = env_var_matrix$elevational_band_m == "2000", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#ff5722", select = env_var_matrix$elevational_band_m == "2100", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#795548", select = env_var_matrix$elevational_band_m == "2200", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#616161", select = env_var_matrix$elevational_band_m == "2300", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#455a64", select = env_var_matrix$elevational_band_m == "2400", size = 1.5)
+points(mds_fig_elevation, "sites", pch = 19, col = "#b0bec5", select = env_var_matrix$elevational_band_m == "2500", size = 1.5)
+
+#' Create a plot of the NMDS results with 3 dimensions. Colour the points by study area
+par(mfrow=c(1,1))
+
+mds_fig_studyarea_3dim <- ordiplot(species_jaccard_dist_mds_3dim, display = "sites", type = "text")
+
+points(mds_fig_studyarea_3dim, "sites", pch = 0, col = "black", select = env_var_matrix$area == "Tor")
+points(mds_fig_studyarea_3dim, "sites", pch = 1, col = "black", select = env_var_matrix$area == "Tavascan")
+points(mds_fig_studyarea_3dim, "sites", pch = 2, col = "black", select = env_var_matrix$area == "La Molinassa")
+points(mds_fig_studyarea_3dim, "sites", pch = 3, col = "black", select = env_var_matrix$area == "Besan")
+points(mds_fig_studyarea_3dim, "sites", pch = 4, col = "black", select = env_var_matrix$area == "Bordes de Viros")
+
+
+#' Try a different way of doing the plots. Draw convex hulls over the sites that are from the same study
+#' areas
+
+ordiplot(species_jaccard_dist_mds_2dim, type = "n")
+ordispider(species_jaccard_dist_mds_2dim, groups = env_var_matrix$area, draw = "spider", col = "grey90", label = TRUE)
+orditorp(species_jaccard_dist_mds_2dim, display = "species", col = "red", air = 1, cex = 0.7)
+orditorp(species_jaccard_dist_mds_2dim, display = "sites", col = "black", air = 0.01, cex = 1.25)
+
+#' Try a surface plot by elevation showing the species
+ordiplot(species_jaccard_dist_mds_2dim, type = "n")
+surf_elev_plot_species <- ordisurf(species_jaccard_dist_mds_2dim, env_var_matrix$elevational_band_m, main="", col ="forestgreen")
+plot(surf_elev_plot_species)
+points(species_jaccard_dist_mds_2dim, display="species", col = "grey30", air = 1, cex = 1)
+labels_species <- ordipointlabel(species_jaccard_dist_mds_2dim, display="species", col = "black")
+plot(labels_species)
+summary(surf_elev_plot_species)
+
+colvecsites = c("black", "red", "green", "blue", "orange")
+#' Try a surface plot by elevation shwoing the sites
+ordiplot(species_jaccard_dist_mds_2dim, type = "n")
+ordipointlabel(species_jaccard_dist_mds_2dim, display = "sites", col = "black", air = 1)
+surf_elev_plot_sites <- ordisurf(species_jaccard_dist_mds_2dim, env_var_matrix$elevational_band_m, main="", col ="black")
+plot(surf_elev_plot_sites)
+summary(surf_elev_plot_sites)
+
+#'Another example
+#'
+ordiplot(species_jaccard_dist_mds_2dim, type = "n")
+
+ordisurf(species_jaccard_dist_mds_2dim, env_var_matrix$elevational_band_m, main="", col="black")
+orditorp(species_jaccard_dist_mds_2dim, display="species", col="grey30", air = 1)
+orditorp(species_jaccard_dist_mds_2dim, display="sites", col=colvecsites[env_var_matrix$area], air = 2, cex=1, pch = 19)
+
+#' ### Permanova
+#'
+#' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
+#' area.
+#'
+#' Null hypothesis: the Jaccard distance is equivalent for all groups, i.e. the community composition of
+#' sites between the different groupings, is the same. See https://rpubs.com/an-bui/vegan-cheat-sheet
+
+site_elevation_permanova <- adonis2(site_species_matrix ~ elevational_band_m,
+                                    method = "jaccard", data = site_env_var_data, perm=999)
+site_elevation_permanova
+
+site_area_permanova <- adonis2(site_species_matrix ~ area,
+                               method = "jaccard", data = site_env_var_data, perm=999)
+site_area_permanova
+
 
 
 #'
