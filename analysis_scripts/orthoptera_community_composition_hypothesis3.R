@@ -21,7 +21,7 @@ source("prepare_vegetation_data.R")
 source("get_physical_site_data.R")
 
 vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp",
-                     "maptools", "leaflet", "rgeos", "corrplot", "vegan", "goeveg", "phytools")
+                     "maptools", "leaflet", "rgeos", "corrplot", "vegan", "goeveg", "phytools", "tibble")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -231,17 +231,9 @@ points(mds_fig_studyarea, "sites", pch = 4, col = "black", select = env_var_matr
 # add confidence ellipses around study areas
 #ordiellipse(species_jaccard_dist_mds, env_var_matrix$area, conf = 0.95, label = TRUE)
 # overlay the cluster results we calculated earlier
-#ordicluster(species_jaccard_dist_mds, species_jaccard_dist_cluster_average, col = "gray")
+ordicluster(species_jaccard_dist_mds_2dim, species_jaccard_dist_cluster_average, col = "gray")
 
-#calculate and plot environmental variable correlations with the axes
 
-env_data_fit <- envfit(species_jaccard_dist_mds_2dim,
-                       choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
-                       scaling = "sites",
-                       permutations = 1000)
-env_data_fit
-plot(env_data_fit)
 
 #ordisurf(species_jaccard_dist_mds ~ elevational_band_m, site_species_matrix, isotropic = TRUE, main = NULL, cex = 3)
 
@@ -306,6 +298,75 @@ ordiplot(species_jaccard_dist_mds_2dim, type = "n")
 ordisurf(species_jaccard_dist_mds_2dim, env_var_matrix$elevational_band_m, main="", col="black")
 orditorp(species_jaccard_dist_mds_2dim, display="species", col="grey30", air = 1)
 orditorp(species_jaccard_dist_mds_2dim, display="sites", col=colvecsites[env_var_matrix$area], air = 2, cex=1, pch = 19)
+
+#' ### Try a plot from https://rpubs.com/an-bui/vegan-cheat-sheet
+#'
+
+#' Create a dataframe from the environmental data
+env_var_df <- env_var_matrix %>% rownames_to_column("site_elevation")
+
+#' Put the NMDS output into a dataframe
+nmds_df <- vegan::scores(species_jaccard_dist_mds_2dim, display = "sites") %>%
+  as.data.frame() %>%
+  rownames_to_column("site_elevation") %>%
+  full_join(env_var_df, by = "site_elevation")
+
+#' Plot the NMDS, colour by elevation and have different shapes for study area
+plot_nmds <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2, color = elevational_band_m, shape = area)) +
+  geom_point(size = 3, alpha = 0.8) +
+  #scale_color_manual(values = c("lightsalmon1", "gold1", "palegreen4", "red", "blue")) +
+  stat_ellipse(linetype = 2, size = 1) +
+  #clean_background +
+  labs(title = "NMDS")
+plot_nmds
+
+#' #### How do species contribute to the dissimilarity of communities? See https://rpubs.com/an-bui/vegan-cheat-sheet
+
+#' Use the site species matrix because we are looking at how the species contribute to the communities,
+#' not the environmental variables
+env_fit <- envfit(species_jaccard_dist_mds_2dim, site_species_matrix, perm = 999)
+
+#' extract p-values for each species
+fit_pvals <- env_fit$vector$pvals %>%
+  as.data.frame() %>%
+  rownames_to_column("species") %>%
+  dplyr::rename("pvals" = ".")
+
+#' Extract coodinates for species where pval = 0.001
+
+# fit_spp <- env_fit %>%
+#   vegan::scores(env_fit$vectors$pvals, display = "vectors") %>%
+#   as.data.frame() %>%
+#   rownames_to_column("species") %>%
+#   full_join(., fit_pvals, by = "species") %>%
+#   filter(pvals < 0.05)
+
+#' Plot this (DOES NOT WORK) See same tutorial as above
+
+# nmds_plot_species <- ggplot(nmds_df, aes(x = NMDS1, y = NMDS2)) +
+#   coord_fixed() +
+#   geom_point(aes(colour = elevational_band_m, shape = area), size = 3, alpha = 0.8) +
+#   stat_ellipse(aes(color = elevational_band_m)) +
+#   geom_segment(data = fit_pvals, aes(x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+#                arrow = arrow(length = unit(0.25, "cm")),
+#   col = "black") +
+#   geom_text(data = fit_pvals, aes(label = species))
+#
+# nmds_plot_species
+
+#' #### Plot environmental variables (Vegan tutorial section 3.1) . This tutorial does it on
+#' NMDS output.
+
+#calculate and plot environmental variable correlations with the axes
+
+env_data_fit <- envfit(species_jaccard_dist_mds_2dim,
+                       choices = 1:2,
+                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
+                       scaling = "sites",
+                       permutations = 1000)
+env_data_fit
+plot(species_jaccard_dist_mds_2dim, display = "sites") # sites are shows in the tutorial
+plot(env_data_fit) # this shows the most significant variables
 
 #' ### Permanova
 #'
