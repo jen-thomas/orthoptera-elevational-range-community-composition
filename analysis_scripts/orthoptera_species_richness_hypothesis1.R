@@ -193,7 +193,7 @@ both_species_richness
 #' Eight sites had a higher species richness when using the conservative identifications. The analysis
 #' will only use conservative identifications until the regression is compared to see if there is any
 #' statistical difference in the relationship between species richness and elevation.
-
+#'
 #' ### Get environmental data
 
 #' Get vegetation data.
@@ -240,8 +240,12 @@ species_richness_sites <- left_join(species_richness_sites, sampling_effort, by 
 corr_test_samplingeffort_speciesrichness <- correlation_test(species_richness_sites, "sampling_effort_index",
                                               "species_richness")
 corr_test_samplingeffort_speciesrichness
+
+#' Print rho
+#+ message=FALSE, warning=FALSE
+
 corr_test_samplingeffort_speciesrichness_rho <- corr_test_samplingeffort_speciesrichness$estimate
-print(corr_test_samplingeffort_speciesrichness)
+print(corr_test_samplingeffort_speciesrichness_rho)
 
 #' and elevation and sampling effort.
 #+ message=FALSE, warning=FALSE
@@ -249,8 +253,12 @@ print(corr_test_samplingeffort_speciesrichness)
 corr_test_samplingeffort_elevation <- correlation_test(species_richness_sites, "elevational_band_m",
                                               "sampling_effort_index")
 corr_test_samplingeffort_elevation
+
+#' Print rho
+#+ message=FALSE, warning=FALSE
+
 corr_test_samplingeffort_elevation_rho <- corr_test_samplingeffort_elevation$estimate
-print(corr_test_samplingeffort_elevation)
+print(corr_test_samplingeffort_elevation_rho)
 
 #' As expected, species richness significantly increases with sampling effort (<em>r<sub>S</sub></em> =
 #' 0.77, <em>p</em> < 0.001). Sampling effort was lower at higher elevations (<em>r<sub>S</sub></em> =
@@ -266,6 +274,8 @@ print(corr_test_samplingeffort_elevation)
 #' <br>H<sub>1</sub>: the correlation coefficient is different from 0.
 #'
 #' View the test
+#+ message=FALSE, warning=FALSE
+
 corr_test <- correlation_test(species_richness_sites, "elevational_band_m",
                               "species_richness")
 corr_coeff <- corr_test$estimate
@@ -318,8 +328,11 @@ glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.fact
     data = species_richness_sites)
 
 summary(glm_species_richness_full)
+
+#' ANOVA
 Anova(glm_species_richness_full)
-logLik(glm_species_richness_full)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
 
 #' Elevation was almost significant (P = 0.053). Study area, slope, sampling effort and percentage
@@ -347,10 +360,17 @@ glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_ban
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
+#' Model summary
+
 summary(glm_species_richness_full_quasipoisson)
+
+#' ANOVA
 Anova(glm_species_richness_full_quasipoisson)
 
 #' ### Model selection
+#'
+#' Stepwise selection will be done on the model to find the best reduced model. To see how the R packages
+#' work and to make sure they are consistent with doing it manually, both methods will be used.
 #'
 #' #### R's backwards stepwise selection
 #'
@@ -363,12 +383,12 @@ glm_species_richness_step <- stats::step(glm_species_richness_full, direction = 
 summary(glm_species_richness_step)
 
 #' Generate an ANOVA table for the model.
-
 Anova(glm_species_richness_step)
-logLik(glm_species_richness_step)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
 
-#' Test forward stepwise selection
+#' Test forward stepwise selection using R's built in stepwise selection
 
 glm_species_richness_step_forward <- stats::step(glm_species_richness_full, direction = "forward")
 
@@ -377,12 +397,12 @@ glm_species_richness_step_forward <- stats::step(glm_species_richness_full, dire
 summary(glm_species_richness_step_forward)
 
 #' Generate an ANOVA table for the model.
-
 Anova(glm_species_richness_step_forward)
-logLik(glm_species_richness_step_forward)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_step_forward, return.K = FALSE, second.ord = TRUE)
 
-#' Test backward stepwise selection
+#' Test backward stepwise selection using R's stepwise selection
 #'
 glm_species_richness_step_backward <- stats::step(glm_species_richness_full, direction = "backward")
 
@@ -393,33 +413,44 @@ summary(glm_species_richness_step_backward)
 #' Generate an ANOVA table for the model.
 
 Anova(glm_species_richness_step_backward)
-logLik(glm_species_richness_step_backward)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.ord = TRUE)
 
 #' #### Manual backwards selection
 #'
 #' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
 #'
-#' Drop aspect
+#' Drop aspect first
 glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height + mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
+#' Model summary
 summary(glm_species_richness_step1)
+
+#' ANOVA
 Anova(glm_species_richness_step1)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_step1, return.K = FALSE, second.ord = TRUE)
 
-#' Drop max vegetation height
+#' Drop max vegetation height next
 
 glm_species_richness_step2 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         sampling_effort_index + mean_perc_veg_cover + mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
+#' Model summary
 summary(glm_species_richness_step2)
+
+#' ANOVA
 Anova(glm_species_richness_step2)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE)
 
 #' All parameters are now significant. Let this be the reduced model. AICC = 145.2388. Vegetation density
@@ -439,7 +470,11 @@ best_glm_species_richness_full_dredge <- get.models(glm_species_richness_full_dr
 glm_species_best_dredge <- glm(best_glm_species_richness_full_dredge,
                                family = poisson(link = "log"),
                                data = species_richness_sites)
+
+#' Model summary
 summary(glm_species_best_dredge)
+
+#' AICC
 AICcmodavg::AICc(glm_species_best_dredge, return.K = FALSE, second.ord = TRUE)
 
 #' The dredge results in a simpler model than using backwards selection. AICC is reduced to 136.10 (from
@@ -469,9 +504,13 @@ glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_
     family = poisson(link = "log"),
     data = species_richness_sites)
 
+#' Model summary
 summary(glm_species_richness_inter_slope_vegcover)
+
+#' ANOVA
 Anova(glm_species_richness_inter_slope_vegcover)
-logLik(glm_species_richness_inter_slope_vegcover)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
 
 #' Including the interaction of slope and vegetation cover did not increase the predictive power of the
@@ -492,17 +531,25 @@ glm_species_richness_full_tor <- glm(species_richness ~ elevational_band_m + slo
     family = poisson(link = "log"),
     data = species_richness_tor)
 
+#' Model summary
 summary(glm_species_richness_full_tor)
+
+#' ANOVA
 Anova(glm_species_richness_full_tor)
-logLik(glm_species_richness_full_tor)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full_tor, return.K = FALSE, second.ord = TRUE)
 
 #' Test stepwise selection for model at Tor
 glm_species_richness_full_tor_step <- stats::step(glm_species_richness_full_tor, direction = "backward")
 
+#' Model summary
 summary(glm_species_richness_full_tor_step)
+
+#' ANOVA
 Anova(glm_species_richness_full_tor_step)
-logLik(glm_species_richness_full_tor_step)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full_tor_step, return.K = FALSE, second.ord = TRUE)
 
 #' #### Tavascan
@@ -513,17 +560,25 @@ glm_species_richness_full_tav <- glm(species_richness ~ elevational_band_m + slo
     family = poisson(link = "log"),
     data = species_richness_tav)
 
+#' Model summary
 summary(glm_species_richness_full_tav)
+
+#' ANOVA
 Anova(glm_species_richness_full_tav)
-logLik(glm_species_richness_full_tav)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full_tav, return.K = FALSE, second.ord = TRUE)
 
 #' Test stepwise selection for model at Tavascan
 glm_species_richness_full_tav_step <- stats::step(glm_species_richness_full_tav, direction = "backward")
 
+#' Model summary
 summary(glm_species_richness_full_tav_step)
+
+#' ANOVA
 Anova(glm_species_richness_full_tav_step)
-logLik(glm_species_richness_full_tav_step)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full_tav_step, return.K = FALSE, second.ord = TRUE)
 
 #' #### La Molinassa
@@ -534,17 +589,25 @@ glm_species_richness_full_mol <- glm(species_richness ~ elevational_band_m + slo
     family = poisson(link = "log"),
     data = species_richness_mol)
 
+#' Model summary
 summary(glm_species_richness_full_mol)
+
+#' ANOVA
 Anova(glm_species_richness_full_mol)
-logLik(glm_species_richness_full_mol)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full_mol, return.K = FALSE, second.ord = TRUE)
 
 #' Test stepwise selection for model at La Molinassa
 glm_species_richness_full_mol_step <- stats::step(glm_species_richness_full_mol, direction = "backward")
 
+#' Model summary
 summary(glm_species_richness_full_mol_step)
+
+#' ANOVA
 Anova(glm_species_richness_full_mol_step)
-logLik(glm_species_richness_full_mol_step)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_full_mol_step, return.K = FALSE, second.ord = TRUE)
 
 #' ### Remove outliers of sampling effort
@@ -577,12 +640,9 @@ glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m
 summary(glm_species_richness_full_caelifera)
 
 #' Do ANOVA of GLM
-
 Anova(glm_species_richness_full_caelifera)
-logLik(glm_species_richness_full_caelifera)
 
 #' Get AICC of GLM
-
 AICcmodavg::AICc(glm_species_richness_full_caelifera, return.K = FALSE, second.ord = TRUE)
 
 #' Do backwards stepwise selection on the GLM to get the reduced model
@@ -594,12 +654,9 @@ glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_cae
 summary(glm_species_richness_caelifera_step)
 
 #' Do ANOVA of reduced GLM
-
 Anova(glm_species_richness_caelifera_step)
-logLik(glm_species_richness_caelifera_step)
 
 #' Get AICC of reduced GLM
-
 AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
 
 #' Define the reduced model for Caelifera species richness
@@ -614,9 +671,13 @@ glm_species_richness_caelifera_reduced_no_elevation <- glm(species_richness ~ sl
     family = poisson(link = "log"),
     data = caelifera_species_richness_sites)
 
+#' Model summary
 summary(glm_species_richness_caelifera_reduced_no_elevation)
+
+#' ANOVA
 Anova(glm_species_richness_caelifera_reduced_no_elevation)
-logLik(glm_species_richness_caelifera_reduced_no_elevation)
+
+#' AICC
 AICcmodavg::AICc(glm_species_richness_caelifera_reduced_no_elevation, return.K = FALSE, second.ord = TRUE)
 
 #' Removing elevation from the model does not improve the predictive power of the model (AICC = 132 still)
