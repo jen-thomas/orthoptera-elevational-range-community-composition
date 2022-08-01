@@ -263,14 +263,24 @@ plot_quadratic_model <- function(dataframe, model) {
   #'
   #' Get the parameters from the model output and add the equation of the line to the plot.
 
-  #' Plot real values
-  plot_elevrange_elevation_suborder(dataframe)
-
+  #plot_elevrange_elevation_suborder(dataframe)
   #' Get minimum and maximum values in the dataset
   i <- seq(min(dataframe$mean_elevation), max(dataframe$mean_elevation), len=100) #  x-value limits for line
 
   #' Calculate the predicted values from the regression so they can be plotted as a line
   predicted_values <- predict(model, data.frame(mean_elevation=i, mean_elevation2=i*i)) #  fitted values
+
+  #' Plot real values
+  # ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
+  #   geom_point(size = 2) +
+  #   geom_line(data = predicted_values, aes(x = i, y = predicted_values, col = "black"))
+  #   labs(x = "Mean elevation (m a.s.l)", y = "Elevational range (m)") +
+  #   theme_classic()
+
+  plot(x = dataframe$mean_elevation, y = dataframe$elevational_range,
+       xlab = "Mean elevation (m a.s.l)", ylab = "Elevational range (m)"
+  )
+
   lines(i, predicted_values, lty=1, lwd=2, col="black")
 
   # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
@@ -307,7 +317,7 @@ plot_histograms_elevational_range(elevational_ranges_species)
 
 par(mfrow = c(1,1))
 plot_elevrange_meanelevation(elevational_ranges_species)
-plot_elevrange_midpointelevation(elevational_ranges_species)
+#plot_elevrange_midpointelevation(elevational_ranges_species)
 
 #' From these plots, we can see that the relationship does not appear to be linear.
 #'
@@ -411,9 +421,9 @@ par(mfrow = c(1,1))
 plot_histograms_elevational_range(elevational_ranges_caelifera)
 
 #' Plot elevational range against elevation for Caelifera only.
-par(mfrow = c(2,1))
+par(mfrow = c(1,1))
 plot_elevrange_meanelevation(elevational_ranges_caelifera)
-plot_elevrange_midpointelevation(elevational_ranges_caelifera)
+#plot_elevrange_midpointelevation(elevational_ranges_caelifera)
 
 #' The relationship between elevation and elevational range again appears to be a quadratic. Run
 #' model for polynomials up to the fourth order and do model selection to choose the most parsimonious
@@ -524,9 +534,12 @@ plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
 #' ## Plots
 #'
 #' Plot the elevational ranges from all observations that are used in the main results (this excludes
-#' the singletons). Points should be different shapes for Caelifera and Ensifera. Overlay the overall
-#' model. Consider overlaying the models just for Caelifera and just for Tavascan and La Molinassa.
+#' the singletons). Filled circles are Caelifera; crosses are Ensifera. The first plot shows the
+#' relationship between elevational range of all species with mean elevation. The second plot shows the
+#' relationship between elevational range with elevation for Caelifera only. Lines show the best-fitted
+#' regression for each set of species.
 
+#' All species
 elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, aes(mean_elevation, elevational_range)) +
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(16, 4)) +
@@ -541,6 +554,7 @@ elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevatio
 save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
 elevationalrange_elevation_plot
 
+#' Only Caelifera
 elevationalrange_elevation_caelifera_plot <- ggplot(elevational_ranges_caelifera_predicted, aes(mean_elevation, elevational_range)) +
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(16, 4)) +
@@ -554,6 +568,9 @@ elevationalrange_elevation_caelifera_plot <- ggplot(elevational_ranges_caelifera
 elevationalrange_elevation_caelifera_plot <- format_theme_ggplot(elevationalrange_elevation_caelifera_plot)
 save_plot(elevationalrange_elevation_caelifera_plot, "hypothesis2_elevational_range_caelifera_model.png")
 elevationalrange_elevation_caelifera_plot
+
+#' Elevational range and mean elevation (filled circles: Caelifera; crosses: Ensifera) of all species.
+#' Ordered by decreasing mean elevation.
 
 species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
                                         aes(x = reorder(species, -mean_elevation), y = mean_elevation)) +
@@ -569,7 +586,7 @@ species_elevationalrange_plot <- format_theme_ggplot_vertical_xaxis_labels(speci
 species_elevationalrange_plot
 save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
 
-#' ## Results
+#' ## Results NOT UPDATED
 #' **TODO**: results need updating here.
 #' There was a significant relationship between elevation and elevational range (<em>R<sup>2</sup></em> =
 #' 0.60; <em>df</em> = 2, 19; <em>p</em> = < 0.001). A maximum elevational range ($ER$) of 857 m was
