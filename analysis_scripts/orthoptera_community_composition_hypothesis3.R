@@ -173,19 +173,14 @@ plot(species_jaccard_dist_cluster_complete, ylab = "Jaccard distance", main = "C
 #' Split into the subgroups using the nodes. This is more to visualise than anything. Plotting the
 #' subgroups is not valid when using the average linkage method.
 
-species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, k = 4)
+species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, k = 7)
 species_jaccard_dist_cluster_average_groups
 
 #' Plotting the subgroups when using the average linking method is not valid so do not include this
-# plot(x = species_jaccard_dist_cluster_average, labels =  row.names(species_jaccard_dist_cluster_average), cex = 0.5)
-# rect.hclust(tree = species_jaccard_dist_cluster_average, k = 4, which = 1:4, border = 1:4, cluster = species_jaccard_dist_cluster_average_groups)
-#
-# sites_df$cluster_group <- species_jaccard_dist_cluster_average_groups[sites_df$site_elevation]
-#
-#
-# map(xlim = c(1.2, 1.4), ylim = c(42.5, 42.75))  # setting the lat and long limits on our map
-# map.axes()
-# points(sites_df$longitude_start_e, sites_df$latitude_start_n, pch = 100, col = sites_df$group)
+plot(x = species_jaccard_dist_cluster_average, labels =  row.names(species_jaccard_dist_cluster_average), cex = 0.5)
+rect.hclust(tree = species_jaccard_dist_cluster_average, k = 4, which = 1:4, border = 1:4, cluster = species_jaccard_dist_cluster_average_groups)
+sites_df$cluster_group <- species_jaccard_dist_cluster_average_groups[sites_df$site_elevation]
+
 
 #' Plot the Shepard stress plot to check how many dimensions should be used. Look for where the line
 #' starts to flatten.
