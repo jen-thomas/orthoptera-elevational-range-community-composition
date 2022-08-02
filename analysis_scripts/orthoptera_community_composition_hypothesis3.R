@@ -160,6 +160,10 @@ species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 
 species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "average")
 
+#' Test the stability of the clusters using permutation tests
+anova(species_jaccard_dist_cluster_average, step = 999)
+pairwisePermutationTest()
+
 #' Plot cluster diagram
 plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
 
