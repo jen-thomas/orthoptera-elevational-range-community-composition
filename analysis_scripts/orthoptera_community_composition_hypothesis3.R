@@ -89,9 +89,7 @@ site_species_matrix
 
 #' ## Environmental variables
 #'
-#' Environmental variables will be checked for collinearity, then the quantitative variables describing
-#' the vegetation (average vegetation height, maximum vegetation height and vegetation density) will be
-#' normalised (**TODO**) to have a mean of 0 and standard deviation of 1. Site aspect will be converted to
+#' Environmental variables will be checked for collinearity. Site aspect will be converted to
 #' four compass points and other environmental variables transformed as needed.
 #'
 #' ### Vegetation data
@@ -160,9 +158,8 @@ species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 
 species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "average")
 
-#' Test the stability of the clusters using permutation tests
-anova(species_jaccard_dist_cluster_average, step = 999)
-pairwisePermutationTest()
+#' TODO Test the stability of the clusters using permutation tests
+
 
 #' Plot cluster diagram
 plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
