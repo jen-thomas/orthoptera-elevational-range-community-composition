@@ -164,23 +164,29 @@ species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "a
 #' Plot cluster diagram
 plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
 
-#' Try complete method
-species_jaccard_dist_cluster_complete <- hclust(species_jaccard_dist, method = "complete")
-
-#' Plot cluster diagram
-plot(species_jaccard_dist_cluster_complete, ylab = "Jaccard distance", main = "Complete")
-
 #' Split into the subgroups using the nodes. This is more to visualise than anything. Plotting the
 #' subgroups is not valid when using the average linkage method.
 
-species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, k = 7)
+species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, h = 0.85)
 species_jaccard_dist_cluster_average_groups
 
-#' Plotting the subgroups when using the average linking method is not valid so do not include this
-plot(x = species_jaccard_dist_cluster_average, labels =  row.names(species_jaccard_dist_cluster_average), cex = 0.5)
-rect.hclust(tree = species_jaccard_dist_cluster_average, k = 4, which = 1:4, border = 1:4, cluster = species_jaccard_dist_cluster_average_groups)
-sites_df$cluster_group <- species_jaccard_dist_cluster_average_groups[sites_df$site_elevation]
+#' Find out how many subgroups have been created
+length(unique(species_jaccard_dist_cluster_average_groups))
 
+#' Plotting the subgroups when using the average linking method is not valid so do not include this
+plot(x = species_jaccard_dist_cluster_average, labels = row.names(species_jaccard_dist_cluster_average), cex = 0.5)
+rect.hclust(tree = species_jaccard_dist_cluster_average, h = 0.85, cluster = species_jaccard_dist_cluster_average_groups)
+
+#' Create a dataframe from the site names and cluster groups
+cluster_average_groups <- species_jaccard_dist_cluster_average_groups %>%
+  as.data.frame() %>%
+  rownames_to_column("site_elevation") %>%
+  dplyr::rename("cluster_group" = ".")
+
+#' Join the cluster numbers onto the environmental variables data frame
+env_var_df <- env_var_matrix %>% rownames_to_column("site_elevation")
+env_var_clusters <- left_join(env_var_df, cluster_average_groups, by = "site_elevation")
+env_var_mat_clusters <- column_to_rownames(env_var_clusters, var = "site_elevation")
 
 #' Plot the Shepard stress plot to check how many dimensions should be used. Look for where the line
 #' starts to flatten.
@@ -208,8 +214,66 @@ stressplot(species_jaccard_dist_mds_2dim)
 #' There is not a lot of scatter around the line but there are lots of points where the dissimilarity is
 #' 1 (which is where we have lots of zeros in our matrix).
 
+#' Calculate and plot environmental variable correlations with the axes. Display the environmental
+#' variables. Note that even though they are plotted, this does not mean they are significant.
+#+ message=FALSE, warning=FALSE
+
+env_data_fit <- envfit(species_jaccard_dist_mds_2dim,
+                       choices = 1:2,
+                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
+                       scaling = "sites",
+                       permutations = 1000)
+env_data_fit
+env_sites_plot <- ordipointlabel(species_jaccard_dist_mds_2dim, display = "sites") # sites are shows in the tutorial
+plot(env_sites_plot)
+
+#' Do the same plot but for sites with the environmental variables and colour the points by the cluster group
+#+ message=FALSE, warning=FALSE
+
+#' Method from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
+
+ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
+points(species_jaccard_dist_mds_2dim, col = env_var_mat_clusters$cluster_group, pch = env_var_mat_clusters$area)
+plot(env_data_fit)
+legend('topright', legend=unique(env_var_mat_clusters$cluster_group), col=unique(env_var_mat_clusters$cluster_group), pch = unique(env_var_mat_clusters$area))
+
+#' ### Permanova
+#'
+#' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
+#' area.
+#'
+#' Null hypothesis: the Jaccard distance is equivalent for all groups, i.e. the community composition of
+#' sites between the different groupings, is the same. See https://rpubs.com/an-bui/vegan-cheat-sheet
+
+site_elevation_permanova <- adonis2(site_species_matrix ~ elevational_band_m,
+                                    method = "jaccard", data = site_env_var_data, perm=999)
+site_elevation_permanova
+
+site_area_permanova <- adonis2(site_species_matrix ~ area,
+                               method = "jaccard", data = site_env_var_data, perm=999)
+site_area_permanova
+
+#' ## Example of how to do plots (not needed for results)
+
 #' Create a plot of the NMDS results. Colour the points by study area
 #+ message=FALSE, warning=FALSE
+
+#' Try another method (this works)
+
+par(mfrow=c(1,1))
+nmds_sites <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites")
+#ordilabel(species_jaccard_dist_mds_2dim, display = "sites")
+points(nmds_sites, "sites", pch = 0, col = "red", env_var_mat_clusters$cluster_group == "1")
+points(nmds_sites, "sites", pch = 0, col = "black", env_var_mat_clusters$cluster_group == "2")
+points(nmds_sites, "sites", pch = 0, col = "blue", env_var_mat_clusters$cluster_group == "3")
+points(nmds_sites, "sites", pch = 0, col = "orange", env_var_mat_clusters$cluster_group == "4")
+points(nmds_sites, "sites", pch = 0, col = "green", env_var_mat_clusters$cluster_group == "5")
+points(nmds_sites, "sites", pch = 0, col = "pink", env_var_mat_clusters$cluster_group == "6")
+points(nmds_sites, "sites", pch = 0, col = "brown", env_var_mat_clusters$cluster_group == "7")
+points(nmds_sites, "sites", pch = 0, col = "yellow", env_var_mat_clusters$cluster_group == "8")
+points(nmds_sites, "sites", pch = 0, col = "grey", env_var_mat_clusters$cluster_group == "9")
+points(nmds_sites, "sites", pch = 0, col = "purple", env_var_mat_clusters$cluster_group == "10")
+plot(env_data_fit)
 
 par(mfrow=c(1,1))
 mds_fig_studyarea <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites")
@@ -276,48 +340,6 @@ fit_pvals <- env_fit$vector$pvals %>%
   as.data.frame() %>%
   rownames_to_column("species") %>%
   dplyr::rename("pvals" = ".")
-
-#' Calculate and plot environmental variable correlations with the axes. Display the environmental
-#' variables. Note that even though they are plotted, this does not mean they are significant.
-#+ message=FALSE, warning=FALSE
-
-env_data_fit <- envfit(species_jaccard_dist_mds_2dim,
-                       choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
-                       scaling = "sites",
-                       permutations = 1000)
-env_data_fit
-env_sites_plot <- ordipointlabel(species_jaccard_dist_mds_2dim, display = "sites") # sites are shows in the tutorial
-plot(env_sites_plot)
-plot(env_data_fit)
-
-#' Do the same plot but for species with the environmental variables
-#+ message=FALSE, warning=FALSE
-
-env_data_fit_species <- envfit(species_jaccard_dist_mds_2dim,
-                       choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
-                       scaling = "species",
-                       permutations = 1000)
-env_data_fit_species
-plot(species_jaccard_dist_mds_2dim, display = "species")
-plot(env_data_fit_species) # this shows the most significant variables
-
-#' ### Permanova
-#'
-#' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
-#' area.
-#'
-#' Null hypothesis: the Jaccard distance is equivalent for all groups, i.e. the community composition of
-#' sites between the different groupings, is the same. See https://rpubs.com/an-bui/vegan-cheat-sheet
-
-site_elevation_permanova <- adonis2(site_species_matrix ~ elevational_band_m,
-                                    method = "jaccard", data = site_env_var_data, perm=999)
-site_elevation_permanova
-
-site_area_permanova <- adonis2(site_species_matrix ~ area,
-                               method = "jaccard", data = site_env_var_data, perm=999)
-site_area_permanova
 
 #' ## Questions NOT UPDATED
 #' ### Environmental variables
