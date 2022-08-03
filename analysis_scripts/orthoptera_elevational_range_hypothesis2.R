@@ -322,9 +322,18 @@ plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
   plot(x = jitter(dataframe$elevational_range_midpoint, amount = 20),
        y = jitter(dataframe$elevational_range, amount = 20),
        pch = c(1, 4)[as.numeric(dataframe$suborder)],
-       xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m)",
-       xlim = c(1100, 2300), ylim = c(0, 1400)
+       xlim = c(1100, 2300), ylim = c(0, 1400),
+       xlab = "Elevational range midpoint (m a.s.l)",
+       ylab = "Elevational range (m)"
+       # xaxt = "n", yaxt = "n",
+       # xlab = "", ylab = "", # so that the labels can be printed below
   )
+
+  # axis(side = 1, tick = TRUE, line = 0, cex.axis = 0.5, lwd = 0.2)
+  # axis(side = 2, tick = TRUE, line = 0, cex.axis = 0.5, lwd = 0.2)
+  #
+  # title(xlab = "Elevational range midpoint (m a.s.l)", cex.axis = 0.6, cex.lab = 0.8, line = 1)
+  # title(ylab = "Elevational range (m)", cex.axis = 0.6, cex.lab = 0.8, line = 1)
 
   lines(i, predicted_values, lty=1, lwd=2, col="black")
   lines(i, intervals[ , 3], lty = "dashed", col = "grey")
@@ -539,7 +548,7 @@ plot_quadratic_model_predvalues(elevational_ranges_caelifera_predicted, nonlin_r
 species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
                                         aes(x = reorder(species, -elevational_range_midpoint), y = elevational_range_midpoint)) +
   geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(11, 4)) +
+  scale_shape_manual(values = c(1, 4)) +
   geom_hline(yintercept = 1100, linetype = "dashed", col = "grey") +
   geom_hline(yintercept = 2500, linetype = "dashed", col = "grey") +
   geom_segment(aes(x = species, xend = species, y = min_elevation, yend = min_elevation + elevational_range)) +
