@@ -109,7 +109,11 @@ calculate_elevational_range <- function(observations) {
     distinct(species, suborder, elevational_band_m) %>%
     group_by(species, suborder) %>%
     dplyr::summarise("min_elevation" = min(elevational_band_m), "max_elevation" = max(elevational_band_m),
-                     "elevational_range" = max_elevation - min_elevation,
+                     "elevational_range" = max_elevation - min_elevation + 100, # assign those that are
+                     # only in one band to have a range of 100m; count the elevational range of the others
+                     # as the full potential range they could have been recorded at, which is the max of
+                     # the highest band to the min of the lowest band. Because we take the elevational
+                     # band of a site to be the minimum elevation, then we just need to add 100
                      "elevational_range_midpoint" = max_elevation - elevational_range / 2,
                      "mean_elevation" = mean(elevational_band_m))
 
@@ -117,11 +121,12 @@ calculate_elevational_range <- function(observations) {
 }
 
 plot_elevrange_elevation_species <- function(observations) {
-  #' Plot the elevational range against elevation, with each data point coloured by species.
+  #' Plot the elevational range against elevation, with each data point coloured by species. Elevation
+  #' here is considered as the midpoint.
 
-    ggplot(observations, aes(x = mean_elevation, y = elevational_range, colour = species)) +
+    ggplot(observations, aes(x = elevational_range_midpoint, y = elevational_range, colour = species)) +
     geom_point(size = 2) +
-    labs(x = "Elevation (m a.s.l)", y = "Elevational range (m)") +
+    labs(x = "Elevational range midpoint (m a.s.l)", y = "Elevational range (m)") +
     theme_classic()
 }
 
@@ -138,11 +143,14 @@ plot_elevrange_elevation_species(elevational_ranges_species)
 #'
 #' We hypothesise that species that live at a higher elevation will occupy a larger elevational range.
 #' Elevational range was calculated by subtracting the minimum elevation at which a species was observed,
-#' from the maximum.
+#' from the maximum. It incorporates the full possible range, so species only found in one band are
+#' artificially given a range of 100m, and all others are given the range of the max from the highest
+#' band to the min of the lower band.
 #'
 #' Two measures of elevation were calculated: the midpoint between the minimum and maximum elevation,
 #' which was calculated by subtracting half of the elevational range from the maximum elevation; and the
-#' mean elevation of all of the observations of each species.
+#' mean elevation of all of the observations of each species. Midpoint is preferred because it is not
+#' biased by potentially more observations at one end of the elevational range.
 #'
 #' The functions below manipulate the data needed for the modelling below.
 
@@ -214,11 +222,11 @@ calculate_polynomials_elevation <- function(dataframe) {
   #'
   #' Return dataframe.
 
-  parameter <- dataframe$mean_elevation
+  parameter <- dataframe$elevational_range_midpoint
 
-  dataframe$mean_elevation2 <- parameter^2
-  dataframe$mean_elevation3 <- parameter^3
-  dataframe$mean_elevation4 <- parameter^4
+  dataframe$elevational_range_midpoint2 <- parameter^2
+  dataframe$elevational_range_midpoint3 <- parameter^3
+  dataframe$elevational_range_midpoint4 <- parameter^4
 
   return(dataframe)
 }
@@ -231,18 +239,18 @@ linear_regression_elevrange_elevation_polynomial <- function(dataframe) {
 
   lin_regs_polynomial <- list()
 
-  lin_reg <- lm(elevational_range ~ mean_elevation, data = dataframe)
+  lin_reg <- lm(elevational_range ~ elevational_range_midpoint, data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(lin_reg))
 
-  nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation + mean_elevation2, data = dataframe)
+  nonlin_reg_quadratic <- lm(elevational_range ~ elevational_range_midpoint + elevational_range_midpoint2, data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quadratic))
 
-  nonlin_reg_cubic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3,
+  nonlin_reg_cubic <- lm(elevational_range ~ elevational_range_midpoint + elevational_range_midpoint2 + elevational_range_midpoint3,
                        data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_cubic))
 
-  nonlin_reg_quartic <- lm(elevational_range ~ mean_elevation + mean_elevation2 + mean_elevation3 +
-                         mean_elevation4, data = dataframe)
+  nonlin_reg_quartic <- lm(elevational_range ~ elevational_range_midpoint + elevational_range_midpoint2 + elevational_range_midpoint3 +
+                         elevational_range_midpoint4, data = dataframe)
   lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quartic))
 
   return(lin_regs_polynomial)
@@ -251,9 +259,9 @@ linear_regression_elevrange_elevation_polynomial <- function(dataframe) {
 plot_elevrange_elevation_suborder <- function(dataframe) {
   #' Plot the elevational range against elevation. Colour by the suborder.
 
-  ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
+  ggplot(dataframe, aes(x = elevational_range_midpoint, y = elevational_range, colour = suborder)) +
     geom_point(size = 2) +
-    labs(x = "Mean elevation (m a.s.l)", y = "Elevational range (m)") +
+    labs(x = "Elevational range midpoint (m a.s.l)", y = "Elevational range (m)") +
     theme_classic()
 }
 
@@ -263,12 +271,11 @@ plot_quadratic_model <- function(dataframe, model) {
   #'
   #' Get the parameters from the model output and add the equation of the line to the plot.
 
-  #plot_elevrange_elevation_suborder(dataframe)
   #' Get minimum and maximum values in the dataset
-  i <- seq(min(dataframe$mean_elevation), max(dataframe$mean_elevation), len=100) #  x-value limits for line
+  i <- seq(min(dataframe$elevational_range_midpoint), max(dataframe$elevational_range_midpoint), len=100) #  x-value limits for line
 
   #' Calculate the predicted values from the regression so they can be plotted as a line
-  predicted_values <- predict(model, data.frame(mean_elevation=i, mean_elevation2=i*i)) #  fitted values
+  predicted_values <- predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
 
   #' Plot real values
   # ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
@@ -277,8 +284,8 @@ plot_quadratic_model <- function(dataframe, model) {
   #   labs(x = "Mean elevation (m a.s.l)", y = "Elevational range (m)") +
   #   theme_classic()
 
-  plot(x = dataframe$mean_elevation, y = dataframe$elevational_range,
-       xlab = "Mean elevation (m a.s.l)", ylab = "Elevational range (m)"
+  plot(x = dataframe$elevational_range_midpoint, y = dataframe$elevational_range,
+       xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m)"
   )
 
   lines(i, predicted_values, lty=1, lwd=2, col="black")
@@ -316,14 +323,14 @@ plot_histograms_elevational_range(elevational_ranges_species)
 #' species was observed.
 
 par(mfrow = c(1,1))
-plot_elevrange_meanelevation(elevational_ranges_species)
-#plot_elevrange_midpointelevation(elevational_ranges_species)
+#plot_elevrange_meanelevation(elevational_ranges_species)
+plot_elevrange_midpointelevation(elevational_ranges_species)
 
 #' From these plots, we can see that the relationship does not appear to be linear.
 #'
-#' There seems to be a non-linear relationship between the elevational range and both measures of elevation
-#' (mean and mid-point) as seen on both of the plots. The relationship could be quadratic. Test the
-#' quadratic, cubic and quartic models. Calculate these parameters first.
+#' There seems to be a non-linear relationship between the elevational range and the mid-point. The
+#' relationship could be quadratic. Test the quadratic, cubic and quartic models. Calculate these
+#' parameters first.
 
 elevational_ranges_species <- calculate_polynomials_elevation(elevational_ranges_species)
 
@@ -422,8 +429,8 @@ plot_histograms_elevational_range(elevational_ranges_caelifera)
 
 #' Plot elevational range against elevation for Caelifera only.
 par(mfrow = c(1,1))
-plot_elevrange_meanelevation(elevational_ranges_caelifera)
-#plot_elevrange_midpointelevation(elevational_ranges_caelifera)
+#plot_elevrange_meanelevation(elevational_ranges_caelifera)
+plot_elevrange_midpointelevation(elevational_ranges_caelifera)
 
 #' The relationship between elevation and elevational range again appears to be a quadratic. Run
 #' model for polynomials up to the fourth order and do model selection to choose the most parsimonious
@@ -465,6 +472,65 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' It is hard to tell if the assumption of heteroscedasticity is violated or not because there are many
 #' more data points for higher fitted values. The residuals have a left-skewed distribution.
 #'
+#' ## Plots
+#'
+#' Plot the elevational ranges from all observations that are used in the main results (this excludes
+#' the singletons). Filled circles are Caelifera; crosses are Ensifera. The first plot shows the
+#' relationship between elevational range of all species with midpoint. The second plot shows the
+#' relationship between elevational range with midpoint elevation for Caelifera only. Lines show the
+#' best-fitted regression for each set of species.
+
+#' All species
+elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted,
+                                          aes(elevational_range_midpoint, elevational_range)) +
+  geom_point(aes(shape = suborder), size = 1.5) +
+  scale_shape_manual(values = c(16, 4)) +
+  geom_line(aes(elevational_range_midpoint, fit), colour = "black") +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
+  labs(x = "Elevational range midpoint (m a.s.l)",
+       y = "Elevational range (m)") +
+  xlim(c(1000, 2600)) +
+  ylim(c(0, 1200))
+
+elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
+save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
+elevationalrange_elevation_plot
+
+#' Only Caelifera
+elevationalrange_elevation_caelifera_plot <- ggplot(elevational_ranges_caelifera_predicted,
+                                                    aes(elevational_range_midpoint, elevational_range)) +
+  geom_point(aes(shape = suborder), size = 1.5) +
+  scale_shape_manual(values = c(16, 4)) +
+  geom_line(aes(elevational_range_midpoint, fit), colour = "black") +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
+  labs(x = "Elevational range midpoint (m a.s.l)",
+       y = "Elevational range (m)") +
+  xlim(c(1100, 2200)) +
+  ylim(c(0, 1150))
+
+elevationalrange_elevation_caelifera_plot <- format_theme_ggplot(elevationalrange_elevation_caelifera_plot)
+save_plot(elevationalrange_elevation_caelifera_plot, "hypothesis2_elevational_range_caelifera_model.png")
+elevationalrange_elevation_caelifera_plot
+
+#' Elevational range and mean elevation (filled circles: Caelifera; crosses: Ensifera) of all species.
+#' Ordered by decreasing elevational range midpoint.
+
+species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
+                                        aes(x = reorder(species, -elevational_range_midpoint), y = elevational_range_midpoint)) +
+  geom_point(aes(shape = suborder), size = 1.5) +
+  scale_shape_manual(values = c(16, 4)) +
+  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = max_elevation)) +
+  ylim(min(elevational_ranges_species_predicted$min_elevation),
+       max(elevational_ranges_species_predicted$max_elevation)) +
+  labs(x = "Species",
+       y = "Elevational range (m)")
+
+species_elevationalrange_plot <- format_theme_ggplot_vertical_xaxis_labels(species_elevationalrange_plot)
+species_elevationalrange_plot
+save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
+
+#' ## DO NOT USE
+
 #' ## Remove Tor observations from analysis
 #'
 #' When looking at the relationship of species richness with elevation, there was a difference between
@@ -531,61 +597,6 @@ plot_quadratic_model(elevational_ranges_tav_mol, nonlin_reg_quadratic_tav_mol)
 #' I'm not sure if this is worth showing at the moment in the results. **TODO**: decide if this
 #' relationship is worth displaying on a plot with the main result and the observations from all sites.
 #'
-#' ## Plots
-#'
-#' Plot the elevational ranges from all observations that are used in the main results (this excludes
-#' the singletons). Filled circles are Caelifera; crosses are Ensifera. The first plot shows the
-#' relationship between elevational range of all species with mean elevation. The second plot shows the
-#' relationship between elevational range with elevation for Caelifera only. Lines show the best-fitted
-#' regression for each set of species.
-
-#' All species
-elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted, aes(mean_elevation, elevational_range)) +
-  geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(16, 4)) +
-  geom_line(aes(mean_elevation, fit), colour = "black") +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
-  labs(x = "Mean elevation (m a.s.l.)",
-       y = "Elevational range (m)") +
-  xlim(c(1000, 2600)) +
-  ylim(c(0, 1200))
-
-elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
-save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
-elevationalrange_elevation_plot
-
-#' Only Caelifera
-elevationalrange_elevation_caelifera_plot <- ggplot(elevational_ranges_caelifera_predicted, aes(mean_elevation, elevational_range)) +
-  geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(16, 4)) +
-  geom_line(aes(mean_elevation, fit), colour = "black") +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
-  labs(x = "Mean elevation (m a.s.l.)",
-       y = "Elevational range (m)") +
-  xlim(c(1100, 2200)) +
-  ylim(c(0, 1150))
-
-elevationalrange_elevation_caelifera_plot <- format_theme_ggplot(elevationalrange_elevation_caelifera_plot)
-save_plot(elevationalrange_elevation_caelifera_plot, "hypothesis2_elevational_range_caelifera_model.png")
-elevationalrange_elevation_caelifera_plot
-
-#' Elevational range and mean elevation (filled circles: Caelifera; crosses: Ensifera) of all species.
-#' Ordered by decreasing mean elevation.
-
-species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
-                                        aes(x = reorder(species, -mean_elevation), y = mean_elevation)) +
-  geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(16, 4)) +
-  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = max_elevation)) +
-  ylim(min(elevational_ranges_species_predicted$min_elevation),
-       max(elevational_ranges_species_predicted$max_elevation)) +
-  labs(x = "Species",
-       y = "Elevational range (m)")
-
-species_elevationalrange_plot <- format_theme_ggplot_vertical_xaxis_labels(species_elevationalrange_plot)
-species_elevationalrange_plot
-save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
-
 #' ## Results NOT UPDATED
 #' **TODO**: results need updating here.
 #' There was a significant relationship between elevation and elevational range (<em>R<sup>2</sup></em> =
