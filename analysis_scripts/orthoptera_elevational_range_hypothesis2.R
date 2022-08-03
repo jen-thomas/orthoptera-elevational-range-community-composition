@@ -114,7 +114,7 @@ calculate_elevational_range <- function(observations) {
                      # as the full potential range they could have been recorded at, which is the max of
                      # the highest band to the min of the lowest band. Because we take the elevational
                      # band of a site to be the minimum elevation, then we just need to add 100
-                     "elevational_range_midpoint" = max_elevation - elevational_range / 2,
+                     "elevational_range_midpoint" = min_elevation + elevational_range / 2,
                      "mean_elevation" = mean(elevational_band_m))
 
   return(elevational_ranges_species)
@@ -519,7 +519,7 @@ species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
                                         aes(x = reorder(species, -elevational_range_midpoint), y = elevational_range_midpoint)) +
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(16, 4)) +
-  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = max_elevation)) +
+  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = (min_elevation + elevational_range))) +
   ylim(min(elevational_ranges_species_predicted$min_elevation),
        max(elevational_ranges_species_predicted$max_elevation)) +
   labs(x = "Species",
