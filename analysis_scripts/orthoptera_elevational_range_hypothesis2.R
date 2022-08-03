@@ -198,7 +198,7 @@ plot_elevrange_midpointelevation <- function(dataframe) {
   y_param <- dataframe$elevational_range
   ylab <- "Elevational range (m)"
 
-  plot(y_param ~ elevational_range_midpoint, data = dataframe,
+  plot(jitter(y_param, amount = 20) ~ jitter(elevational_range_midpoint, amount = 20), data = dataframe,
        xlab = "Elevational range midpoint (m a.s.l)", ylab = ylab)
 }
 
@@ -284,7 +284,8 @@ plot_quadratic_model <- function(dataframe, model) {
   #   labs(x = "Mean elevation (m a.s.l)", y = "Elevational range (m)") +
   #   theme_classic()
 
-  plot(x = dataframe$elevational_range_midpoint, y = dataframe$elevational_range,
+  plot(x = jitter(dataframe$elevational_range_midpoint, amount = 20),
+       y = jitter(dataframe$elevational_range, amount = 20),
        xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m)"
   )
 
@@ -298,6 +299,51 @@ plot_quadratic_model <- function(dataframe, model) {
                      ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]), " E^2 ")
 
   mtext(equation, side = 3, line = -1)
+}
+
+plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
+  #' Plot the elevational range as a function of elevation (data points) and include the line for the
+  #' predicted values from the quadratic model. Also add the CIs.
+  #'
+  #' Get the parameters from the model output and add the equation of the line to the plot.
+
+  #' Get minimum and maximum values in the dataset
+  i <- seq(min(dataframe$elevational_range_midpoint), max(dataframe$elevational_range_midpoint), len=100) #  x-value limits for line
+
+  #' Calculate the predicted values from the regression so they can be plotted as a line
+  predicted_values <- predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+  intervals <-  predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+
+  #' Set up place to save file
+  path <- "../analysis_plots/"
+  filepath <- file.path(path, filename)
+  png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+
+  plot(x = jitter(dataframe$elevational_range_midpoint, amount = 20),
+       y = jitter(dataframe$elevational_range, amount = 20),
+       pch = c(1, 4)[as.numeric(dataframe$suborder)],
+       xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m)",
+       xlim = c(1100, 2300), ylim = c(0, 1400)
+  )
+
+  lines(i, predicted_values, lty=1, lwd=2, col="black")
+  lines(i, intervals[ , 3], lty = "dashed", col = "grey")
+  lines(i, intervals[ , 2], lty = "dashed", col = "grey")
+
+  # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
+  cf <- signif(coef(model), 2)
+
+  int_term <- cf[1]
+  lin_term <- cf[2]
+  quadratic_term <- abs(cf[3])
+  # lin_term <- paste0(ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]))
+  # quadratic_term <- paste0(ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]))
+
+  equation <- bquote(italic(E[R]) == .(int_term) + .(lin_term)*italic(E) - .(quadratic_term)*italic(E)^2)
+  text(equation, x = 1500, y = 1350, cex = 0.5)
+
+  dev.off()
+
 }
 
 check_model_assumptions <- function(model) {
@@ -429,7 +475,6 @@ plot_histograms_elevational_range(elevational_ranges_caelifera)
 
 #' Plot elevational range against elevation for Caelifera only.
 par(mfrow = c(1,1))
-#plot_elevrange_meanelevation(elevational_ranges_caelifera)
 plot_elevrange_midpointelevation(elevational_ranges_caelifera)
 
 #' The relationship between elevation and elevational range again appears to be a quadratic. Run
@@ -481,47 +526,25 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' best-fitted regression for each set of species.
 
 #' All species
-elevationalrange_elevation_plot <- ggplot(elevational_ranges_species_predicted,
-                                          aes(elevational_range_midpoint, elevational_range)) +
-  geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(16, 4)) +
-  geom_line(aes(elevational_range_midpoint, fit), colour = "black") +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
-  labs(x = "Elevational range midpoint (m a.s.l)",
-       y = "Elevational range (m)") +
-  xlim(c(1000, 2600)) +
-  ylim(c(0, 1200))
 
-elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
-save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
-elevationalrange_elevation_plot
+plot_quadratic_model_predvalues(elevational_ranges_species, nonlin_reg_quadratic, "hypothesis2_elevational_range_model.png")
 
 #' Only Caelifera
-elevationalrange_elevation_caelifera_plot <- ggplot(elevational_ranges_caelifera_predicted,
-                                                    aes(elevational_range_midpoint, elevational_range)) +
-  geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(16, 4)) +
-  geom_line(aes(elevational_range_midpoint, fit), colour = "black") +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.2) +
-  labs(x = "Elevational range midpoint (m a.s.l)",
-       y = "Elevational range (m)") +
-  xlim(c(1100, 2200)) +
-  ylim(c(0, 1150))
 
-elevationalrange_elevation_caelifera_plot <- format_theme_ggplot(elevationalrange_elevation_caelifera_plot)
-save_plot(elevationalrange_elevation_caelifera_plot, "hypothesis2_elevational_range_caelifera_model.png")
-elevationalrange_elevation_caelifera_plot
+plot_quadratic_model_predvalues(elevational_ranges_caelifera_predicted, nonlin_reg_quadratic_caelifera, "hypothesis2_elevational_range_model_caelifera.png")
 
-#' Elevational range and mean elevation (filled circles: Caelifera; crosses: Ensifera) of all species.
+#' Elevational range and mean elevation (open circles: Caelifera; crosses: Ensifera) of all species.
 #' Ordered by decreasing elevational range midpoint.
 
 species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
                                         aes(x = reorder(species, -elevational_range_midpoint), y = elevational_range_midpoint)) +
   geom_point(aes(shape = suborder), size = 1.5) +
-  scale_shape_manual(values = c(16, 4)) +
-  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = (min_elevation + elevational_range))) +
-  ylim(min(elevational_ranges_species_predicted$min_elevation),
-       max(elevational_ranges_species_predicted$max_elevation)) +
+  scale_shape_manual(values = c(11, 4)) +
+  geom_hline(yintercept = 1100, linetype = "dashed", col = "grey") +
+  geom_hline(yintercept = 2500, linetype = "dashed", col = "grey") +
+  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = min_elevation + elevational_range)) +
+  ylim(min(elevational_ranges_species_predicted$min_elevation) - 100,
+       max(elevational_ranges_species_predicted$max_elevation) + 100) +
   labs(x = "Species",
        y = "Elevational range (m)")
 

@@ -91,3 +91,15 @@ save_plot <- function(plot_name, filename) {
          scale = 1, width = 1000, height = 1000, units = "px", dpi = 300,
          bg = NULL)
 }
+
+save_base_plot_png <- function(plot_to_do, filename) {
+  #' Save a specified base r plot to a specific PNG filename.
+  #'
+  #' This function will provide the filepath and concatenate it with the filename provided.
+
+  path <- "../analysis_plots/"
+  filepath <- file.path(path, filename)
+  png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+  plot_to_do
+  dev.off()
+}
