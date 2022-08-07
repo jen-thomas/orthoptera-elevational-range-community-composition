@@ -467,6 +467,51 @@ AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, se
 #' Including the interaction of slope and vegetation cover did not increase the predictive power of the
 #' model (AICC = 140) and neither the individual parameters nor the interaction were significant
 #' predictors.
+#'
+#' ### Test species richness from three main study areas (excluding Besan and les Bordes de Viros)
+
+#' Calculate the species richness for only the sites in the three main study areas. Leave combined. There
+#' are not enough data to split the data and model each site differently (see the section in the appendix
+#' for this).
+#'
+species_richness_tortavmol <- species_richness_sites[species_richness_sites$area %in%
+                                                       c("La Molinassa", "Tor", "Tavascan"), ]
+
+#' GLM of species richness (Tor, Tavascan, La Molinassa) with the set of parameters as used in the full
+#' model of overall species richness.
+
+glm_species_richness_full_tortavmol <- glm(species_richness ~ elevational_band_m +
+                                        as.factor(area) + slope + as.factor(aspect_cardinal) +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height +
+                                        mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_tortavmol)
+
+#' Summarise the GLM
+summary(glm_species_richness_full_tortavmol)
+
+#' Do ANOVA of GLM
+Anova(glm_species_richness_full_tortavmol)
+
+#' Get AICC of GLM
+AICcmodavg::AICc(glm_species_richness_full_tortavmol, return.K = FALSE, second.ord = TRUE)
+
+#' Do backwards stepwise selection on the GLM to get the reduced model for the main study areas
+
+glm_species_richness_full_tortavmol_step <- stats::step(glm_species_richness_full_tortavmol, direction = "backward")
+
+#' Summarise the reduced GLM
+summary(glm_species_richness_full_tortavmol_step)
+
+#' Do ANOVA of reduced GLM
+Anova(glm_species_richness_full_tortavmol_step)
+
+#' Get AICC of reduced GLM
+AICcmodavg::AICc(glm_species_richness_full_tortavmol_step, return.K = FALSE, second.ord = TRUE)
+
+#' Define the reduced model for species richness at the main study areas
+
+glm_species_richness_tortavmol_reduced <- glm_species_richness_full_tortavmol_step
 
 #' ### Test species richness of Caelifera in GLM
 
@@ -565,7 +610,19 @@ reduced_test
 #' As P is large (0.77), we have no evidence against the hypothesis that the model is adequate, therefore
 #' we accept the model is satisfactory.
 #'
-#' #' ### Caelifera reduced model
+#' ### Species richness main study areas reduced model
+
+par(mfrow = c(1,2))
+plot(species_richness_tortavmol$species_richness, fitted(glm_species_richness_tortavmol_reduced),
+     xlab = "Observed values", ylab = "Fitted values")
+abline(0,1)
+plot(fitted(glm_species_richness_tortavmol_reduced), residuals(glm_species_richness_tortavmol_reduced, type = "pearson"))
+abline(h = 0)
+
+reduced_test_tortavmol <- 1-pchisq(13.92499, 18)
+reduced_test_tortavmol
+
+#' ### Caelifera reduced model
 #'
 #' Test the reduced model which was the outcome of the manual stepwise selection
 
@@ -635,6 +692,15 @@ knitr::kable(glm_species_richness_inter_slope_vegcover_table, caption = "Paramet
 standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
 reduced GLM for overall species richness including an interaction between vegetation cover and slope
 (AICc = 140)")
+
+#' Reduced model for species richness from all main study areas
+
+glm_species_richness_tortavmol_reduced_table <- xtable(glm_species_richness_tortavmol_reduced)
+glm_species_richness_tortavmol_reduced_table
+print(glm_species_richness_tortavmol_reduced_table)
+knitr::kable(glm_species_richness_tortavmol_reduced_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P < 0.05) for variables included in the reduced
+ GLM for species richness from all main study areas (AIC = )")
 
 #' Reduced model for Caelifera species richness
 
