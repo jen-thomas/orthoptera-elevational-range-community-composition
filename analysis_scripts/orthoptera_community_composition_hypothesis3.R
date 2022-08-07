@@ -233,10 +233,18 @@ plot(env_sites_plot)
 #' Method from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
 ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
-points(species_jaccard_dist_mds_2dim, col = c("red", "green", "blue", "black", "grey")[as.numeric(env_var_mat_clusters$cluster_group)], pch = c(1,2, 3, 4, 5)[as.factor(env_var_mat_clusters$area)])
-plot(env_data_fit)
-legend('topright', legend=unique(env_var_mat_clusters$cluster_group), col=unique(env_var_mat_clusters$cluster_group), pch = unique(env_var_mat_clusters$area))
+#points(species_jaccard_dist_mds_2dim, col = c("red", "green", "blue", "black", "grey")[as.numeric(env_var_mat_clusters$cluster_group)], pch = c(1,2, 3, 4, 5)[as.factor(env_var_mat_clusters$area)])
+points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_mat_clusters$area)], pch = c(1, 2, 8, 5, 6, 0, 4)[as.factor(env_var_mat_clusters$cluster_group)])
+plot(env_data_fit, col = "grey")
+legend('topright', legend=unique(env_var_mat_clusters$cluster_group), col = "black", pch = unique(env_var_mat_clusters$cluster_group))
 
+
+ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
+ordilabel(species_jaccard_dist_mds_2dim, display = "sites", labels = env_var_mat_clusters$cluster_group)
+#points(species_jaccard_dist_mds_2dim, col = c("red", "green", "blue", "black", "grey")[as.numeric(env_var_mat_clusters$cluster_group)], pch = c(1,2, 3, 4, 5)[as.factor(env_var_mat_clusters$area)])
+points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_mat_clusters$area)], pch = c(1, 2, 8, 5, 6, 0, 4)[as.factor(env_var_mat_clusters$cluster_group)])
+plot(env_data_fit, col = "grey")
+legend('right', legend=unique(env_var_mat_clusters$cluster_group), col = "black", pch = unique(env_var_mat_clusters$cluster_group))
 #' ### Permanova
 #'
 #' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
