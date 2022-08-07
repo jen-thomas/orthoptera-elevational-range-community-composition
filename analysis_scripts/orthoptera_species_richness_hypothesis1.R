@@ -369,8 +369,11 @@ Anova(glm_species_richness_full_quasipoisson)
 
 #' ### Model selection
 #'
-#' Stepwise selection will be done on the model to find the best reduced model. To see how the R packages
-#' work and to make sure they are consistent with doing it manually, both methods will be used.
+#' Stepwise selection will be done on the model to find the best reduced model.
+#'
+#' To see how the R packages work and to make sure they are consistent with doing it manually, both R's
+#' methods and manual selection will be used. Below is R's backwards stepwise selection. For the other
+#' methods, see the section at the end of this code.
 #'
 #' #### R's backwards stepwise selection
 #'
@@ -417,6 +420,247 @@ Anova(glm_species_richness_step_backward)
 #' AICC
 AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.ord = TRUE)
 
+#' #### Define reduced model
+
+glm_species_richness_reduced <- glm_species_richness_step2
+
+#' Summary of model
+summary(glm_species_richness_reduced)
+
+#' ANOVA
+Anova(glm_species_richness_reduced)
+
+#' Log likelihood
+logLik(glm_species_richness_reduced)
+
+#' AICC
+AICcmodavg::AICc(glm_species_richness_reduced)
+
+#' ### Test for overdispersion on the reduced model
+
+ratio_dispersion_reduced <- summary(glm_species_richness_reduced)$deviance /
+                    summary(glm_species_richness_reduced)$df.residual
+paste0("ratio: ", ratio_dispersion_reduced)
+
+#' Given that this ratio < 1.5, we can say that the model does not suffer from overdispersion.
+#'
+#' ### Test interaction slope and vegetation cover
+#'
+#' Test an interaction between slope and vegetation cover rather than as an addition to the reduced model,
+#' given that they are significantly correlated.
+
+glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                                 slope + sampling_effort_index*mean_perc_veg_cover +
+                                                 mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+#' Model summary
+summary(glm_species_richness_inter_slope_vegcover)
+
+#' ANOVA
+Anova(glm_species_richness_inter_slope_vegcover)
+
+#' AICC
+AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
+
+#' Including the interaction of slope and vegetation cover did not increase the predictive power of the
+#' model (AICC = 140) and neither the individual parameters nor the interaction were significant
+#' predictors.
+
+#' ### Test species richness of Caelifera in GLM
+
+#' Calculate the species richness for only Caelifera at each site.
+
+caelifera_observations <- get_caelifera_only(all_observations_conservative)
+
+caelifera_species_richness <- calculate_species_richness_sites(caelifera_observations)
+
+caelifera_species_richness_sites <- left_join(caelifera_species_richness, site_env_var_data,
+                                    by = c("site_elevation", "area", "elevational_band_m"))
+
+caelifera_species_richness_sites <- left_join(caelifera_species_richness_sites, sampling_effort, by = "site_elevation")
+
+#' GLM of Caelifera species richness with the set of parameters as used in the full model of overall
+#' species richness.
+
+glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m +
+                                        as.factor(area) + slope + as.factor(aspect_cardinal) +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height +
+                                        mean_density,
+    family = poisson(link = "log"),
+    data = caelifera_species_richness_sites)
+
+#' Summarise the GLM
+
+summary(glm_species_richness_full_caelifera)
+
+#' Do ANOVA of GLM
+Anova(glm_species_richness_full_caelifera)
+
+#' Get AICC of GLM
+AICcmodavg::AICc(glm_species_richness_full_caelifera, return.K = FALSE, second.ord = TRUE)
+
+#' Do backwards stepwise selection on the GLM to get the reduced model
+
+glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_caelifera, direction = "backward")
+
+#' Summarise the reduced GLM
+
+summary(glm_species_richness_caelifera_step)
+
+#' Do ANOVA of reduced GLM
+Anova(glm_species_richness_caelifera_step)
+
+#' Get AICC of reduced GLM
+AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
+
+#' Define the reduced model for Caelifera species richness
+
+glm_species_richness_caelifera_reduced <- glm_species_richness_caelifera_step
+
+#' Test removing elevation because it is not significant in the reduced model. See if it changes the
+#' predictive power of the model.
+
+glm_species_richness_caelifera_reduced_no_elevation <- glm(species_richness ~ slope +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_density,
+    family = poisson(link = "log"),
+    data = caelifera_species_richness_sites)
+
+#' Model summary
+summary(glm_species_richness_caelifera_reduced_no_elevation)
+
+#' ANOVA
+Anova(glm_species_richness_caelifera_reduced_no_elevation)
+
+#' AICC
+AICcmodavg::AICc(glm_species_richness_caelifera_reduced_no_elevation, return.K = FALSE, second.ord = TRUE)
+
+#' Removing elevation from the model does not improve the predictive power of the model (AICC = 132 still)
+#' and the parameter estimates for the other variables remain the same, therefore we leave it in the
+#' reduced model.
+#'
+#' ## GLM model assessment
+#'
+#' Plot the observed against fitted values for the full model and each of the final reduced models. Also
+#' plot the residuals.
+#'
+#' Also test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
+#' the p-value for the model where the deviance and degrees of freedom are used.
+#'
+#' ### Overall reduced model
+#'
+#' Test the reduced model which was the outcome of the manual stepwise selection
+
+par(mfrow = c(1,2))
+plot(species_richness_sites$species_richness, fitted(glm_species_richness_reduced),
+     xlab = "Observed values", ylab = "Fitted values")
+abline(0,1)
+plot(fitted(glm_species_richness_reduced), residuals(glm_species_richness_reduced, type = "pearson"))
+abline(h = 0)
+
+reduced_test <- 1-pchisq(13.92499, 18)
+reduced_test
+
+#' As P is large (0.77), we have no evidence against the hypothesis that the model is adequate, therefore
+#' we accept the model is satisfactory.
+#'
+#' #' ### Caelifera reduced model
+#'
+#' Test the reduced model which was the outcome of the manual stepwise selection
+
+par(mfrow = c(1,2))
+plot(species_richness_caelifera$species_richness, fitted(glm_species_richness_caelifera_reduced),
+     xlab = "Observed values", ylab = "Fitted values")
+abline(0,1)
+plot(fitted(glm_species_richness_caelifera_reduced), residuals(glm_species_richness_caelifera_reduced, type = "pearson"))
+abline(h = 0)
+
+reduced_test_caelifera <- 1-pchisq(13.92499, 18)
+reduced_test_caelifera
+
+#' As P is ???, we have no evidence against the hypothesis that the model is adequate, therefore
+#' we accept the model is satisfactory.
+#'
+#' ## Plots for report
+#'
+#' Plot the modelled variables
+
+par(mfrow=c(3, 2))
+visreg(glm_species_richness_reduced, xvar = "elevational_band_m")
+visreg(glm_species_richness_reduced, xvar = "area")
+visreg(glm_species_richness_reduced, xvar = "slope")
+visreg(glm_species_richness_reduced, xvar = "sampling_effort_index")
+visreg(glm_species_richness_reduced, xvar = "mean_perc_veg_cover")
+visreg(glm_species_richness_reduced, xvar = "mean_density")
+
+#' Plot the predicted values on top of the actual data points.
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+par(mfrow = c(1,1))
+species_richness_elevation_plot <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
+                                     scale = "response",
+                                     rug = FALSE,
+                                     line = list(col = "black"),
+                                     xlab = "Elevation (m a.s.l)", xlim = c(1000, 2550),
+                                     ylab = "Species richness", ylim = c(0, 17))
+species_richness_elevation_plot
+points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 1.5)
+dev.off()
+
+#' ## Output tables for report
+#'
+#' Reduced model for overall species richness
+
+glm_species_richness_reduced_table <- xtable(glm_species_richness_reduced)
+glm_species_richness_reduced_table
+print(glm_species_richness_reduced_table)
+knitr::kable(glm_species_richness_reduced_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness (AICc = 145.24)")
+knitr::kable(glm_species_richness_reduced_table, format = "simple", caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness (AICc = 145.24)")
+knitr::kable(glm_species_richness_reduced_table, format = "pipe", caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness (AICc = 145.24)")
+
+#' Reduced model including the interaction between vegetation cover and slope
+
+glm_species_richness_inter_slope_vegcover_table <- xtable(glm_species_richness_inter_slope_vegcover)
+glm_species_richness_inter_slope_vegcover_table
+print(glm_species_richness_inter_slope_vegcover_table)
+knitr::kable(glm_species_richness_inter_slope_vegcover_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness including an interaction between vegetation cover and slope
+(AICc = 140)")
+
+#' Reduced model for Caelifera species richness
+
+glm_species_richness_reduced_caelifera_table <- xtable(glm_species_richness_caelifera_reduced)
+glm_species_richness_reduced_caelifera_table
+print(glm_species_richness_reduced_caelifera_table)
+knitr::kable(glm_species_richness_reduced_caelifera_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P < 0.05) for variables included in the reduced
+ GLM for Caelifera species richness (AIC = 132.0)")
+
+#' Reduced model for Caelifera species richness without elevation
+
+glm_species_richness_caelifera_reduced_no_elevation_table <- xtable(glm_species_richness_caelifera_reduced_no_elevation)
+glm_species_richness_caelifera_reduced_no_elevation_table
+print(glm_species_richness_caelifera_reduced_no_elevation_table)
+knitr::kable(glm_species_richness_caelifera_reduced_no_elevation_table, caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P < 0.05) for variables included in the reduced
+ GLM for Caelifera species richness after removing elevation (AIC = 132.0)")
+
+#' ## Appendix
+#'
+#' ### GLM model reduction
+#'
+#' The sections below show the different methods of stepwise selection that were used. R's automatic
+#' backwards selection is in the main section of code above.
+#'
 #' #### Manual backwards selection
 #'
 #' Attempt manual stepwise selection, removing the parameter with the highest p-value each time.
@@ -481,47 +725,12 @@ AICcmodavg::AICc(glm_species_best_dredge, return.K = FALSE, second.ord = TRUE)
 #' 145.24) but given that the other parameters are significant in the model and they are biologically
 #' important, the reduced model obtained through backwards selection is retained.
 #'
-#' #### Define reduced model
-
-glm_species_richness_reduced <- glm_species_richness_step2
-
-#' ### Test for overdispersion on reduced model
-
-ratio_dispersion_reduced <- summary(glm_species_richness_reduced)$deviance /
-                    summary(glm_species_richness_reduced)$df.residual
-paste0("ratio: ", ratio_dispersion_reduced)
-
-#' Given that this ratio < 1.5, we can say that the model does not suffer from overdispersion.
-#'
-#' ### Test interaction slope and vegetation cover
-#'
-#' Test an interaction between slope and vegetation cover rather than as an addition to the reduced model,
-#' given that they are significantly correlated.
-
-glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                                 slope + sampling_effort_index*mean_perc_veg_cover +
-                                                 mean_density,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-#' Model summary
-summary(glm_species_richness_inter_slope_vegcover)
-
-#' ANOVA
-Anova(glm_species_richness_inter_slope_vegcover)
-
-#' AICC
-AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
-
-#' Including the interaction of slope and vegetation cover did not increase the predictive power of the
-#' model (AICC = 140) and neither the individual parameters nor the interaction were significant
-#' predictors.
-#'
-#' ### Test species richness in study areas separately
+#' #' ### Test species richness in study areas separately
 #'
 #' Study area is an important predictor of species richness. Given the differences in land use in the
-#' three different study areas, model the species richness for each area separately. As study area is now
-#' being separated, this will not be used as a predictive factor in the model.
+#' three different study areas, we modelled the species richness for each area separately. As study area
+#' is now being separated, this will not be used as a predictive factor in the model. **CAUTION**: this
+#' part of the analysis is not used because we don't really have enough data to test each area separately.
 #'
 #' #### Tor
 
@@ -609,152 +818,3 @@ Anova(glm_species_richness_full_mol_step)
 
 #' AICC
 AICcmodavg::AICc(glm_species_richness_full_mol_step, return.K = FALSE, second.ord = TRUE)
-
-#' ### Remove outliers of sampling effort
-#' **TODO**
-#'
-#' ### Test species richness of Caelifera in GLM
-
-#' Calculate the species richness for only Caelifera at each site.
-
-caelifera_observations <- get_caelifera_only(all_observations_conservative)
-
-caelifera_species_richness <- calculate_species_richness_sites(caelifera_observations)
-
-caelifera_species_richness_sites <- left_join(caelifera_species_richness, site_env_var_data,
-                                    by = c("site_elevation", "area", "elevational_band_m"))
-
-caelifera_species_richness_sites <- left_join(caelifera_species_richness_sites, sampling_effort, by = "site_elevation")
-
-#' GLM of Caelifera species richness with the set of parameters as used in the full model of overall
-#' species richness.
-
-glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
-    family = poisson(link = "log"),
-    data = caelifera_species_richness_sites)
-
-#' Summarise the GLM
-
-summary(glm_species_richness_full_caelifera)
-
-#' Do ANOVA of GLM
-Anova(glm_species_richness_full_caelifera)
-
-#' Get AICC of GLM
-AICcmodavg::AICc(glm_species_richness_full_caelifera, return.K = FALSE, second.ord = TRUE)
-
-#' Do backwards stepwise selection on the GLM to get the reduced model
-
-glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_caelifera, direction = "backward")
-
-#' Summarise the reduced GLM
-
-summary(glm_species_richness_caelifera_step)
-
-#' Do ANOVA of reduced GLM
-Anova(glm_species_richness_caelifera_step)
-
-#' Get AICC of reduced GLM
-AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
-
-#' Define the reduced model for Caelifera species richness
-
-glm_species_richness_caelifera_reduced <- glm_species_richness_caelifera_step
-
-#' Test removing elevation because it is not significant in the reduced model. See if it changes the
-#' predictive power of the model.
-
-glm_species_richness_caelifera_reduced_no_elevation <- glm(species_richness ~ slope +
-                                        sampling_effort_index + mean_perc_veg_cover + mean_density,
-    family = poisson(link = "log"),
-    data = caelifera_species_richness_sites)
-
-#' Model summary
-summary(glm_species_richness_caelifera_reduced_no_elevation)
-
-#' ANOVA
-Anova(glm_species_richness_caelifera_reduced_no_elevation)
-
-#' AICC
-AICcmodavg::AICc(glm_species_richness_caelifera_reduced_no_elevation, return.K = FALSE, second.ord = TRUE)
-
-#' Removing elevation from the model does not improve the predictive power of the model (AICC = 132 still)
-#' and the parameter estimates for the other variables remain the same, therefore we leave it in the
-#' reduced model.
-#'
-#' ### Model assessment
-#'
-#' Plot the observed against fitted values for the full model and each of the final reduced models. Also
-#' plot the residuals.
-#'
-#' Also test if the model is suitable. H0: model is correct. H1: model is not correct. To do this, calculate
-#' the p-value for the model where the deviance and degrees of freedom are used.
-
-#' Test the reduced model which was the outcome of the manual stepwise selection
-
-par(mfrow = c(1,2))
-plot(species_richness_sites$species_richness, fitted(glm_species_richness_reduced),
-     xlab = "Observed values", ylab = "Fitted values")
-abline(0,1)
-plot(fitted(glm_species_richness_reduced), residuals(glm_species_richness_reduced, type = "pearson"))
-abline(h = 0)
-
-reduced_test <- 1-pchisq(13.92499, 18)
-reduced_test
-
-#' As P is large (0.77), we have no evidence against the hypothesis that the model is adequate, therefore
-#' we accept the model is satisfactory.
-#'
-#' ## Plots for report
-#'
-#' Plot the modelled variables
-
-par(mfrow=c(3, 2))
-visreg(glm_species_richness_reduced, xvar = "elevational_band_m")
-visreg(glm_species_richness_reduced, xvar = "area")
-visreg(glm_species_richness_reduced, xvar = "slope")
-visreg(glm_species_richness_reduced, xvar = "sampling_effort_index")
-visreg(glm_species_richness_reduced, xvar = "mean_perc_veg_cover")
-visreg(glm_species_richness_reduced, xvar = "mean_density")
-
-#' Plot the predicted values on top of the actual data points.
-
-par(mfrow = c(1,1))
-visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
-                                     scale = "response",
-                                     rug = FALSE,
-                                     line = list(col = "black"),
-                                     xlab = "Elevation (m a.s.l)", xlim = c(1000, 2600),
-                                     ylab = "Species richness", ylim = c(0, 17))
-points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 1.5)
-
-# elevationalrange_elevation_plot <- format_theme_ggplot(elevationalrange_elevation_plot)
-# save_plot(elevationalrange_elevation_plot, "hypothesis2_elevational_range_model.png")
-
-#' ## Output tables for report
-#'
-#' Reduced model for overall species richness
-
-glm_species_richness_reduced_table <- xtable(glm_species_richness_reduced)
-glm_species_richness_reduced_table
-print(glm_species_richness_reduced_table)
-knitr::kable(glm_species_richness_reduced_table, caption = "Parameter estimate and
-standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
-reduced GLM for overall species richness (AICc = 145.24)")
-knitr::kable(glm_species_richness_reduced_table, format = "simple", caption = "Parameter estimate and
-standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
-reduced GLM for overall species richness (AICc = 145.24)")
-knitr::kable(glm_species_richness_reduced_table, format = "pipe", caption = "Parameter estimate and
-standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
-reduced GLM for overall species richness (AICc = 145.24)")
-
-#' Reduced model for Caelifera species richness
-
-glm_species_richness_reduced_caelifera_table <- xtable(glm_species_richness_caelifera_reduced)
-glm_species_richness_reduced_caelifera_table
-print(glm_species_richness_reduced_caelifera_table)
-knitr::kable(glm_species_richness_reduced_caelifera_table, caption = "Parameter estimate and
-standard error, Wald's chi-squared and significance level (P < 0.05) for variables included in the reduced
- GLM for Caelifera species richness (AIC = 132.0)")
