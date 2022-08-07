@@ -420,7 +420,7 @@ paste0("ratio: ", ratio_dispersion_reduced)
 #' given that they are significantly correlated.
 
 glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                                 sampling_effort + slope*mean_perc_veg_cover +
+                                                 sampling_effort_index + slope*mean_perc_veg_cover +
                                                  mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
