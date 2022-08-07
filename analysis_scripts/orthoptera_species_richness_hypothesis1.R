@@ -632,7 +632,7 @@ species_richness_elevation_plot <- visreg(glm_species_richness_reduced, xvar = "
                                      line = list(col = "black"),
                                      xlab = "Elevation (m a.s.l)", xlim = c(1000, 2550),
                                      ylab = "Species richness", ylim = c(0, 17))
-species_richness_elevation_plot
+#species_richness_elevation_plot
 points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 1.5)
 dev.off()
 
