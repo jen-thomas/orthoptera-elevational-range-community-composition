@@ -422,7 +422,7 @@ AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.or
 
 #' #### Define reduced model
 
-glm_species_richness_reduced <- glm_species_richness_step2
+glm_species_richness_reduced <- glm_species_richness_step_backward
 
 #' Summary of model
 summary(glm_species_richness_reduced)
