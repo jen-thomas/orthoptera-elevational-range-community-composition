@@ -743,6 +743,12 @@ print(glm_species_richness_reduced_table)
 knitr::kable(glm_species_richness_reduced_table, caption = "Parameter estimate and
 standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
 reduced GLM for overall species richness (AICc = 145.24)")
+knitr::kable(glm_species_richness_reduced_table, format = "simple", caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness (AICc = 145.24)")
+knitr::kable(glm_species_richness_reduced_table, format = "pipe", caption = "Parameter estimate and
+standard error, Wald's chi-squared and significance level (P <- 0.05) for variables included in the
+reduced GLM for overall species richness (AICc = 145.24)")
 
 #' Reduced model for Caelifera species richness
 
@@ -753,7 +759,6 @@ knitr::kable(glm_species_richness_reduced_caelifera_table, caption = "Parameter 
 standard error, Wald's chi-squared and significance level (P < 0.05) for variables included in the reduced
  GLM for Caelifera species richness (AIC = 132.0)")
 
-#'
 #'
 #' ## Linear regression - NOT CHANGED
 #' Create a linear model of species richness against elevation and look at the model output.

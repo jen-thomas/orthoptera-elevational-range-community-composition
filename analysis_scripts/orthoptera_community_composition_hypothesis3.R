@@ -233,7 +233,7 @@ plot(env_sites_plot)
 #' Method from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
 ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
-points(species_jaccard_dist_mds_2dim, col = env_var_mat_clusters$cluster_group, pch = env_var_mat_clusters$area)
+points(species_jaccard_dist_mds_2dim, col = c("red", "green", "blue", "black", "grey")[as.numeric(env_var_mat_clusters$cluster_group)], pch = c(1,2, 3, 4, 5)[as.factor(env_var_mat_clusters$area)])
 plot(env_data_fit)
 legend('topright', legend=unique(env_var_mat_clusters$cluster_group), col=unique(env_var_mat_clusters$cluster_group), pch = unique(env_var_mat_clusters$area))
 
