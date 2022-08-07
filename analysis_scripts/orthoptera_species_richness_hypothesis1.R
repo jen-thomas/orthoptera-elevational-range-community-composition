@@ -376,37 +376,7 @@ Anova(glm_species_richness_full_quasipoisson)
 #' methods, see the section at the end of this code.
 #'
 #' #### R's backwards stepwise selection
-#'
-#' Attempt stepwise selection from both directions to reduce the number of parameters in the model.
 
-glm_species_richness_step <- stats::step(glm_species_richness_full, direction = "both")
-
-#' Show the summary of the reduced model as found by R's stepwise selection.
-
-summary(glm_species_richness_step)
-
-#' Generate an ANOVA table for the model.
-Anova(glm_species_richness_step)
-
-#' AICC
-AICcmodavg::AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
-
-#' Test forward stepwise selection using R's built in stepwise selection
-
-glm_species_richness_step_forward <- stats::step(glm_species_richness_full, direction = "forward")
-
-#' Show the summary of the reduced model as found by R's stepwise selection.
-
-summary(glm_species_richness_step_forward)
-
-#' Generate an ANOVA table for the model.
-Anova(glm_species_richness_step_forward)
-
-#' AICC
-AICcmodavg::AICc(glm_species_richness_step_forward, return.K = FALSE, second.ord = TRUE)
-
-#' Test backward stepwise selection using R's stepwise selection
-#'
 glm_species_richness_step_backward <- stats::step(glm_species_richness_full, direction = "backward")
 
 #' Show the summary of the reduced model as found by R's stepwise selection.
@@ -766,6 +736,34 @@ AICcmodavg::AICc(glm_species_richness_step2, return.K = FALSE, second.ord = TRUE
 #' All parameters are now significant. Let this be the reduced model. AICC = 145.2388. Vegetation density
 #' was borderline significant (P = 0.0506). Removing this parameter from the model was tested, but AICC =
 #' 144, so it didn't make any great improvement to the model. Therefore it was retained.
+#'
+#' #### Test R's built in stepwise selection from both directions
+
+glm_species_richness_step <- stats::step(glm_species_richness_full, direction = "both")
+
+#' Show the summary of the reduced model as found by R's stepwise selection.
+
+summary(glm_species_richness_step)
+
+#' Generate an ANOVA table for the model.
+Anova(glm_species_richness_step)
+
+#' AICC
+AICcmodavg::AICc(glm_species_richness_step, return.K = FALSE, second.ord = TRUE)
+
+#' #### Test forward stepwise selection using R's built in stepwise selection
+
+glm_species_richness_step_forward <- stats::step(glm_species_richness_full, direction = "forward")
+
+#' Show the summary of the reduced model as found by R's stepwise selection.
+
+summary(glm_species_richness_step_forward)
+
+#' Generate an ANOVA table for the model.
+Anova(glm_species_richness_step_forward)
+
+#' AICC
+AICcmodavg::AICc(glm_species_richness_step_forward, return.K = FALSE, second.ord = TRUE)
 
 #' #### Dredge for best model fit
 #'
