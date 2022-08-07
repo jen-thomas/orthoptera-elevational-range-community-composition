@@ -570,7 +570,7 @@ reduced_test
 #' Test the reduced model which was the outcome of the manual stepwise selection
 
 par(mfrow = c(1,2))
-plot(species_richness_caelifera$species_richness, fitted(glm_species_richness_caelifera_reduced),
+plot(caelifera_species_richness_sites$species_richness, fitted(glm_species_richness_caelifera_reduced),
      xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
 plot(fitted(glm_species_richness_caelifera_reduced), residuals(glm_species_richness_caelifera_reduced, type = "pearson"))
