@@ -218,14 +218,12 @@ stressplot(species_jaccard_dist_mds_2dim)
 #' variables. Note that even though they are plotted, this does not mean they are significant.
 #+ message=FALSE, warning=FALSE
 
-env_data_fit <- envfit(species_jaccard_dist_mds_2dim,
+env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
                        env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
                        scaling = "sites",
                        permutations = 1000)
-env_data_fit
-env_sites_plot <- ordipointlabel(species_jaccard_dist_mds_2dim, display = "sites") # sites are shows in the tutorial
-plot(env_sites_plot)
+env_data_fit_sites
 
 #' Do the same plot but for sites with the environmental variables and colour the points by the cluster group
 #+ message=FALSE, warning=FALSE
@@ -233,18 +231,10 @@ plot(env_sites_plot)
 #' Method from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
 ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
-#points(species_jaccard_dist_mds_2dim, col = c("red", "green", "blue", "black", "grey")[as.numeric(env_var_mat_clusters$cluster_group)], pch = c(1,2, 3, 4, 5)[as.factor(env_var_mat_clusters$area)])
-points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_mat_clusters$area)], pch = c(1, 2, 8, 5, 6, 0, 4)[as.factor(env_var_mat_clusters$cluster_group)])
-plot(env_data_fit, col = "grey")
-legend('topright', legend=unique(env_var_mat_clusters$cluster_group), col = "black", pch = unique(env_var_mat_clusters$cluster_group))
+points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_mat_clusters$area)], pch = c(1, 2, 8, 5, 6, 0, 4)[ordered(as.factor(env_var_mat_clusters$cluster_group))])
+plot(env_data_fit_sites, col = "grey")
+legend('right', legend = unique(env_var_mat_clusters$cluster_group), col = "black", pch = c(1, 2, 8, 5, 6, 0, 4)[ordered(as.factor(env_var_mat_clusters$cluster_group))])
 
-
-ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
-ordilabel(species_jaccard_dist_mds_2dim, display = "sites", labels = env_var_mat_clusters$cluster_group)
-#points(species_jaccard_dist_mds_2dim, col = c("red", "green", "blue", "black", "grey")[as.numeric(env_var_mat_clusters$cluster_group)], pch = c(1,2, 3, 4, 5)[as.factor(env_var_mat_clusters$area)])
-points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_mat_clusters$area)], pch = c(1, 2, 8, 5, 6, 0, 4)[as.factor(env_var_mat_clusters$cluster_group)])
-plot(env_data_fit, col = "grey")
-legend('right', legend=unique(env_var_mat_clusters$cluster_group), col = "black", pch = unique(env_var_mat_clusters$cluster_group))
 #' ### Permanova
 #'
 #' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
@@ -281,7 +271,7 @@ points(nmds_sites, "sites", pch = 0, col = "brown", env_var_mat_clusters$cluster
 points(nmds_sites, "sites", pch = 0, col = "yellow", env_var_mat_clusters$cluster_group == "8")
 points(nmds_sites, "sites", pch = 0, col = "grey", env_var_mat_clusters$cluster_group == "9")
 points(nmds_sites, "sites", pch = 0, col = "purple", env_var_mat_clusters$cluster_group == "10")
-plot(env_data_fit)
+plot(env_data_fit_sites)
 
 par(mfrow=c(1,1))
 mds_fig_studyarea <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites")
