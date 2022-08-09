@@ -75,6 +75,10 @@ all_observations_conservative <- get_conservative_observations(confirmed_observa
 
 unique_taxa_sites <- get_unique_taxa_site(all_observations_conservative)
 
+#' Get unique taxa across all sites.
+
+unique_taxa_all_sites <- get_unique_taxa_all_sites(unique_taxa_sites)
+
 #' Create and preview the presence-absence site-species matrix. Site name is in the format
 #' elevation(m)_site where the name is an abbreviation of the study area.
 #'
@@ -84,7 +88,7 @@ unique_taxa_sites <- get_unique_taxa_site(all_observations_conservative)
 #' particular sites where it was observed. **TODO**: consider if these should be removed from the analysis
 #' if they are not a unique taxa for the whole project, rather than just for a site.
 
-site_species_matrix <- create_presence_absence_site_species_matrix(unique_taxa_sites)
+site_species_matrix <- create_presence_absence_site_species_matrix(unique_taxa_all_sites)
 site_species_matrix
 
 #' ## Environmental variables

@@ -287,3 +287,55 @@ get_data_into_format_for_ancova<- function(species_richness_conservative, specie
   all_species_richness <- rbind(species_richness_conservative, species_richness_notconservative)
   return(all_species_richness)
 }
+
+get_unique_taxa_site <- function(all_observations) {
+  #' Get unique taxa for each site. Add a finalised taxa name for each
+  #' of the unique taxa (this is needed because it will potentially be at a different taxonomic level).
+  #'
+  #' Return a dataframe with the site and taxa.
+
+  site_elevations <- get_site_elevation(all_observations) # makes sure all sites are searched for
+  # specimens
+
+  taxa_all_sites <- data.frame()
+
+  for (i in rownames(site_elevations)) {
+    site <- (site_elevations[i, "site_elevation"])
+    site_observations <- filter(all_observations, all_observations$site_elevation == site)
+    unique_taxa_site <- get_unique_taxa(site_observations)
+      for (record in rownames(unique_taxa_site)) {
+        taxa_name <- get_taxa_name(unique_taxa_site[record, ])
+        unique_taxa_site[record, "taxa"] <- taxa_name
+        unique_taxa_site[record, "site_elevation"] <- site
+      }
+    taxa_all_sites <- rbind(taxa_all_sites, unique_taxa_site)
+  }
+
+  return(taxa_all_sites)
+}
+
+get_unique_taxa_all_sites <- function(unique_taxa_sites) {
+  #' Get unique taxa for each site, but exclude all higher taxa levels that could be other lower level
+  #' taxa from the same or other sites.
+  #'
+  #' Return dataframe of unique taxa across all sites at each site.
+
+  observations_species <- filter(unique_taxa_sites, species != "")
+  taxa_df <- observations_species
+
+  observations_genus <- filter(unique_taxa_sites, (genus != "") & (species == ""))
+  in_genus_not_species <- anti_join(observations_genus, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  taxa_df <- rbind(taxa_df, in_genus_not_species)
+
+  observations_subfamily <- filter(unique_taxa_sites, (subfamily != "") & (genus == "") & (species == ""))
+  in_subfamily_not_taxa <- anti_join(observations_subfamily, taxa_df, by = c('suborder', 'family', 'subfamily'))
+  taxa_df <- rbind(taxa_df, in_subfamily_not_taxa)
+
+  observations_family <- filter(unique_taxa_sites, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
+  in_family_not_taxa <- anti_join(observations_family, taxa_df, by = c('suborder', 'family'))
+  taxa_df <- rbind(taxa_df, in_family_not_taxa)
+
+  taxa_df <- taxa_df[!(taxa_df$taxa == "Gomphocerus / Gomphoceridius" | taxa_df$taxa=="Chorthippus biguttulus / Chorthippus mollis"),]
+
+  return(taxa_df)
+}
