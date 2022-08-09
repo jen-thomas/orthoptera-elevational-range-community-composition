@@ -236,7 +236,7 @@ get_taxa_name <- function(taxa_record) {
 }
 
 get_unique_taxa_site <- function(all_observations) {
-  #' For each site in the dataset, go through and get each unique taxa. Add a finalised taxa name for each
+  #' Get unique taxa for each site. Add a finalised taxa name for each
   #' of the unique taxa (this is needed because it will potentially be at a different taxonomic level).
   #'
   #' Return a dataframe with the site and taxa.
@@ -245,7 +245,6 @@ get_unique_taxa_site <- function(all_observations) {
   # specimens
 
   taxa_all_sites <- data.frame()
-  unique_taxa_site <- data.frame()
 
   for (i in rownames(site_elevations)) {
     site <- (site_elevations[i, "site_elevation"])
