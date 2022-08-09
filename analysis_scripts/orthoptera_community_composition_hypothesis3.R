@@ -173,6 +173,12 @@ kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 25)
 plot(species_jaccard_dist_matrix, col = kmeans_fit$cluster)
 points(kmeans_fit$centers, col = 1:5, pch = 8)
 
+#' Add the cluster means to the matrix
+
+for (name in names(kmeans_fit$cluster)) {
+  cluster_number <- as.numeric(kmeans_fit$cluster[name])
+  env_var_matrix[name, "cluster_group"] <- cluster_number
+  }
 
 #' ## NMDS
 
