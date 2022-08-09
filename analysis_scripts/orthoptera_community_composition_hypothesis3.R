@@ -208,7 +208,7 @@ kmeans_fit_clusters
 #' from Tavascan, which were meadows with long grass. The lower of the two was well-grazed and fairly
 #' damp. There was quite a lot of human activity in this area. It also included three mid-high elevation
 #' sites at La Molinassa.
-
+#'
 #' ### Test for any difference between the clusters in terms of each of the environmental variables.
 
 #' First check for normality and constant variance to see if parametric ANOVA tests can be used.
