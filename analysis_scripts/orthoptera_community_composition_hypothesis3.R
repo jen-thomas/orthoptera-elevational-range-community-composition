@@ -188,37 +188,57 @@ for (name in names(kmeans_fit$cluster)) {
   env_var_matrix[name, "cluster_group"] <- cluster_number
   }
 
-#' ### Test for any difference between the clusters in terms of each of the environmental variables.
+#' Look at the clusters.
 
 kmeans_fit_clusters <- kmeans_fit$cluster
 species_jaccard_dist_matrix[order(kmeans_fit_clusters), ]
+kmeans_fit_clusters
+
+#' There seems to be one cluster which includes the low sites at Besan (BES) and les Bordes de Viros
+#' (BOR), a few mid-elevation sites at Tor (where there was quite a lot of grazing and generally human
+#' activity, and strangely, the two highest sites of all the survey sites, at la Molinassa (MOL). Maybe
+#' these high-altitude sites are included because there was only one species recorded at each.
+#'
+#' Another cluster includes the higher elevation sites at Tor which range from 1900-2300 m, and two
+#' mid-high elevation sites from Tavascan (1800-1900).
+#'
+#' One cluster has only two sites at la Molinassa (2100-2200 m) and another has the higher elevation sites
+#' at Tavascan with one at 2300 at La Molinassa. This latter cluster includes sites which were grazed only
+#' sparsely and for a short period during the height of the summer.
+#'
+#' Finally, the last cluster has a mixture of one low-elevation site from Tor, some mid-elevation sites
+#' from Tavascan, which were meadows with long grass. The lower of the two was well-grazed and fairly
+#' damp. There was quite a lot of human activity in this area. It also included three mid-high elevation
+#' sites at La Molinassa.
+
+#' ### Test for any difference between the clusters in terms of each of the environmental variables.
 
 #' First check for normality and constant variance to see if parametric ANOVA tests can be used.
 
 with(env_var_matrix, {
-  shapiro.test(resid(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
-  shapiro.test(resid(aov(aspect ~ as.factor(kmeans_fit_clusters))))
-  shapiro.test(resid(aov(slope ~ as.factor(kmeans_fit_clusters))))
-  shapiro.test(resid(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
-  shapiro.test(resid(aov(mean_height_75percent ~ as.factor(kmeans_fit_clusters))))
-  shapiro.test(resid(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
+  print(shapiro.test(resid(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(aspect ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(slope ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(mean_density ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters)))))
 
-  bartlett.test(elevational_band_m, as.factor(kmeans_fit_clusters))
-  bartlett.test(aspect, as.factor(kmeans_fit_clusters))
-  bartlett.test(slope, as.factor(kmeans_fit_clusters))
-  bartlett.test(mean_density, as.factor(kmeans_fit_clusters))
-  bartlett.test(mean_height_75percent, as.factor(kmeans_fit_clusters))
-  bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters))
+  print(bartlett.test(elevational_band_m, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(aspect, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(slope, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(mean_density, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(mean_height_75percent, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters)))
 
-  summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters)))
-  summary(aov(aspect ~ as.factor(kmeans_fit_clusters)))
-  summary(aov(slope ~ as.factor(kmeans_fit_clusters)))
-  summary(aov(mean_density ~ as.factor(kmeans_fit_clusters)))
-  summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters)))
+  print(summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
+  print(summary(aov(aspect ~ as.factor(kmeans_fit_clusters))))
+  print(summary(aov(slope ~ as.factor(kmeans_fit_clusters))))
+  print(summary(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
+  print(summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
 
   #' Vegetation height was not normally distributed so use a non-parametric Kruskal-Wallis test to test for
   #' any difference in this factor between the different clusters.
-  kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters))
+  print(kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))
 })
 
 #' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
