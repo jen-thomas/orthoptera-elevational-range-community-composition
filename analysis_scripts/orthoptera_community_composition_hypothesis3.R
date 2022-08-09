@@ -174,11 +174,9 @@ plot(1:15, wss, type = "b", xlab = "Number of clusters", ylab = "Within groups s
 
 fviz_nbclust(species_jaccard_dist_matrix, kmeans, method='silhouette')
 
-#' From the Silhouette plot, choose to use K-means with 5 clusters.
+#' From the Silhouette plot, choose to use K-means with 5 clusters. Do the cluster analysis.
 
 kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 25)
-plot(species_jaccard_dist_matrix, col = kmeans_fit$cluster)
-points(kmeans_fit$centers, col = 1:5, pch = 8)
 
 #' Add the cluster means to the matrix (this is probably not needed at this point. Adding it to the plot
 #' would make it a bit too cluttered).
