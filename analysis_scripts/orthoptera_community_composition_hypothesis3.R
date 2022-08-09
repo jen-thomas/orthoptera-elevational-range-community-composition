@@ -244,7 +244,7 @@ with(env_var_matrix, {
 #' cluster.
 
 #' ## NMDS
-
+#'
 #' Plot the Shepard stress plot to check how many dimensions should be used. Look for where the line
 #' starts to flatten.
 
