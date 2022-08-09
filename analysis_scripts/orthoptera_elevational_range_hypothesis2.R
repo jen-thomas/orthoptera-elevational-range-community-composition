@@ -550,7 +550,7 @@ species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(1, 4)) +
   geom_hline(yintercept = 1100, linetype = "dashed", col = "grey") +
-  geom_hline(yintercept = 2500, linetype = "dashed", col = "grey") +
+  geom_hline(yintercept = 2600, linetype = "dashed", col = "grey") +
   geom_segment(aes(x = species, xend = species, y = min_elevation, yend = min_elevation + elevational_range)) +
   ylim(min(elevational_ranges_species_predicted$min_elevation) - 100,
        max(elevational_ranges_species_predicted$max_elevation) + 100) +
