@@ -188,6 +188,40 @@ for (name in names(kmeans_fit$cluster)) {
   env_var_matrix[name, "cluster_group"] <- cluster_number
   }
 
+#' ### Test for any difference between the clusters in terms of each of the environmental variables.
+
+kmeans_fit_clusters <- kmeans_fit$cluster
+species_jaccard_dist_matrix[order(kmeans_fit_clusters), ]
+
+#' First check for normality and constant variance to see if parametric ANOVA tests can be used.
+
+with(env_var_matrix, {
+  shapiro.test(resid(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
+  shapiro.test(resid(aov(aspect ~ as.factor(kmeans_fit_clusters))))
+  shapiro.test(resid(aov(slope ~ as.factor(kmeans_fit_clusters))))
+  shapiro.test(resid(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
+  shapiro.test(resid(aov(mean_height_75percent ~ as.factor(kmeans_fit_clusters))))
+  shapiro.test(resid(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
+
+  bartlett.test(elevational_band_m, as.factor(kmeans_fit_clusters))
+  bartlett.test(aspect, as.factor(kmeans_fit_clusters))
+  bartlett.test(slope, as.factor(kmeans_fit_clusters))
+  bartlett.test(mean_density, as.factor(kmeans_fit_clusters))
+  bartlett.test(mean_height_75percent, as.factor(kmeans_fit_clusters))
+  bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters))
+
+  summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters)))
+  summary(aov(aspect ~ as.factor(kmeans_fit_clusters)))
+  summary(aov(slope ~ as.factor(kmeans_fit_clusters)))
+  summary(aov(mean_density ~ as.factor(kmeans_fit_clusters)))
+  summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters)))
+
+  #' Vegetation height was not normally distributed so use a non-parametric Kruskal-Wallis test to test for
+  #' any difference in this factor between the different clusters.
+  kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters))
+})
+
+
 #' ## NMDS
 
 #' Plot the Shepard stress plot to check how many dimensions should be used. Look for where the line
