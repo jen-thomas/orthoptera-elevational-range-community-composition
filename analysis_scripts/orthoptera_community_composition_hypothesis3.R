@@ -75,18 +75,15 @@ all_observations_conservative <- get_conservative_observations(confirmed_observa
 
 unique_taxa_sites <- get_unique_taxa_site(all_observations_conservative)
 
-#' Get unique taxa across all sites.
+#' Get unique taxa across all sites so that higher taxa do not include taxa that may already have been
+#' observed at the same or different sites. Also remove records where the taxa was one of multiple taxa,
+#' but only if they have all been observed, or could have been observed at the same or other sites. The
+#' site-species matrix that this produces will therefore be on the conservative side.
 
 unique_taxa_all_sites <- get_unique_taxa_all_sites(unique_taxa_sites)
 
 #' Create and preview the presence-absence site-species matrix. Site name is in the format
 #' elevation(m)_site where the name is an abbreviation of the study area.
-#'
-#' This matrix includes all unique taxa from each site (as was used for the species richness analysis).
-#' This means though, that a higher taxonomic level, such as genus, may be represented elsewhere in the
-#' matrix by a different taxa. The genus though in this example, would be a unique taxa from the
-#' particular sites where it was observed. **TODO**: consider if these should be removed from the analysis
-#' if they are not a unique taxa for the whole project, rather than just for a site.
 
 site_species_matrix <- create_presence_absence_site_species_matrix(unique_taxa_all_sites)
 site_species_matrix
