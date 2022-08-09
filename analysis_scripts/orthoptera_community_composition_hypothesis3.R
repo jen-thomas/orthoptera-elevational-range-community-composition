@@ -21,7 +21,8 @@ source("prepare_vegetation_data.R")
 source("get_physical_site_data.R")
 
 vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp",
-                     "maptools", "leaflet", "rgeos", "corrplot", "vegan", "goeveg", "phytools", "tibble")
+                     "maptools", "leaflet", "rgeos", "corrplot", "vegan", "goeveg", "phytools", "tibble",
+"Matrix")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -143,7 +144,7 @@ check_collinearity(site_env_var_data)
 
 env_var_matrix <- create_env_var_matrix(site_env_var_data)
 
-#' ## Hierarchical cluster analysis
+#' ## Calculate dissimilarity matrix
 
 #' Calculate a dissimilarity matrix using the Jaccard distance. This is used because it excludes double
 #' zeros whilst giving equal weight to non-zero agreements and disagreements. Data are already binary so
@@ -151,43 +152,29 @@ env_var_matrix <- create_env_var_matrix(site_env_var_data)
 
 species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 
-#' Cluster communities using the average-linkage algorithm. This is a standard method to use in ecology
-#' and particularly in biogeography. It "links sites and species by considering the distances to a
-#' subgroup's arithmetic average" (https://ourcodingclub.github.io/tutorials/data-clustering/). TODO Do
-#' some kind of bootstrapping (this doesn't seem to be used for presence-absence data) or resampling
-#' to assess the stability of the clustering solution.
+#' Convert dissimilarity indices to matrix
 
-species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "average")
+species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 
-#' TODO Test the stability of the clusters using permutation tests
+#' ## K-means cluster analysis
+
+#' Determine the number of clusters to use for K-means clustering. Calculate the within group sum of
+#' squares if we consider up to fifteen clusters. Plot these and look for the step of where the sum of
+#' squares decreases. Code adapted from https://www.statmethods.net/advstats/cluster.html
+
+wss <- (nrow(species_jaccard_dist_matrix) - 1) * sum(apply(species_jaccard_dist_matrix, 2, var))
+for (i in 2:15) wss[i] <- sum(kmeans(species_jaccard_dist_matrix, centers=i)$withinss)
+plot(1:15, wss, type = "b", xlab = "Number of clusters", ylab = "Within groups sum of squares")
+
+#' There is no clear difference in this scree plot to identify the number of clusters to choose. From 5
+#' onwards, there seems to be a slight flattening, so choose 5 for the K-means clustering.
+
+kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 25)
+plot(species_jaccard_dist_matrix, col = kmeans_fit$cluster)
+points(kmeans_fit$centers, col = 1:5, pch = 8)
 
 
-#' Plot cluster diagram
-plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
-
-#' Split into the subgroups using the nodes. This is more to visualise than anything. Plotting the
-#' subgroups is not valid when using the average linkage method.
-
-species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, h = 0.85)
-species_jaccard_dist_cluster_average_groups
-
-#' Find out how many subgroups have been created
-length(unique(species_jaccard_dist_cluster_average_groups))
-
-#' Plotting the subgroups when using the average linking method is not valid so do not include this
-plot(x = species_jaccard_dist_cluster_average, labels = row.names(species_jaccard_dist_cluster_average), cex = 0.5)
-rect.hclust(tree = species_jaccard_dist_cluster_average, h = 0.85, cluster = species_jaccard_dist_cluster_average_groups)
-
-#' Create a dataframe from the site names and cluster groups
-cluster_average_groups <- species_jaccard_dist_cluster_average_groups %>%
-  as.data.frame() %>%
-  rownames_to_column("site_elevation") %>%
-  dplyr::rename("cluster_group" = ".")
-
-#' Join the cluster numbers onto the environmental variables data frame
-env_var_df <- env_var_matrix %>% rownames_to_column("site_elevation")
-env_var_clusters <- left_join(env_var_df, cluster_average_groups, by = "site_elevation")
-env_var_mat_clusters <- column_to_rownames(env_var_clusters, var = "site_elevation")
+#' ## NMDS
 
 #' Plot the Shepard stress plot to check how many dimensions should be used. Look for where the line
 #' starts to flatten.
@@ -221,12 +208,14 @@ stressplot(species_jaccard_dist_mds_2dim)
 
 env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover", "mean_density")],
+                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover",
+                                          "mean_density")],
                        scaling = "sites",
                        permutations = 1000)
 env_data_fit_sites
 
-#' Do the same plot but for sites with the environmental variables and colour the points by the cluster group
+#' Do the same plot but for sites with the environmental variables and colour the points by the cluster
+#' group
 #+ message=FALSE, warning=FALSE
 
 #' Method from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
@@ -236,7 +225,7 @@ points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC7
 plot(env_data_fit_sites, col = "grey")
 legend('right', legend = unique(env_var_mat_clusters$cluster_group), col = "black", pch = c(1, 2, 8, 5, 6, 0, 4)[ordered(as.factor(env_var_mat_clusters$cluster_group))])
 
-#' ### Permanova
+#' ## Permanova
 #'
 #' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
 #' area.
@@ -251,6 +240,47 @@ site_elevation_permanova
 site_area_permanova <- adonis2(site_species_matrix ~ area,
                                method = "jaccard", data = site_env_var_data, perm=999)
 site_area_permanova
+
+#' # Appendix
+#'
+#' ## Code from previous attempts at analysis
+#'
+#' ### Hierarchical agglomerative clustering with average linking
+
+#' Cluster communities using the average-linkage algorithm. This is a standard method to use in ecology
+#' and particularly in biogeography. It "links sites and species by considering the distances to a
+#' subgroup's arithmetic average" (https://ourcodingclub.github.io/tutorials/data-clustering/). TODO Do
+#' some kind of bootstrapping (this doesn't seem to be used for presence-absence data) or resampling
+#' to assess the stability of the clustering solution.
+
+species_jaccard_dist_cluster_average <- hclust(species_jaccard_dist, method = "average")
+
+#' Plot cluster diagram
+plot(species_jaccard_dist_cluster_average, ylab = "Jaccard distance", main = "Average")
+
+#' Split into the subgroups using the nodes. This is more to visualise than anything. Plotting the
+#' subgroups is not valid when using the average linkage method.
+
+species_jaccard_dist_cluster_average_groups <- cutree(species_jaccard_dist_cluster_average, h = 0.85)
+species_jaccard_dist_cluster_average_groups
+
+#' Find out how many subgroups have been created
+length(unique(species_jaccard_dist_cluster_average_groups))
+
+#' Plotting the subgroups when using the average linking method is not valid so do not include this
+plot(x = species_jaccard_dist_cluster_average, labels = row.names(species_jaccard_dist_cluster_average), cex = 0.5)
+rect.hclust(tree = species_jaccard_dist_cluster_average, h = 0.85, cluster = species_jaccard_dist_cluster_average_groups)
+
+#' Create a dataframe from the site names and cluster groups
+cluster_average_groups <- species_jaccard_dist_cluster_average_groups %>%
+  as.data.frame() %>%
+  rownames_to_column("site_elevation") %>%
+  dplyr::rename("cluster_group" = ".")
+
+#' Join the cluster numbers onto the environmental variables data frame
+env_var_df <- env_var_matrix %>% rownames_to_column("site_elevation")
+env_var_clusters <- left_join(env_var_df, cluster_average_groups, by = "site_elevation")
+env_var_mat_clusters <- column_to_rownames(env_var_clusters, var = "site_elevation")
 
 #' ## Example of how to do plots (not needed for results)
 
