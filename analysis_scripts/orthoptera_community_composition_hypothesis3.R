@@ -22,7 +22,7 @@ source("get_physical_site_data.R")
 
 vector_packages <- c("visreg", "ggplot2", "dplyr", "raster", "terra", "XML", "lubridate", "sp",
                      "maptools", "leaflet", "rgeos", "corrplot", "vegan", "goeveg", "phytools", "tibble",
-"Matrix")
+"factoextra")
 get_packages(vector_packages)
 
 #' ## Create site-species matrix.
@@ -158,8 +158,8 @@ species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 
 #' ## K-means cluster analysis
 
-#' Determine the number of clusters to use for K-means clustering. Calculate the within group sum of
-#' squares if we consider up to fifteen clusters. Plot these and look for the step of where the sum of
+#' Determine the number of clusters to use for K-means clustering. Firstly, calculate the within group sum
+#' of squares if we consider up to fifteen clusters. Plot these and look for the step of where the sum of
 #' squares decreases. Code adapted from https://www.statmethods.net/advstats/cluster.html
 
 wss <- (nrow(species_jaccard_dist_matrix) - 1) * sum(apply(species_jaccard_dist_matrix, 2, var))
@@ -167,13 +167,21 @@ for (i in 2:15) wss[i] <- sum(kmeans(species_jaccard_dist_matrix, centers=i)$wit
 plot(1:15, wss, type = "b", xlab = "Number of clusters", ylab = "Within groups sum of squares")
 
 #' There is no clear difference in this scree plot to identify the number of clusters to choose. From 5
-#' onwards, there seems to be a slight flattening, so choose 5 for the K-means clustering.
+#' onwards, there seems to be a slight flattening, so this might be reasonable.
+#'
+#' Use the Silhouette scores to see if 5 sounds like a reasonable number of clusters. Find where the
+#' maximum is reached.
+
+fviz_nbclust(species_jaccard_dist_matrix, kmeans, method='silhouette')
+
+#' From the Silhouette plot, choose to use K-means with 5 clusters.
 
 kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 25)
 plot(species_jaccard_dist_matrix, col = kmeans_fit$cluster)
 points(kmeans_fit$centers, col = 1:5, pch = 8)
 
-#' Add the cluster means to the matrix
+#' Add the cluster means to the matrix (this is probably not needed at this point. Adding it to the plot
+#' would make it a bit too cluttered).
 
 for (name in names(kmeans_fit$cluster)) {
   cluster_number <- as.numeric(kmeans_fit$cluster[name])
@@ -198,6 +206,7 @@ species_jaccard_dist_mds_2dim <- metaMDS(site_species_matrix, k = 2, distance = 
                                          trace = TRUE)
 
 #' Get the stress value for 2 dimension
+
 print(species_jaccard_dist_mds_2dim["stress"])
 
 #' A Shepard plot can then be used to assess goodness of ordination fit.
@@ -214,8 +223,9 @@ stressplot(species_jaccard_dist_mds_2dim)
 
 env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "mean_perc_veg_cover",
-                                          "mean_density")],
+                       env_var_matrix[, c("elevational_band_m", "slope", "aspect", "area",
+                                          "mean_perc_veg_cover",
+                                          "mean_height_75percent", "mean_density")],
                        scaling = "sites",
                        permutations = 1000)
 env_data_fit_sites
@@ -224,28 +234,43 @@ env_data_fit_sites
 #' group
 #+ message=FALSE, warning=FALSE
 
-#' Method from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
+#' Method modified from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
-ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "n")
-points(species_jaccard_dist_mds_2dim, col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_mat_clusters$area)], pch = c(1, 2, 8, 5, 6, 0, 4)[ordered(as.factor(env_var_mat_clusters$cluster_group))])
-plot(env_data_fit_sites, col = "grey")
-legend('right', legend = unique(env_var_mat_clusters$cluster_group), col = "black", pch = c(1, 2, 8, 5, 6, 0, 4)[ordered(as.factor(env_var_mat_clusters$cluster_group))])
+list_vectors <- c("Elevation band (m)", "Slope", "Aspect", "% vegetation cover",
+                       "Vegetation height", "Vegetation density")
+list_factors <- c("", "", "", "", "") # hacky way to avoid printing the study areas
+
+ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
+text(ordination_plot, "sites",
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+     labels = env_var_matrix$elevational_band_m)
+plot(env_data_fit_sites,
+     col = "grey",
+     labels = list(vectors = list_vectors, factors = list_factors))
 
 #' ## Permanova
 #'
-#' Use PERMANOVA to test if there is any differences between communities. Do this for elevation and study
-#' area.
+#' Use PERMANOVA to test if there is any differences between communities. Do this for elevation, study
+#' area and the clusters. Then put all variables in.
 #'
 #' Null hypothesis: the Jaccard distance is equivalent for all groups, i.e. the community composition of
 #' sites between the different groupings, is the same. See https://rpubs.com/an-bui/vegan-cheat-sheet
 
-site_elevation_permanova <- adonis2(site_species_matrix ~ elevational_band_m,
-                                    method = "jaccard", data = site_env_var_data, perm=999)
+site_elevation_permanova <- adonis2(species_jaccard_dist ~ elevational_band_m,
+                                    data = env_var_matrix, perm=999)
 site_elevation_permanova
 
-site_area_permanova <- adonis2(site_species_matrix ~ area,
-                               method = "jaccard", data = site_env_var_data, perm=999)
+site_area_permanova <- adonis2(species_jaccard_dist ~ area,
+                               data = env_var_matrix, perm=999)
 site_area_permanova
+
+cluster_group_permanova <- adonis2(species_jaccard_dist ~ cluster_group, data = env_var_matrix, perm=999)
+cluster_group_permanova
+
+all_env_vars_permanova <- adonis2(species_jaccard_dist ~ area + elevational_band_m + slope + aspect +
+                                  mean_height_75percent + mean_density + mean_perc_veg_cover,
+                                  data = env_var_matrix, perm=999)
+all_env_vars_permanova
 
 #' # Appendix
 #'
