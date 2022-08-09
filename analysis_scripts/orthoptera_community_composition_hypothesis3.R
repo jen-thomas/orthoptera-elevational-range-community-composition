@@ -221,6 +221,9 @@ with(env_var_matrix, {
   kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters))
 })
 
+#' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
+#' that there was any difference between each of the individual environmental variables within each
+#' cluster.
 
 #' ## NMDS
 
