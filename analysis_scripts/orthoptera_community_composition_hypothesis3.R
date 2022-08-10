@@ -151,10 +151,13 @@ env_var_matrix <- create_env_var_matrix(site_env_var_data)
 #' there is no need to convert the matrix to presence-absence before calculating the matrix.
 
 species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
+species_jaccard_dist
 
-#' Convert dissimilarity indices to matrix
+#' Convert dissimilarity indices to matrix because they cannot be used in the kmeans function as they are.
+#' Is this the correct thing to do? Now both the upper and lower halves of the matrix will be the same.
 
 species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
+species_jaccard_dist_matrix
 
 #' ## K-means cluster analysis
 
