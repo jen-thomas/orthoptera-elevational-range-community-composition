@@ -51,7 +51,7 @@ create_env_var_matrix <- function(env_var_df) {
   rownames(env_var_df) <- env_var_df$site_elevation
 
     #' select only a subset of the parameters to use in the analysis
-  env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect, area,
+  env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect_cardinal, area,
                                   mean_perc_veg_cover, mean_height_75percent, mean_density)
 
   return(env_var_matrix)
@@ -212,6 +212,7 @@ kmeans_fit_clusters
 #' damp. There was quite a lot of human activity in this area. It also included three mid-high elevation
 #' sites at La Molinassa.
 #'
+
 #' ### Test for any difference between the clusters in terms of each of the environmental variables.
 
 #' First check for normality and constant variance to see if parametric ANOVA tests can be used.
@@ -281,9 +282,9 @@ stressplot(species_jaccard_dist_mds_2dim)
 
 env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "aspect", "area",
-                                          "mean_perc_veg_cover",
-                                          "mean_height_75percent", "mean_density")],
+                       env_var_matrix[, c("elevational_band_m", "slope", "aspect_cardinal", "area",
+                                          "mean_perc_veg_cover", "mean_height_75percent",
+                                          "mean_density")],
                        scaling = "sites",
                        permutations = 1000)
 env_data_fit_sites
@@ -306,6 +307,14 @@ plot(env_data_fit_sites,
      col = "grey",
      labels = list(vectors = list_vectors, factors = list_factors))
 
+ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
+text(ordination_plot, "sites",
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+     labels = env_var_matrix$elevational_band_m)
+base::plot(env_data_fit_sites,
+     col = "grey",
+     labels = list(vectors = list_vectors, factors = list_factors))
+
 #' ## Permanova
 #'
 #' Use PERMANOVA to test if there is any differences between communities. Do this for elevation, study
@@ -325,8 +334,9 @@ site_area_permanova
 cluster_group_permanova <- adonis2(species_jaccard_dist ~ cluster_group, data = env_var_matrix, perm=999)
 cluster_group_permanova
 
-all_env_vars_permanova <- adonis2(species_jaccard_dist ~ area + elevational_band_m + slope + aspect +
-                                  mean_height_75percent + mean_density + mean_perc_veg_cover,
+all_env_vars_permanova <- adonis2(species_jaccard_dist ~ area + elevational_band_m + slope +
+                                  aspect_cardinal + mean_height_75percent + mean_density +
+                                  mean_perc_veg_cover,
                                   data = env_var_matrix, perm=999)
 all_env_vars_permanova
 
