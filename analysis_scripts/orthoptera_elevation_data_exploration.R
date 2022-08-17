@@ -272,9 +272,9 @@ get_species_summary_site <- function(observations) {
   #' Return a dataframe of the species seen at each site.
 
   species_summary <- observations %>%
-    distinct(site_elevation, species) %>%
+    distinct(site_elevation, species, suborder) %>%
     group_by(site_elevation) %>%
-    arrange(site_elevation, species)
+    arrange(site_elevation, species, suborder)
 
   return(species_summary)
 }
@@ -386,6 +386,10 @@ joined_survey_summary_data <- join_site_summary_data(number_visits_site, number_
                                                      number_taxa_site, transect_lengths,
                                                      site_survey_summary)
 joined_survey_summary_data[order(joined_survey_summary_data$site_elevation), ]
+
+#' List the species seen at each site
+
+species_summary_site <- get_species_summary_site(all_observations_conservative)
 
 #' ### Summarise by elevational band
 #'
