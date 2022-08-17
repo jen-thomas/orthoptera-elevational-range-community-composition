@@ -247,6 +247,10 @@ corr_test_samplingeffort_speciesrichness
 corr_test_samplingeffort_speciesrichness_rho <- corr_test_samplingeffort_speciesrichness$estimate
 print(corr_test_samplingeffort_speciesrichness_rho)
 
+#' <br>and calculate the coefficient of determination (R<sup>2</sup>).
+coeff_det_samplingeffort_speciesrichnessn <- calculate_coefficient_of_determination(corr_test_samplingeffort_speciesrichness_rho)
+print(coeff_det_samplingeffort_speciesrichnessn)
+
 #' and elevation and sampling effort.
 #+ message=FALSE, warning=FALSE
 
@@ -259,6 +263,10 @@ corr_test_samplingeffort_elevation
 
 corr_test_samplingeffort_elevation_rho <- corr_test_samplingeffort_elevation$estimate
 print(corr_test_samplingeffort_elevation_rho)
+
+#' <br>and calculate the coefficient of determination (R<sup>2</sup>).
+coeff_det_samplingeffort_elevation <- calculate_coefficient_of_determination(corr_test_samplingeffort_elevation_rho)
+print(coeff_det_samplingeffort_elevation)
 
 #' As expected, species richness significantly increases with sampling effort (<em>r<sub>S</sub></em> =
 #' 0.77, <em>p</em> < 0.001). Sampling effort was lower at higher elevations (<em>r<sub>S</sub></em> =
