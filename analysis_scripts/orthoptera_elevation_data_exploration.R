@@ -111,6 +111,21 @@ get_number_observations_suborder <- function(observations) {
   return(all_number_observations_suborder)
 }
 
+get_number_observations_adult <- function(observations) {
+  #' Get the number of adults recorded. Use all observations.
+  #'
+  #' Return a dataframe with the number of adults and nymphs.
+
+    adults_nymphs <- observations %>%
+    distinct(stage, specimen_label) %>% # account for multiple identifications for a finalised
+    # observation
+    group_by(stage) %>%
+    dplyr::summarise("number_observations" = n())
+
+    return(adults_nymphs)
+}
+
+
 #' <br>The total number of observations was
 get_number_observations(observations_sites_df)
 
@@ -127,6 +142,9 @@ unique_confirmed_taxa[order(unique_confirmed_taxa$species, unique_confirmed_taxa
 
 #' The following number of individuals were identified per suborder
 get_number_observations_suborder(all_observations_conservative)
+
+#' <br>Calculate the number of adults and nymphs.
+get_number_observations_adult(all_observations_conservative)
 
 #' ### Summarise by site
 #'
