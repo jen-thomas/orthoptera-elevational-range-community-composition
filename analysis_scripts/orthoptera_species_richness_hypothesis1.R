@@ -392,8 +392,10 @@ glm_species_richness_step_backward <- stats::step(glm_species_richness_full, dir
 summary(glm_species_richness_step_backward)
 
 #' Generate an ANOVA table for the model.
+car::Anova(glm_species_richness_step_backward)
 
-Anova(glm_species_richness_step_backward)
+#' Try ANOVA from the car package, just to see what difference there is.
+car::Anova(glm_species_richness_step_backward, type="II", test.statistic = "F")
 
 #' AICC
 AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.ord = TRUE)
@@ -406,7 +408,7 @@ glm_species_richness_reduced <- glm_species_richness_step_backward
 summary(glm_species_richness_reduced)
 
 #' ANOVA
-Anova(glm_species_richness_reduced)
+car::Anova(glm_species_richness_reduced, type="II", test.statistic = "LR", error.estimate = "deviance")
 
 #' Log likelihood
 logLik(glm_species_richness_reduced)
@@ -437,7 +439,8 @@ glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_
 summary(glm_species_richness_inter_slope_vegcover)
 
 #' ANOVA
-Anova(glm_species_richness_inter_slope_vegcover)
+car::Anova(glm_species_richness_inter_slope_vegcover, type="II", test.statistic = "LR", error.estimate = "deviance")
+
 
 #' AICC
 AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
@@ -533,7 +536,8 @@ glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_cae
 summary(glm_species_richness_caelifera_step)
 
 #' Do ANOVA of reduced GLM
-Anova(glm_species_richness_caelifera_step)
+car::Anova(glm_species_richness_caelifera_step, type="II", test.statistic = "LR", error.estimate = "deviance")
+
 
 #' Get AICC of reduced GLM
 AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
@@ -554,7 +558,8 @@ glm_species_richness_caelifera_reduced_no_elevation <- glm(species_richness ~ sl
 summary(glm_species_richness_caelifera_reduced_no_elevation)
 
 #' ANOVA
-Anova(glm_species_richness_caelifera_reduced_no_elevation)
+car::Anova(glm_species_richness_caelifera_reduced_no_elevation, type="II", test.statistic = "LR", error.estimate = "deviance")
+
 
 #' AICC
 AICcmodavg::AICc(glm_species_richness_caelifera_reduced_no_elevation, return.K = FALSE, second.ord = TRUE)
