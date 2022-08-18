@@ -637,16 +637,16 @@ visreg(glm_species_richness_reduced, xvar = "mean_density")
 #' Plot the predicted values on top of the actual data points.
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+png(file = filepath, width = 1200, height = 800, units = "px", bg = "white", res = 300)
 par(mfrow = c(1,1))
 species_richness_elevation_plot <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
                                      scale = "response",
                                      rug = FALSE,
-                                     line = list(col = "black"),
+                                     line.par = list(col = "black", lwd = 0.5),
                                      xlab = "Elevation (m a.s.l)", xlim = c(1000, 2550),
                                      ylab = "Species richness", ylim = c(0, 17))
 #species_richness_elevation_plot
-points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 1.5)
+points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 1)
 dev.off()
 
 #' ## Output tables for report
