@@ -622,13 +622,18 @@ dev.off()
 #'
 #' Ordered by decreasing elevational range midpoint.
 
+#' Create the output plot file
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis2_species_elevational_range.png")
+png(file = filepath, width = 1400, height = 1000, units = "px", bg = "white", res = 300)
+
 species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
                                         aes(x = reorder(species, -elevational_range_midpoint), y = elevational_range_midpoint)) +
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(1, 4)) +
-  geom_hline(yintercept = 1100, linetype = "dashed", col = "grey") +
-  geom_hline(yintercept = 2600, linetype = "dashed", col = "grey") +
-  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = min_elevation + elevational_range)) +
+  geom_hline(yintercept = 1100, linetype = "dashed", col = "grey", lwd = 0.5) +
+  geom_hline(yintercept = 2600, linetype = "dashed", col = "grey", lwd = 0.5) +
+  geom_segment(aes(x = species, xend = species, y = min_elevation, yend = min_elevation + elevational_range), lwd = 0.5) +
   ylim(min(elevational_ranges_species_predicted$min_elevation) - 100,
        max(elevational_ranges_species_predicted$max_elevation) + 100) +
   labs(x = "Species",
@@ -636,7 +641,9 @@ species_elevationalrange_plot <- ggplot(elevational_ranges_species_predicted,
 
 species_elevationalrange_plot <- format_theme_ggplot_vertical_xaxis_labels(species_elevationalrange_plot)
 species_elevationalrange_plot
-save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
+dev.off()
+
+#save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
 
 #' ## DO NOT USE
 
