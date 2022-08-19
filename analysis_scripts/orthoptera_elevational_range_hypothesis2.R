@@ -277,13 +277,6 @@ plot_quadratic_model <- function(dataframe, model) {
   #' Calculate the predicted values from the regression so they can be plotted as a line
   predicted_values <- predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
 
-  #' Plot real values
-  # ggplot(dataframe, aes(x = mean_elevation, y = elevational_range, colour = suborder)) +
-  #   geom_point(size = 2) +
-  #   geom_line(data = predicted_values, aes(x = i, y = predicted_values, col = "black"))
-  #   labs(x = "Mean elevation (m a.s.l)", y = "Elevational range (m)") +
-  #   theme_classic()
-
   plot(x = jitter(dataframe$elevational_range_midpoint, amount = 20),
        y = jitter(dataframe$elevational_range, amount = 20),
        xlab = "Elevational range midpoint (m a.s.l)", ylab = "Elevational range (m)"
@@ -325,15 +318,8 @@ plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
        xlim = c(1100, 2300), ylim = c(0, 1400),
        xlab = "Elevational range midpoint (m a.s.l)",
        ylab = "Elevational range (m)"
-       # xaxt = "n", yaxt = "n",
-       # xlab = "", ylab = "", # so that the labels can be printed below
-  )
 
-  # axis(side = 1, tick = TRUE, line = 0, cex.axis = 0.5, lwd = 0.2)
-  # axis(side = 2, tick = TRUE, line = 0, cex.axis = 0.5, lwd = 0.2)
-  #
-  # title(xlab = "Elevational range midpoint (m a.s.l)", cex.axis = 0.6, cex.lab = 0.8, line = 1)
-  # title(ylab = "Elevational range (m)", cex.axis = 0.6, cex.lab = 0.8, line = 1)
+  )
 
   lines(i, predicted_values, lty=1, lwd=1, col="black")
   lines(i, intervals[ , 3], lty = "dashed", col = "darkgrey")
@@ -345,8 +331,6 @@ plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
   int_term <- cf[1]
   lin_term <- cf[2]
   quadratic_term <- abs(cf[3])
-  # lin_term <- paste0(ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]))
-  # quadratic_term <- paste0(ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]))
 
   equation <- bquote(italic(E[R]) == .(int_term) + .(lin_term)*italic(E) - .(quadratic_term)*italic(E)^2)
   text(equation, x = 1500, y = 1350, cex = 0.5)
