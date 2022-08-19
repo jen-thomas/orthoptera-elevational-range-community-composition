@@ -649,7 +649,7 @@ fitted_glm_values <- data.frame(species_richness_elevation_plot$fit)
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
 print(filepath)
-png(file = filepath, width = 1200, height = 1200, units = "px", bg = "white", res = 300)
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 par(mfrow = c(1,1))
 species_richness_elevation_plot2 <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
                                      scale = "response",
