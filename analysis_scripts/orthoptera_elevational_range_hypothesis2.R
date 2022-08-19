@@ -355,6 +355,68 @@ plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
 
 }
 
+plot_quadratic_model_predvalues_ggplot <- function(dataframe, model, filename) {
+  #' Plot the elevational range as a function of elevation (data points) and include the line for the
+  #' predicted values from the quadratic model. Also add the CIs.
+  #'
+  #' Get the parameters from the model output and add the equation of the line to the plot.
+
+  #' Get minimum and maximum values in the dataset
+  i <- seq(min(dataframe$elevational_range_midpoint), max(dataframe$elevational_range_midpoint), len=100) #  x-value limits for line
+
+  #' Calculate the predicted values from the regression so they can be plotted as a line
+  predicted_values <- predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+  intervals <-  predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+
+  #' Set up place to save file
+  # path <- "../analysis_plots/"
+  # filepath <- file.path(path, filename)
+  # png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+
+  plot_output <- ggplot(data = dataframe) +
+    geom_point(aes(x = elevational_range_midpoint, y = elevational_range), shape = 1, colour = "black",
+               size = 2, show.legend = FALSE) +
+    geom_jitter() +
+    ylim(min(dataframe$elevational_range) - 100,
+       max(dataframe$elevational_range) + 100) +
+    xlim(min(dataframe$elevational_range_midpoint) - 100,
+       max(dataframe$elevational_range_midpoint) + 100) +
+    labs(x = "Elevational range midpoint (m a.s.l)", y = "Elevational range (m)") +
+    theme_classic()
+
+  # plot_output
+  # # dev.off()
+  #
+  # # plot(x = jitter(dataframe$elevational_range_midpoint, amount = 20),
+  # #      y = jitter(dataframe$elevational_range, amount = 20),
+  # #      pch = c(1, 4)[as.numeric(dataframe$suborder)],
+  # #      xlim = c(1100, 2300), ylim = c(0, 1400),
+  # #      xlab = "Elevational range midpoint (m a.s.l)",
+  # #      ylab = "Elevational range (m)"
+  #      # xaxt = "n", yaxt = "n",
+  #      # xlab = "", ylab = "", # so that the labels can be printed below
+  #
+  #
+  # lines(i, predicted_values, lty=1, lwd=1, col="black")
+  # lines(i, intervals[ , 3], lty = "dashed", col = "darkgrey")
+  # lines(i, intervals[ , 2], lty = "dashed", col = "darkgrey")
+  #
+  # # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
+  # cf <- signif(coef(model), 2)
+  #
+  # int_term <- cf[1]
+  # lin_term <- cf[2]
+  # quadratic_term <- abs(cf[3])
+  # # lin_term <- paste0(ifelse(sign(cf[2])==1, " + ", " - "), abs(cf[2]))
+  # # quadratic_term <- paste0(ifelse(sign(cf[3])==1, " + ", " - "), abs(cf[3]))
+  #
+  # equation <- bquote(italic(E[R]) == .(int_term) + .(lin_term)*italic(E) - .(quadratic_term)*italic(E)^2)
+  # text(equation, x = 1500, y = 1350, cex = 0.5)
+  #
+
+
+}
+
 check_model_assumptions <- function(model) {
   #' Plot a histogram of the residuals to check for a normal distribution. Secondly, plot the residuals
   #' against the predicted values, to check for homoscedasticity.
@@ -537,10 +599,46 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 #' All species
 
 plot_quadratic_model_predvalues(elevational_ranges_species, nonlin_reg_quadratic, "hypothesis2_elevational_range_model.png")
+#plot_quadratic_model_predvalues_ggplot(elevational_ranges_species, nonlin_reg_quadratic, "hypothesis2_elevational_range_model_ggplot.png")
+
+#' try with ggplot
+
+#' Get minimum and maximum values in the dataset
+i <- seq(min(elevational_ranges_species$elevational_range_midpoint), max(elevational_ranges_species$elevational_range_midpoint), len=100) #  x-value limits for line
+
+#' Calculate the predicted values from the regression so they can be plotted as a line
+predicted_values <- predict(nonlin_reg_quadratic, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+intervals <-  predict(nonlin_reg_quadratic, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+
+confidence_bands_predicted <- data.frame(i, intervals)
+
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis2_elevational_range_model_ggplot.png")
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+
+plot_output <- ggplot(data = elevational_ranges_species,
+             aes(x = elevational_range_midpoint, y = elevational_range)) +
+  geom_jitter(aes(shape = suborder), size = 1.5, show.legend = FALSE, width = 10, height = 10) +
+  scale_shape_manual(values = c(1, 4)) +
+  ylim(min(elevational_ranges_species$elevational_range) - 100,
+     max(elevational_ranges_species$elevational_range) + 100) +
+  xlim(min(elevational_ranges_species$elevational_range_midpoint) - 100,
+     max(elevational_ranges_species$elevational_range_midpoint) + 100) +
+  geom_line(data = confidence_bands_predicted, aes(x = i, y = fit), lty=1, lwd=1, col="black") +
+  geom_line(data = confidence_bands_predicted, aes(x = i, y = lwr), lty=1, lwd=1, col="darkgrey") +
+  geom_line(data = confidence_bands_predicted, aes(x = i, y = upr), lty=1, lwd=1, col="darkgrey") +
+  labs(x = "Elevational range midpoint (m a.s.l)",
+       y = "Elevational range (m)") +
+  theme_classic()
+
+plot_output
+dev.off()
 
 #' Only Caelifera
 
 plot_quadratic_model_predvalues(elevational_ranges_caelifera_predicted, nonlin_reg_quadratic_caelifera, "hypothesis2_elevational_range_model_caelifera.png")
+plot_quadratic_model_predvalues_ggplot(elevational_ranges_caelifera_predicted, nonlin_reg_quadratic_caelifera, "hypothesis2_elevational_range_model_caelifera_gglpot.png")
+
 
 #' Elevational range and mean elevation (open circles: Caelifera; crosses: Ensifera) of all species.
 #' Ordered by decreasing elevational range midpoint.
