@@ -655,7 +655,7 @@ species_richness_elevation_plot2 <- visreg(glm_species_richness_reduced, xvar = 
                                      scale = "response",
                                      rug = FALSE,
                                      band = FALSE,
-                                     line.par = list(col = "black", lwd = 1),
+                                     line.par = list(col = "black", lwd = 0.5),
                                      xlab = "Elevation (m a.s.l)",
                                      ylab = "Species richness",
                                      gg = TRUE) +
