@@ -353,8 +353,13 @@ create_short_area_code <- function(dataframe) {
     area == "Tor" ~ "TOR",
     area ==  "Besan" ~ "VFE",
     area == "Bordes de Viros" ~ "VFE"
-    )) %>%
+    ))
+
+  df_with_combined_code <- df_with_area_code %>%
     mutate(short_code_elevation = paste0(area_short_code, " ", elevational_band_m))
 
-  return(df_with_area_code)
+  df_with_combined_code["short_code_elevation"][df_with_combined_code["area"] == "Besan" & df_with_combined_code["elevational_band_m"] == 1100] <- "VFE 1100a"
+  df_with_combined_code["short_code_elevation"][df_with_combined_code["area"] == "Bordes de Viros" & df_with_combined_code["elevational_band_m"] == 1100] <- "VFE 1100b"
+
+  return(df_with_combined_code)
 }

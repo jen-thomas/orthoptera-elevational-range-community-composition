@@ -47,17 +47,13 @@ create_env_var_matrix <- function(env_var_df) {
     #'
     #' Return matrix.
 
-    #' set row names to be the site_elevation column
-  rownames(env_var_df) <- env_var_df$site_elevation
+      rownames(env_var_df) <- env_var_df$site_elevation
 
     #' select only a subset of the parameters to use in the analysis
-  env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect_cardinal, area,
+    env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect_cardinal, area,
                                   mean_perc_veg_cover, mean_height_75percent, mean_density)
 
-  matrix_with_code <- create_short_area_code(env_var_matrix)
-  matrix_with_rownames <- column_to_rownames(matrix_with_code, short_code_elevation)
-
-  return(matrix_with_rownames)
+  return(env_var_matrix)
 }
 
 #' Read in and prepare the site-species data for the matrix.
@@ -146,8 +142,6 @@ check_collinearity(site_env_var_data)
 #' site elevation, aspect, slope, vegetation height, vegetation ground cover and vegetation density.
 
 env_var_matrix <- create_env_var_matrix(site_env_var_data)
-#env_var_matrix_with_area <- column_to_rownames(create_short_area_code(env_var_matrix), short_code_elevation)
-
 
 #' ## Calculate dissimilarity matrix
 
@@ -312,6 +306,12 @@ list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
+#' Set up the env var matrix to use the row names in the plot
+env_var_matrix_code <- create_short_area_code(env_var_matrix)
+remove_rownames(env_var_matrix_code)
+rownames(env_var_matrix_code) <- env_var_matrix_code$short_code_elevation
+
+
 #' Create the plot and add the environmental variables and a legend.
 ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none",
                             xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
@@ -345,7 +345,7 @@ plot(env_data_fit_sites,
      labels = list(vectors = list_vectors, factors = list_factors))
 ordipointlabel(ordination_plot_ordipointlabel, "sites", add = TRUE,# I like this, it looks much better
      col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
-               cex = 0.7, labels = env_var_matrix$area_short_code)
+               cex = 0.7)
 legend("topright", legend = sort(unique(env_var_matrix$cluster_group)), bty = "n",
             col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
             title = "Cluster")
