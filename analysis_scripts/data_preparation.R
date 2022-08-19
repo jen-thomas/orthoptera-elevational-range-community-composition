@@ -340,3 +340,21 @@ get_unique_taxa_all_sites <- function(unique_taxa_sites) {
   return(taxa_df)
 }
 
+create_short_area_code <- function(dataframe) {
+  #' Get the study area column and translate it into a short code. Add the new short code column to the
+  #' dataframe.
+  #'
+  #' Return the dataframe with the new column added.
+
+  df_with_area_code <- dataframe %>%
+  mutate(area_short_code = case_when(
+    area == "Tavascan" ~ "TAV",
+    area == "La Molinassa" ~ "MOL",
+    area == "Tor" ~ "TOR",
+    area ==  "Besan" ~ "VFE",
+    area == "Bordes de Viros" ~ "VFE"
+    )) %>%
+    mutate(short_code_elevation = paste0(area_short_code, " ", elevational_band_m))
+
+  return(df_with_area_code)
+}

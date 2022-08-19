@@ -54,7 +54,10 @@ create_env_var_matrix <- function(env_var_df) {
   env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect_cardinal, area,
                                   mean_perc_veg_cover, mean_height_75percent, mean_density)
 
-  return(env_var_matrix)
+  matrix_with_code <- create_short_area_code(env_var_matrix)
+  matrix_with_rownames <- column_to_rownames(matrix_with_code, short_code_elevation)
+
+  return(matrix_with_rownames)
 }
 
 #' Read in and prepare the site-species data for the matrix.
@@ -143,6 +146,8 @@ check_collinearity(site_env_var_data)
 #' site elevation, aspect, slope, vegetation height, vegetation ground cover and vegetation density.
 
 env_var_matrix <- create_env_var_matrix(site_env_var_data)
+#env_var_matrix_with_area <- column_to_rownames(create_short_area_code(env_var_matrix), short_code_elevation)
+
 
 #' ## Calculate dissimilarity matrix
 
@@ -179,7 +184,7 @@ fviz_nbclust(species_jaccard_dist_matrix, kmeans, method='silhouette')
 
 #' From the Silhouette plot, choose to use K-means with 5 clusters. Do the cluster analysis.
 
-kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 25)
+kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 100)
 
 #' Add the cluster means to the matrix (this is probably not needed at this point. Adding it to the plot
 #' would make it a bit too cluttered).
@@ -297,35 +302,53 @@ env_data_fit_sites
 
 #' Method modified from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
-
-# ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
-# orditorp(ordination_plot, "sites", # I like this, it looks much better
-#      col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
-#          air = 0.1)
-# plot(env_data_fit_sites,
-#      col = "darkgrey",
-#      labels = list(vectors = list_vectors, factors = list_factors))
-
 #' Create the output plot file
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis3_nmds.png")
 png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
 
+#' Use these vectors to label the environmental variables.
 list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
+#' Create the plot and add the environmental variables and a legend.
 ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none",
                             xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
-orditorp(ordination_plot, "sites", # I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
-         air = 0.3, cex = 0.7, labels = paste0("TEST", env_var_matrix$elevational_band_m))
 plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
+orditorp(ordination_plot, "sites", # I like this, it looks much better
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+         air = 0.3, cex = 0.7, labels = paste0(env_var_matrix$area_short_code, " ", env_var_matrix$elevational_band_m))
 legend("topright", legend = sort(unique(env_var_matrix$cluster_group)), bty = "n",
             col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
 title = "Cluster")
+
+dev.off()
+
+#' Create the output plot file
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis3_nmds_ordipointlabel.png")
+png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
+
+#' Use these vectors to label the environmental variables.
+list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
+                       "Vegetation height", "Vegetation density")
+list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
+
+#' Create the plot and add the environmental variables and a legend.
+ordination_plot_ordipointlabel <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none",
+                            xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
+plot(env_data_fit_sites,
+     col = "darkgrey", cex = 0.7,
+     labels = list(vectors = list_vectors, factors = list_factors))
+ordipointlabel(ordination_plot_ordipointlabel, "sites", add = TRUE,# I like this, it looks much better
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+               cex = 0.7, labels = env_var_matrix$area_short_code)
+legend("topright", legend = sort(unique(env_var_matrix$cluster_group)), bty = "n",
+            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
+            title = "Cluster")
 
 dev.off()
 
