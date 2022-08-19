@@ -526,12 +526,12 @@ i_all_sp <- seq(min(elevational_ranges_species_predicted$elevational_range_midpo
 
 #' Calculate the predicted values from the regression so they can be plotted as a line
 predicted_values_all_sp <- predict(nonlin_reg_quadratic,
-                            data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+                            data.frame(elevational_range_midpoint=i_all_sp, elevational_range_midpoint2=i_all_sp*i_all_sp)) #  fitted values
 intervals_all_sp <-  predict(nonlin_reg_quadratic,
-                      data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+                      data.frame(elevational_range_midpoint=i_all_sp, elevational_range_midpoint2=i_all_sp*i_all_sp), interval = "confidence")
 
 #' Put the values into a dataframe
-confidence_bands_all_sp <- data.frame(i_all_sp, intervals)
+confidence_bands_all_sp <- data.frame(i_all_sp, intervals_all_sp)
 
 #' Get the coefficients of the equation and put these into text
 cf_all_sp <- signif(coef(nonlin_reg_quadratic), 2)
@@ -577,12 +577,12 @@ i_cael <- seq(min(elevational_ranges_caelifera_predicted$elevational_range_midpo
 
 #' Calculate the predicted values from the regression so they can be plotted as a line
 predicted_values_cael <- predict(nonlin_reg_quadratic_caelifera,
-                            data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+                            data.frame(elevational_range_midpoint=i_cael, elevational_range_midpoint2=i_cael*i_cael)) #  fitted values
 intervals_cael <-  predict(nonlin_reg_quadratic_caelifera,
-                      data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+                      data.frame(elevational_range_midpoint=i_cael, elevational_range_midpoint2=i_cael*i_cael), interval = "confidence")
 
 #' Put the values into a dataframe
-confidence_bands_cael <- data.frame(i_all_sp, intervals)
+confidence_bands_cael <- data.frame(i_cael, intervals_cael)
 
 #' Get the coefficients of the equation and put these into text
 cf_cael <- signif(coef(nonlin_reg_quadratic_caelifera), 2)
