@@ -219,21 +219,21 @@ kmeans_fit_clusters
 
 with(env_var_matrix, {
   print(shapiro.test(resid(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters)))))
-  print(shapiro.test(resid(aov(aspect ~ as.factor(kmeans_fit_clusters)))))
+  #print(shapiro.test(resid(aov(aspect_cardinal ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(slope ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_density ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters)))))
 
   print(bartlett.test(elevational_band_m, as.factor(kmeans_fit_clusters)))
-  print(bartlett.test(aspect, as.factor(kmeans_fit_clusters)))
+  #print(bartlett.test(aspect_cardinal, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(slope, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_density, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_height_75percent, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters)))
 
   print(summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
-  print(summary(aov(aspect ~ as.factor(kmeans_fit_clusters))))
+  #print(summary(aov(aspect_cardinal ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(slope ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
@@ -286,8 +286,11 @@ env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                                           "mean_perc_veg_cover", "mean_height_75percent",
                                           "mean_density")],
                        scaling = "sites",
-                       permutations = 1000)
+                       permutations = 1000, display = "sites")
 env_data_fit_sites
+plot(env_data_fit_sites)
+
+#' ## Plots
 
 #' Do the same plot but for sites with the environmental variables and colour the points by the cluster
 #' group
@@ -295,17 +298,32 @@ env_data_fit_sites
 
 #' Method modified from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
-list_vectors <- c("Elevation band (m)", "Slope", "Aspect", "% vegetation cover",
+list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
-list_factors <- c("", "", "", "", "") # hacky way to avoid printing the study areas
+list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
+
+ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
+orditorp(ordination_plot, "sites", # I like this, it looks much better
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+     #labels = rownames(env_var_matrix),
+         air = 1
+)
+plot(env_data_fit_sites,
+     col = "darkgrey",
+     labels = list(vectors = list_vectors, factors = list_factors))
+
+#' Doesn't work because of vector labels at the moment
+list_vectors <- c("Elevation band (m)", "Slope", "% vegetation cover",
+                       "Vegetation height", "Vegetation density")
+list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
 ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
 text(ordination_plot, "sites",
      col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
-     labels = env_var_matrix$elevational_band_m)
+     labels = rownames(env_var_matrix))
 plot(env_data_fit_sites,
      col = "grey",
-     labels = list(vectors = list_vectors, factors = list_factors))
+     labels = list(vectors = list_vectors, factors = factors))
 
 ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
 text(ordination_plot, "sites",
