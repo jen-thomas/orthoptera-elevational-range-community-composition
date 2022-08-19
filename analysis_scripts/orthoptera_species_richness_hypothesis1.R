@@ -663,10 +663,10 @@ species_richness_elevation_plot2 <- visreg(glm_species_richness_reduced, xvar = 
              aes(x = elevational_band_m, y = species_richness), show.legend = FALSE) +
   geom_line(data = fitted_glm_values, aes(x = elevational_band_m,
             y = visregUpr),
-            linetype = "dashed", col = "darkgrey") +
+            linetype = "dashed", col = "darkgrey", lwd = 0.5) +
   geom_line(data = fitted_glm_values, aes(x = elevational_band_m,
             y = visregLwr),
-            linetype = "dashed", col = "darkgrey") +
+            linetype = "dashed", col = "darkgrey", lwd = 0.5) +
   ylim(min(species_richness_sites$species_richness) - 1,
        max(species_richness_sites$species_richness) + 1) +
   xlim(min(species_richness_sites$elevational_band_m) - 100,

@@ -603,42 +603,93 @@ plot_quadratic_model_predvalues(elevational_ranges_species, nonlin_reg_quadratic
 
 #' try with ggplot
 
-#' Get minimum and maximum values in the dataset
-i <- seq(min(elevational_ranges_species$elevational_range_midpoint), max(elevational_ranges_species$elevational_range_midpoint), len=100) #  x-value limits for line
+i_all_sp <- seq(min(elevational_ranges_species_predicted$elevational_range_midpoint),
+         max(elevational_ranges_species_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
 
 #' Calculate the predicted values from the regression so they can be plotted as a line
-predicted_values <- predict(nonlin_reg_quadratic, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
-intervals <-  predict(nonlin_reg_quadratic, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+predicted_values_all_sp <- predict(nonlin_reg_quadratic,
+                            data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+intervals_all_sp <-  predict(nonlin_reg_quadratic,
+                      data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
 
-confidence_bands_predicted <- data.frame(i, intervals)
+confidence_bands_all_sp <- data.frame(i_all_sp, intervals)
+
+cf_all_sp <- signif(coef(nonlin_reg_quadratic), 2)
+
+int_term_all_sp <- cf_all_sp[1]
+lin_term_all_sp <- cf_all_sp[2]
+quadratic_term_all_sp <- abs(cf_all_sp[3])
+
+equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp)*italic(E) - .(quadratic_term_all_sp)*italic(E)^2)
 
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_elevational_range_model_ggplot.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+png(file = filepath, width = 1200, height = 1000, units = "px", bg = "white", res = 300)
 
-plot_output <- ggplot(data = elevational_ranges_species,
+plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicted,
              aes(x = elevational_range_midpoint, y = elevational_range)) +
-  geom_jitter(aes(shape = suborder), size = 1.5, show.legend = FALSE, width = 10, height = 10) +
+  geom_jitter(aes(shape = suborder), size = 1.8, show.legend = FALSE, width = 30, height = 20) +
   scale_shape_manual(values = c(1, 4)) +
-  ylim(min(elevational_ranges_species$elevational_range) - 100,
-     max(elevational_ranges_species$elevational_range) + 100) +
-  xlim(min(elevational_ranges_species$elevational_range_midpoint) - 100,
-     max(elevational_ranges_species$elevational_range_midpoint) + 100) +
-  geom_line(data = confidence_bands_predicted, aes(x = i, y = fit), lty=1, lwd=1, col="black") +
-  geom_line(data = confidence_bands_predicted, aes(x = i, y = lwr), lty=1, lwd=1, col="darkgrey") +
-  geom_line(data = confidence_bands_predicted, aes(x = i, y = upr), lty=1, lwd=1, col="darkgrey") +
+  ylim(0, 1600) +
+  xlim(1000, 2600) +
+  geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = fit), lty=1, lwd=0.5, col="black") +
+  geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = lwr),
+            lwd=0.5, col="darkgrey", linetype = "dashed") +
+  geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = upr),
+            lwd=0.5, col="darkgrey", linetype = "dashed") +
+  annotate("text", label = equation_all_sp, x = 1400, y = 1550, cex = 3) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
 
-plot_output
+plot_elev_range_all_species
 dev.off()
 
 #' Only Caelifera
 
 plot_quadratic_model_predvalues(elevational_ranges_caelifera_predicted, nonlin_reg_quadratic_caelifera, "hypothesis2_elevational_range_model_caelifera.png")
-plot_quadratic_model_predvalues_ggplot(elevational_ranges_caelifera_predicted, nonlin_reg_quadratic_caelifera, "hypothesis2_elevational_range_model_caelifera_gglpot.png")
 
+#' try with ggplot
+i_cael <- seq(min(elevational_ranges_caelifera_predicted$elevational_range_midpoint),
+         max(elevational_ranges_caelifera_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
+
+#' Calculate the predicted values from the regression so they can be plotted as a line
+predicted_values_cael <- predict(nonlin_reg_quadratic_caelifera,
+                            data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
+intervals_cael <-  predict(nonlin_reg_quadratic_caelifera,
+                      data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
+
+confidence_bands_cael <- data.frame(i_all_sp, intervals)
+
+cf_cael <- signif(coef(nonlin_reg_quadratic_caelifera), 2)
+
+int_term_cael <- cf_cael[1]
+lin_term_cael <- cf_cael[2]
+quadratic_term_cael <- abs(cf_cael[3])
+
+equation_cael <- bquote(italic(E[R]) == .(int_term_cael) + .(lin_term_cael)*italic(E) - .(quadratic_term_cael)*italic(E)^2)
+
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis2_elevational_range_model_caelifera_ggplot.png")
+png(file = filepath, width = 1200, height = 1000, units = "px", bg = "white", res = 300)
+
+plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicted,
+             aes(x = elevational_range_midpoint, y = elevational_range)) +
+  geom_jitter(shape = 1, size = 1.8, show.legend = FALSE, width = 30, height = 20) +
+  ylim(0, 1600) +
+  xlim(1000, 2600) +
+  geom_line(data = confidence_bands_cael, aes(x = i_cael, y = fit), lty=1, lwd=0.5, col="black") +
+  geom_line(data = confidence_bands_cael, aes(x = i_cael, y = lwr),
+            lwd=0.5, col="darkgrey", linetype = "dashed") +
+  geom_line(data = confidence_bands_cael, aes(x = i_cael, y = upr),
+            lwd=0.5, col="darkgrey", linetype = "dashed") +
+  annotate("text", label = equation_cael, x = 1400, y = 1550, cex = 3) +
+  labs(x = "Elevational range midpoint (m a.s.l)",
+       y = "Elevational range (m)") +
+  theme_classic()
+
+plot_elev_range_caelifera
+dev.off()
 
 #' Elevational range and mean elevation (open circles: Caelifera; crosses: Ensifera) of all species.
 #' Ordered by decreasing elevational range midpoint.
