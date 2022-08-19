@@ -296,6 +296,11 @@ env_data_fit_sites
 
 #' Method modified from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
 
+#' Set up the env var matrix to use the row names in the plot
+env_var_matrix_code <- create_short_area_code(env_var_matrix)
+remove_rownames(env_var_matrix_code)
+rownames(env_var_matrix_code) <- env_var_matrix_code$short_code_elevation
+
 #' Create the output plot file
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis3_nmds.png")
@@ -306,12 +311,6 @@ list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
-#' Set up the env var matrix to use the row names in the plot
-env_var_matrix_code <- create_short_area_code(env_var_matrix)
-remove_rownames(env_var_matrix_code)
-rownames(env_var_matrix_code) <- env_var_matrix_code$short_code_elevation
-
-
 #' Create the plot and add the environmental variables and a legend.
 ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none",
                             xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
@@ -319,9 +318,9 @@ plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
 orditorp(ordination_plot, "sites", # I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
-         air = 0.3, cex = 0.7, labels = paste0(env_var_matrix$area_short_code, " ", env_var_matrix$elevational_band_m))
-legend("topright", legend = sort(unique(env_var_matrix$cluster_group)), bty = "n",
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
+         air = 0.3, cex = 0.7, labels = env_var_matrix_code$short_code_elevation)
+legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
             col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
 title = "Cluster")
 
@@ -344,9 +343,9 @@ plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.7,
      labels = list(vectors = list_vectors, factors = list_factors))
 ordipointlabel(ordination_plot_ordipointlabel, "sites", add = TRUE,# I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
                cex = 0.7)
-legend("topright", legend = sort(unique(env_var_matrix$cluster_group)), bty = "n",
+legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
             col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
             title = "Cluster")
 
