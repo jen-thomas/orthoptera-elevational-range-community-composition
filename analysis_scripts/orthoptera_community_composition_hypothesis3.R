@@ -309,6 +309,16 @@ plot(env_data_fit_sites,
      col = "darkgrey",
      labels = list(vectors = list_vectors, factors = list_factors))
 
+ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none")
+orditorp(ordination_plot, "sites", # I like this, it looks much better
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix$cluster_group)],
+         air = 0.1)
+plot(env_data_fit_sites,
+     col = "darkgrey",
+     labels = list(vectors = list_vectors, factors = list_factors))
+legend("bottomright", legend = sort(unique(env_var_matrix$cluster_group)), bty = "n",
+            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21)
+
 #' ## Permanova
 #'
 #' Use PERMANOVA to test if there is any differences between communities. Do this for elevation, study
