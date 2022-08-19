@@ -424,6 +424,16 @@ paste0("ratio: ", ratio_dispersion_reduced)
 
 #' Given that this ratio < 1.5, we can say that the model does not suffer from overdispersion.
 #'
+#' ### Plot the modelled variables
+
+par(mfrow=c(3, 2))
+visreg(glm_species_richness_reduced, xvar = "elevational_band_m")
+visreg(glm_species_richness_reduced, xvar = "area")
+visreg(glm_species_richness_reduced, xvar = "slope")
+visreg(glm_species_richness_reduced, xvar = "sampling_effort_index")
+visreg(glm_species_richness_reduced, xvar = "mean_perc_veg_cover")
+visreg(glm_species_richness_reduced, xvar = "mean_density")
+
 #' ### Test interaction slope and vegetation cover
 #'
 #' Test an interaction between slope and vegetation cover rather than as an addition to the reduced model,
@@ -624,30 +634,48 @@ reduced_test_caelifera
 #'
 #' ## Plots for report
 #'
-#' Plot the modelled variables
-
-par(mfrow=c(3, 2))
-visreg(glm_species_richness_reduced, xvar = "elevational_band_m")
-visreg(glm_species_richness_reduced, xvar = "area")
-visreg(glm_species_richness_reduced, xvar = "slope")
-visreg(glm_species_richness_reduced, xvar = "sampling_effort_index")
-visreg(glm_species_richness_reduced, xvar = "mean_perc_veg_cover")
-visreg(glm_species_richness_reduced, xvar = "mean_density")
-
 #' Plot the predicted values on top of the actual data points.
-path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
-png(file = filepath, width = 1200, height = 800, units = "px", bg = "white", res = 300)
-par(mfrow = c(1,1))
 species_richness_elevation_plot <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
                                      scale = "response",
                                      rug = FALSE,
                                      line.par = list(col = "black", lwd = 1),
                                      xlab = "Elevation (m a.s.l)", xlim = c(1000, 2550),
                                      ylab = "Species richness", ylim = c(0, 17))
-#species_richness_elevation_plot
-points(species_richness ~ elevational_band_m, data = species_richness_sites, pch = 1.5, col = "black", lwd = 0.8)
+
+#' Get the fitted values from the visreg object to plot in the next plot
+fitted_glm_values <- data.frame(species_richness_elevation_plot$fit)
+
+#' Create and save the output plot
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
+print(filepath)
+png(file = filepath, width = 1200, height = 1200, units = "px", bg = "white", res = 300)
+par(mfrow = c(1,1))
+species_richness_elevation_plot2 <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
+                                     scale = "response",
+                                     rug = FALSE,
+                                     band = FALSE,
+                                     line.par = list(col = "black", lwd = 1),
+                                     xlab = "Elevation (m a.s.l)",
+                                     ylab = "Species richness",
+                                     gg = TRUE) +
+  geom_point(shape = 16, colour = "black", size = 2, data = species_richness_sites,
+             aes(x = elevational_band_m, y = species_richness), show.legend = FALSE) +
+  geom_line(data = fitted_glm_values, aes(x = elevational_band_m,
+            y = visregUpr),
+            linetype = "dashed", col = "darkgrey") +
+  geom_line(data = fitted_glm_values, aes(x = elevational_band_m,
+            y = visregLwr),
+            linetype = "dashed", col = "darkgrey") +
+  ylim(min(species_richness_sites$species_richness) - 1,
+       max(species_richness_sites$species_richness) + 1) +
+  xlim(min(species_richness_sites$elevational_band_m) - 100,
+       max(species_richness_sites$elevational_band_m) + 100) +
+  theme_classic()
+species_richness_elevation_plot2
+
 dev.off()
+
 
 #' ## Output tables for report
 #'

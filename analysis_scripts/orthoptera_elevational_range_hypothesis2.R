@@ -335,9 +335,9 @@ plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
   # title(xlab = "Elevational range midpoint (m a.s.l)", cex.axis = 0.6, cex.lab = 0.8, line = 1)
   # title(ylab = "Elevational range (m)", cex.axis = 0.6, cex.lab = 0.8, line = 1)
 
-  lines(i, predicted_values, lty=1, lwd=2, col="black")
-  lines(i, intervals[ , 3], lty = "dashed", col = "grey")
-  lines(i, intervals[ , 2], lty = "dashed", col = "grey")
+  lines(i, predicted_values, lty=1, lwd=1, col="black")
+  lines(i, intervals[ , 3], lty = "dashed", col = "darkgrey")
+  lines(i, intervals[ , 2], lty = "dashed", col = "darkgrey")
 
   # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
   cf <- signif(coef(model), 2)
