@@ -69,8 +69,8 @@ format_theme_ggplot_vertical_xaxis_labels <- function(plot_with_ggplot) {
 
   formatted_plot <- plot_with_ggplot +
                     theme_bw() +
-                    theme(axis.text.x = element_text(size = 5, face = "italic", hjust = 1, vjust = 1, angle = 90),
-                          axis.text.y = element_text(size = 8),
+                    theme(axis.text.y = element_text(size = 8, face = "italic"),
+                          axis.text.x = element_text(size = 9),
                           axis.title = element_text(size = 10),
                           legend.position = "none",
                           axis.line = element_line(),

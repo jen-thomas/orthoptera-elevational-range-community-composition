@@ -559,7 +559,7 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
             lwd=0.5, col="darkgrey", linetype = "dashed") +
   geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = upr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
-  annotate("text", label = equation_all_sp, x = 1400, y = 1600, cex = 3) +
+  annotate("text", label = equation_all_sp, x = 2100, y = 1600, cex = 3) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
@@ -609,7 +609,7 @@ plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicte
             lwd=0.5, col="darkgrey", linetype = "dashed") +
   geom_line(data = confidence_bands_cael, aes(x = i_cael, y = upr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
-  annotate("text", label = equation_cael, x = 1400, y = 1600, cex = 3) +
+  annotate("text", label = equation_cael, x = 2100, y = 1600, cex = 3) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
@@ -649,11 +649,11 @@ filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png"
 png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
 
 species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_predicted,
-                                        aes(y = reorder(species, -elevational_range_midpoint), x = elevational_range_midpoint)) +
+                                        aes(y = reorder(species, elevational_range_midpoint), x = elevational_range_midpoint)) +
   geom_point(aes(shape = suborder), size = 1.5) +
   scale_shape_manual(values = c(1, 4)) +
-  geom_vline(yintercept = 1100, linetype = "dashed", col = "grey", lwd = 0.5) +
-  geom_vline(yintercept = 2600, linetype = "dashed", col = "grey", lwd = 0.5) +
+  geom_vline(xintercept = 1100, linetype = "dashed", col = "grey", lwd = 0.5) +
+  geom_vline(xintercept = 2600, linetype = "dashed", col = "grey", lwd = 0.5) +
   geom_segment(aes(y = species, yend = species, x = min_elevation, xend = min_elevation + elevational_range), lwd = 0.5) +
   xlim(min(elevational_ranges_species_predicted$min_elevation) - 100,
        max(elevational_ranges_species_predicted$max_elevation) + 100) +
