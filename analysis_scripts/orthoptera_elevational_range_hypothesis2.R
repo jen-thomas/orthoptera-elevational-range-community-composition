@@ -545,7 +545,7 @@ equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp
 #' Create the output plot file
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_elevational_range_model.png")
-png(file = filepath, width = 1200, height = 1000, units = "px", bg = "white", res = 300)
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
 #' Do the plot
 plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicted,
@@ -553,13 +553,13 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
   geom_jitter(aes(shape = suborder), size = 1.8, show.legend = FALSE, width = 30, height = 20) +
   scale_shape_manual(values = c(1, 4)) +
   ylim(0, 1600) +
-  xlim(1000, 2600) +
+  xlim(1000, 2501) +
   geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = fit), lty=1, lwd=0.5, col="black") +
   geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = lwr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
   geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = upr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
-  annotate("text", label = equation_all_sp, x = 1400, y = 1550, cex = 3) +
+  annotate("text", label = equation_all_sp, x = 1400, y = 1600, cex = 3) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
@@ -596,20 +596,20 @@ equation_cael <- bquote(italic(E[R]) == .(int_term_cael) + .(lin_term_cael)*ital
 #' Create the output plot file
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_elevational_range_model_caelifera.png")
-png(file = filepath, width = 1200, height = 1000, units = "px", bg = "white", res = 300)
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
 #' Do the plot
 plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicted,
              aes(x = elevational_range_midpoint, y = elevational_range)) +
   geom_jitter(shape = 1, size = 1.8, show.legend = FALSE, width = 30, height = 20) +
   ylim(0, 1600) +
-  xlim(1000, 2600) +
+  xlim(1000, 2501) +
   geom_line(data = confidence_bands_cael, aes(x = i_cael, y = fit), lty=1, lwd=0.5, col="black") +
   geom_line(data = confidence_bands_cael, aes(x = i_cael, y = lwr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
   geom_line(data = confidence_bands_cael, aes(x = i_cael, y = upr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
-  annotate("text", label = equation_cael, x = 1400, y = 1550, cex = 3) +
+  annotate("text", label = equation_cael, x = 1400, y = 1600, cex = 3) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
@@ -643,7 +643,26 @@ species_elevationalrange_plot <- format_theme_ggplot_vertical_xaxis_labels(speci
 species_elevationalrange_plot
 dev.off()
 
-#save_plot(species_elevationalrange_plot, "hypothesis2_species_elevational_range.png")
+#' Create the output plot file
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png")
+png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
+
+species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_predicted,
+                                        aes(y = reorder(species, -elevational_range_midpoint), x = elevational_range_midpoint)) +
+  geom_point(aes(shape = suborder), size = 1.5) +
+  scale_shape_manual(values = c(1, 4)) +
+  geom_vline(yintercept = 1100, linetype = "dashed", col = "grey", lwd = 0.5) +
+  geom_vline(yintercept = 2600, linetype = "dashed", col = "grey", lwd = 0.5) +
+  geom_segment(aes(y = species, yend = species, x = min_elevation, xend = min_elevation + elevational_range), lwd = 0.5) +
+  xlim(min(elevational_ranges_species_predicted$min_elevation) - 100,
+       max(elevational_ranges_species_predicted$max_elevation) + 100) +
+  labs(y = "Species",
+       x = "Elevational range (m)")
+
+species_elevationalrange_plot_vertical <- format_theme_ggplot_vertical_xaxis_labels(species_elevationalrange_plot_vertical)
+species_elevationalrange_plot_vertical
+dev.off()
 
 #' ## DO NOT USE
 
