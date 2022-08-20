@@ -50,7 +50,7 @@ create_env_var_matrix <- function(env_var_df) {
       rownames(env_var_df) <- env_var_df$site_elevation
 
     #' select only a subset of the parameters to use in the analysis
-    env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, slope, aspect_cardinal, area,
+    env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, sampling_effort_index, slope, aspect_cardinal, area,
                                   mean_perc_veg_cover, mean_height_75percent, mean_density)
 
   return(env_var_matrix)
@@ -72,6 +72,7 @@ finalised_observations <- get_finalised_observations(observations_sites_df)
 
 all_observations_conservative <- get_conservative_observations(confirmed_observations,
                                                                finalised_observations)
+sampling_effort <- calculate_sampling_weights(all_observations_conservative)
 
 unique_taxa_sites <- get_unique_taxa_site(all_observations_conservative)
 
@@ -126,10 +127,11 @@ site_topography <- get_site_topography(sites_df)
 #+ message=FALSE, warning=FALSE
 
 site_env_var_data <- left_join(site_topography, vegetation_averaged_df, by = "site_elevation")
+site_var_data <- left_join(site_env_var_data, sampling_effort, by = "site_elevation")
 
 #' ### Check for collinearity between environmental variables
 
-check_collinearity(site_env_var_data)
+check_collinearity(site_var_data)
 
 #' Looking at the previous plots we can see that there seems to be some collinearity between the two
 #' measures of vegetation height. Given that the maximum vegetation height can just represent one piece of
@@ -141,7 +143,7 @@ check_collinearity(site_env_var_data)
 #' Prepare the matrix of environmental variables to be used in the next part of the analysis. Only include
 #' site elevation, aspect, slope, vegetation height, vegetation ground cover and vegetation density.
 
-env_var_matrix <- create_env_var_matrix(site_env_var_data)
+env_var_matrix <- create_env_var_matrix(site_var_data)
 
 #' ## Calculate dissimilarity matrix
 
@@ -157,7 +159,7 @@ species_jaccard_dist
 
 species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 species_jaccard_dist_matrix
-
+print("Created matrix")
 #' ## K-means cluster analysis
 
 #' Determine the number of clusters to use for K-means clustering. Firstly, calculate the within group sum
@@ -167,7 +169,7 @@ species_jaccard_dist_matrix
 wss <- (nrow(species_jaccard_dist_matrix) - 1) * sum(apply(species_jaccard_dist_matrix, 2, var))
 for (i in 2:15) wss[i] <- sum(kmeans(species_jaccard_dist_matrix, centers=i)$withinss)
 plot(1:15, wss, type = "b", xlab = "Number of clusters", ylab = "Within groups sum of squares")
-
+print("Get numebr of clusters")
 #' There is no clear difference in this scree plot to identify the number of clusters to choose. From 5
 #' onwards, there seems to be a slight flattening, so this might be reasonable.
 #'
@@ -179,7 +181,7 @@ fviz_nbclust(species_jaccard_dist_matrix, kmeans, method='silhouette')
 #' From the Silhouette plot, choose to use K-means with 5 clusters. Do the cluster analysis.
 
 kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 100)
-
+print("Do k means")
 #' Add the cluster means to the matrix (this is probably not needed at this point. Adding it to the plot
 #' would make it a bit too cluttered).
 
@@ -218,21 +220,21 @@ kmeans_fit_clusters
 
 with(env_var_matrix, {
   print(shapiro.test(resid(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters)))))
-  #print(shapiro.test(resid(aov(aspect_cardinal ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(sampling_effort_index ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(slope ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_density ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters)))))
 
   print(bartlett.test(elevational_band_m, as.factor(kmeans_fit_clusters)))
-  #print(bartlett.test(aspect_cardinal, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(sampling_effort_index, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(slope, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_density, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_height_75percent, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters)))
 
   print(summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
-  #print(summary(aov(aspect_cardinal ~ as.factor(kmeans_fit_clusters))))
+  print(summary(aov(sampling_effort_index ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(slope ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
@@ -241,7 +243,7 @@ with(env_var_matrix, {
   #' any difference in this factor between the different clusters.
   print(kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))
 })
-
+print("Test vars")
 #' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
 #' that there was any difference between each of the individual environmental variables within each
 #' cluster.
@@ -262,7 +264,7 @@ dimcheckMDS(site_species_matrix, dist = "jaccard")
 set.seed(10)
 species_jaccard_dist_mds_2dim <- metaMDS(site_species_matrix, k = 2, distance = "jaccard", trymax = 1000,
                                          trace = TRUE)
-
+print("Do NMDS")
 #' Get the stress value for 2 dimension
 
 print(species_jaccard_dist_mds_2dim["stress"])
@@ -271,7 +273,7 @@ print(species_jaccard_dist_mds_2dim["stress"])
 
 par(mfrow=c(1,1))
 stressplot(species_jaccard_dist_mds_2dim)
-
+print("Stressplot")
 #' There is not a lot of scatter around the line but there are lots of points where the dissimilarity is
 #' 1 (which is where we have lots of zeros in our matrix).
 
@@ -281,13 +283,13 @@ stressplot(species_jaccard_dist_mds_2dim)
 
 env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
-                       env_var_matrix[, c("elevational_band_m", "slope", "aspect_cardinal", "area",
+                       env_var_matrix[, c("elevational_band_m", "sampling_effort_index", "slope", "aspect_cardinal", "area",
                                           "mean_perc_veg_cover", "mean_height_75percent",
                                           "mean_density")],
                        scaling = "sites",
                        permutations = 1000, display = "sites")
 env_data_fit_sites
-
+print("Do envfit")
 #' ## Plots
 
 #' Do the same plot but for sites with the environmental variables and colour the points by the cluster
@@ -307,7 +309,7 @@ filepath <- file.path(path, "hypothesis3_nmds.png")
 png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
 
 #' Use these vectors to label the environmental variables.
-list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
+list_vectors <- c("Elevation band", "Slope", "Sampling effect", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
@@ -318,10 +320,10 @@ plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
 orditorp(ordination_plot, "sites", # I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red")[as.numeric(env_var_matrix_code$cluster_group)],
          air = 0.3, cex = 0.7, labels = env_var_matrix_code$short_code_elevation)
 legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
-            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
+            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red"), pch = 21, cex = 0.8,
 title = "Cluster")
 
 dev.off()
@@ -332,7 +334,7 @@ filepath <- file.path(path, "hypothesis3_nmds_ordipointlabel.png")
 png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
 
 #' Use these vectors to label the environmental variables.
-list_vectors <- c("Elevation band", "Slope", "Vegetation cover",
+list_vectors <- c("Elevation band", "Slope", "Sampling effect", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
@@ -343,10 +345,10 @@ plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.7,
      labels = list(vectors = list_vectors, factors = list_factors))
 ordipointlabel(ordination_plot_ordipointlabel, "sites", add = TRUE,# I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red")[as.numeric(env_var_matrix_code$cluster_group)],
                cex = 0.7)
 legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
-            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
+            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red"), pch = 21, cex = 0.8,
             title = "Cluster")
 
 dev.off()
@@ -370,9 +372,9 @@ site_area_permanova
 cluster_group_permanova <- adonis2(species_jaccard_dist ~ cluster_group, data = env_var_matrix, perm=999)
 cluster_group_permanova
 
-all_env_vars_permanova <- adonis2(species_jaccard_dist ~ area + elevational_band_m + slope +
-                                  aspect_cardinal + mean_height_75percent + mean_density +
-                                  mean_perc_veg_cover,
+all_env_vars_permanova <- adonis2(species_jaccard_dist ~ area + elevational_band_m +
+                                  sampling_effort_index +slope + aspect_cardinal + mean_height_75percent +
+                                  mean_density + mean_perc_veg_cover,
                                   data = env_var_matrix, perm=999)
 all_env_vars_permanova
 
