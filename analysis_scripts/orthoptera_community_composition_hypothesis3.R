@@ -159,7 +159,7 @@ species_jaccard_dist
 
 species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 species_jaccard_dist_matrix
-print("Created matrix")
+
 #' ## K-means cluster analysis
 
 #' Determine the number of clusters to use for K-means clustering. Firstly, calculate the within group sum
@@ -169,7 +169,7 @@ print("Created matrix")
 wss <- (nrow(species_jaccard_dist_matrix) - 1) * sum(apply(species_jaccard_dist_matrix, 2, var))
 for (i in 2:15) wss[i] <- sum(kmeans(species_jaccard_dist_matrix, centers=i)$withinss)
 plot(1:15, wss, type = "b", xlab = "Number of clusters", ylab = "Within groups sum of squares")
-print("Get numebr of clusters")
+
 #' There is no clear difference in this scree plot to identify the number of clusters to choose. From 5
 #' onwards, there seems to be a slight flattening, so this might be reasonable.
 #'
@@ -181,7 +181,7 @@ fviz_nbclust(species_jaccard_dist_matrix, kmeans, method='silhouette')
 #' From the Silhouette plot, choose to use K-means with 5 clusters. Do the cluster analysis.
 
 kmeans_fit <- kmeans(species_jaccard_dist_matrix, 5, nstart = 100)
-print("Do k means")
+
 #' Add the cluster means to the matrix (this is probably not needed at this point. Adding it to the plot
 #' would make it a bit too cluttered).
 
@@ -234,16 +234,17 @@ with(env_var_matrix, {
   print(bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters)))
 
   print(summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
-  print(summary(aov(sampling_effort_index ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(slope ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
 
-  #' Vegetation height was not normally distributed so use a non-parametric Kruskal-Wallis test to test for
-  #' any difference in this factor between the different clusters.
+  #' Vegetation height and sampling effort were not normally distributed so use a non-parametric
+  #' Kruskal-Wallis test to test for any difference in this factor between the different clusters.
   print(kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))
+  print(kruskal.test(sampling_effort_index ~ as.factor(kmeans_fit_clusters)))
+
 })
-print("Test vars")
+
 #' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
 #' that there was any difference between each of the individual environmental variables within each
 #' cluster.
@@ -273,7 +274,7 @@ print(species_jaccard_dist_mds_2dim["stress"])
 
 par(mfrow=c(1,1))
 stressplot(species_jaccard_dist_mds_2dim)
-print("Stressplot")
+
 #' There is not a lot of scatter around the line but there are lots of points where the dissimilarity is
 #' 1 (which is where we have lots of zeros in our matrix).
 
@@ -289,7 +290,7 @@ env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        scaling = "sites",
                        permutations = 1000, display = "sites")
 env_data_fit_sites
-print("Do envfit")
+
 #' ## Plots
 
 #' Do the same plot but for sites with the environmental variables and colour the points by the cluster
@@ -320,10 +321,10 @@ plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
 orditorp(ordination_plot, "sites", # I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red")[as.numeric(env_var_matrix_code$cluster_group)],
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
          air = 0.3, cex = 0.7, labels = env_var_matrix_code$short_code_elevation)
 legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
-            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red"), pch = 21, cex = 0.8,
+            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
 title = "Cluster")
 
 dev.off()
@@ -345,10 +346,10 @@ plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.7,
      labels = list(vectors = list_vectors, factors = list_factors))
 ordipointlabel(ordination_plot_ordipointlabel, "sites", add = TRUE,# I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red")[as.numeric(env_var_matrix_code$cluster_group)],
+     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
                cex = 0.7)
 legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
-            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73", "red"), pch = 21, cex = 0.8,
+            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
             title = "Cluster")
 
 dev.off()
