@@ -242,7 +242,6 @@ with(env_var_matrix, {
   #' Kruskal-Wallis test to test for any difference in this factor between the different clusters.
   print(kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))
   print(kruskal.test(sampling_effort_index ~ as.factor(kmeans_fit_clusters)))
-
 })
 
 #' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
@@ -340,7 +339,7 @@ list_vectors <- c("Elevation band", "Slope", "Sampling effect", "Vegetation cove
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
 #' Create the plot and add the environmental variables and a legend.
-ordination_plot_ordipointlabel <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none",
+ordination_plot_ordipointlabel <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "points",
                             xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
 plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.7,
