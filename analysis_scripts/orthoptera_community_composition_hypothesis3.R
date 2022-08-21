@@ -309,7 +309,7 @@ filepath <- file.path(path, "hypothesis3_nmds.png")
 png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
 
 #' Use these vectors to label the environmental variables.
-list_vectors <- c("Elevation band", "Slope", "Sampling effect", "Vegetation cover",
+list_vectors <- c("Elevation band", "Sampling effort", "Slope", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
@@ -325,31 +325,6 @@ orditorp(ordination_plot, "sites", # I like this, it looks much better
 legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
             col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
 title = "Cluster")
-
-dev.off()
-
-#' Create the output plot file
-path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis3_nmds_ordipointlabel.png")
-png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
-
-#' Use these vectors to label the environmental variables.
-list_vectors <- c("Elevation band", "Slope", "Sampling effect", "Vegetation cover",
-                       "Vegetation height", "Vegetation density")
-list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
-
-#' Create the plot and add the environmental variables and a legend.
-ordination_plot_ordipointlabel <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "points",
-                            xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
-plot(env_data_fit_sites,
-     col = "darkgrey", cex = 0.7,
-     labels = list(vectors = list_vectors, factors = list_factors))
-ordipointlabel(ordination_plot_ordipointlabel, "sites", add = TRUE,# I like this, it looks much better
-     col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
-               cex = 0.7)
-legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
-            col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
-            title = "Cluster")
 
 dev.off()
 
