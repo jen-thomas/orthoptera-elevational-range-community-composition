@@ -637,7 +637,7 @@ species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_pred
   xlim(min(elevational_ranges_species_predicted$min_elevation) - 100,
        max(elevational_ranges_species_predicted$max_elevation) + 100) +
   labs(y = "Species",
-       x = "Elevational range (m)")
+       x = "Elevation (m)")
 
 species_elevationalrange_plot_vertical <- format_theme_ggplot_vertical_xaxis_labels(species_elevationalrange_plot_vertical)
 species_elevationalrange_plot_vertical
