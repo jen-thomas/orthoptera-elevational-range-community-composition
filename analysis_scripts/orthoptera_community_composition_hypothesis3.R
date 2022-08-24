@@ -238,6 +238,11 @@ with(env_var_matrix, {
   print(summary(aov(mean_density ~ as.factor(kmeans_fit_clusters))))
   print(summary(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
 
+  print(summary(lm(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
+  print(summary(lm(slope ~ as.factor(kmeans_fit_clusters))))
+  print(summary(lm(mean_density ~ as.factor(kmeans_fit_clusters))))
+  print(summary(lm(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters))))
+
   #' Vegetation height and sampling effort were not normally distributed so use a non-parametric
   #' Kruskal-Wallis test to test for any difference in this factor between the different clusters.
   print(kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))
