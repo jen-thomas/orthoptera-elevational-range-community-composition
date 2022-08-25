@@ -8,7 +8,7 @@
 analysis_scripts/Rplots.pdf
 
 renv/
-
+.idea/
 analysis_plots/
 analysis_outputs/
 data/
