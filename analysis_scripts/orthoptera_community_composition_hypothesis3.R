@@ -155,10 +155,25 @@ species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 species_jaccard_dist
 
 #' Convert dissimilarity indices to matrix because they cannot be used in the kmeans function as they are.
-#' Is this the correct thing to do? Now both the upper and lower halves of the matrix will be the same.
+#' Now both the upper and lower halves of the matrix will be the same.
 
 species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 species_jaccard_dist_matrix
+
+#' ## Test new analysis - beta diversity 2023-01-13
+#'
+#' From https://grunwaldlab.github.io/analysis_of_microbiome_community_data_in_r/07--diversity_stats.html
+
+mds <- metaMDS(species_jaccard_dist_matrix)
+mds_df <- as.data.frame(mds$points)
+mds_df$site_elevation <- rownames(mds_df)
+
+#' Join the MDS data with the site species matrix
+
+mds_site_data <- dplyr::left_join(mds_df, site_survey_df)
+
+ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = elevational_band_m)) + geom_point()
+ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = area)) + geom_point()
 
 #' ## K-means cluster analysis
 
