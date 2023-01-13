@@ -16,7 +16,7 @@ source("get_finalised_observations_species_richness_conservative.R")
 source("get_physical_site_data.R")
 source("prepare_vegetation_data.R")
 
-vector_packages <- c("fossil", "stringr", "plyr", "dplyr", "psych")
+vector_packages <- c("fossil", "stringr", "plyr", "dplyr", "psych", "rgdal")
 get_packages(vector_packages)
 
 #' ## Prepare observation data

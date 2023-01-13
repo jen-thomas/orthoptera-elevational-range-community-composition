@@ -270,6 +270,7 @@ set.seed(10)
 species_jaccard_dist_mds_2dim <- metaMDS(site_species_matrix, k = 2, distance = "jaccard", trymax = 1000,
                                          trace = TRUE)
 print("Do NMDS")
+
 #' Get the stress value for 2 dimension
 
 print(species_jaccard_dist_mds_2dim["stress"])
