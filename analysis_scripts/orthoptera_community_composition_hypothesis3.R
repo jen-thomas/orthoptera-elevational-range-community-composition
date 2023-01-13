@@ -164,16 +164,19 @@ species_jaccard_dist_matrix
 #'
 #' From https://grunwaldlab.github.io/analysis_of_microbiome_community_data_in_r/07--diversity_stats.html
 
-mds <- metaMDS(species_jaccard_dist_matrix)
+mds <- metaMDS(species_jaccard_dist_matrix,k = 2, distance = "jaccard", trymax = 1000, trace = TRUE)
 mds_df <- as.data.frame(mds$points)
 mds_df$site_elevation <- rownames(mds_df)
 
-#' Join the MDS data with the site species matrix
+#' Join the MDS data with the site species matrix and plot it, coloured by elevation and with different
+#' point shapes for each study area so that any similarities can be distinguished according to these
+#' parameters.
 
 mds_site_data <- dplyr::left_join(mds_df, site_survey_df)
 
-ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = elevational_band_m)) + geom_point()
-ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = area)) + geom_point()
+ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = elevational_band_m, shape = area)) +
+  geom_point(size=3.5) +
+  scale_color_gradient(low = "#0072B2", high = "#C4961A")
 
 #' ## K-means cluster analysis
 
