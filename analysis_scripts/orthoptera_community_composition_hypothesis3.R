@@ -160,11 +160,15 @@ species_jaccard_dist
 species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 species_jaccard_dist_matrix
 
-#' ## Test new analysis - beta diversity 2023-01-13
+#' ## Test beta diversity between sites - 2023-01-13
 #'
-#' From https://grunwaldlab.github.io/analysis_of_microbiome_community_data_in_r/07--diversity_stats.html
+#' Beta diversity is a measure of the similarity in community composition between samples, in this case,
+#' sites.
+#'
+#' This calculation will be based on the Jaccard distance matrix calculated above.
+#' Code modified from https://grunwaldlab.github.io/analysis_of_microbiome_community_data_in_r/07--diversity_stats.html
 
-mds <- metaMDS(species_jaccard_dist_matrix,k = 2, distance = "jaccard", trymax = 1000, trace = TRUE)
+mds <- metaMDS(species_jaccard_dist_matrix, k = 2, distance = "jaccard", trymax = 1000, trace = TRUE)
 mds_df <- as.data.frame(mds$points)
 mds_df$site_elevation <- rownames(mds_df)
 
@@ -177,6 +181,13 @@ mds_site_data <- dplyr::left_join(mds_df, site_survey_df)
 ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = elevational_band_m, shape = area)) +
   geom_point(size=3.5) +
   scale_color_gradient(low = "#0072B2", high = "#C4961A")
+
+#' The three lower-elevation sites (coloured in dark blue) are fairly similar in terms of their species
+#' composition. There is a very lose grouping of the sites at Tor, and another for those at La Molinassa.
+#' The trend from low elevation to higher elevations can be seen as well. In itself this is interesting
+#' and knowing the sites, it is a nice way to see which have a similar community composition. I am not
+#' sure though, if this plot adds anything that cannot be seen in figure 2 (in the manuscript). I would
+#' welcome your thoughts on this though. 
 
 #' ## K-means cluster analysis
 
