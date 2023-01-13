@@ -188,7 +188,7 @@ ggplot(mds_site_data, aes(x = MDS1, y = MDS2, color = elevational_band_m, shape 
 #' and knowing the sites, it is a nice way to see which have a similar community composition. I am not
 #' sure though, if this plot adds anything that cannot be seen in figure 2 (in the manuscript). I would
 #' welcome your thoughts on this though.
-
+#'
 #' ## K-means cluster analysis
 
 #' Determine the number of clusters to use for K-means clustering. Firstly, calculate the within group sum
