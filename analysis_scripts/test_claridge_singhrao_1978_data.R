@@ -22,7 +22,7 @@ get_packages(vector_packages)
 #' ## Prepare data
 #+ message=FALSE, warning=FALSE
 
-elevational_ranges_species <- "../data/elevational_observations_claridge_singhao_1978.csv"
+elevational_ranges_species <- "../data/elevational_observations_claridge_singhrao_1978.csv"
 elevational_ranges_species_df <- read_csv_data_file(elevational_ranges_species)
 
 #' ### Calculate polynomials
