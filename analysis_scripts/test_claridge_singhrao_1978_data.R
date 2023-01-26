@@ -96,3 +96,13 @@ ggplot(data = elevational_ranges_species_predicted,
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
+
+#' The plot shows an increase in the elevational range with elevation, in agreement with Rapoport's
+#' elevational rule.
+#'
+#' ### Test model assumptions
+
+check_model_assumptions(lin_reg)
+
+#' The residuals seem to conform more or less to a normal distribution. The scatterplot does not show any
+#' evidence of heteroscedasticity.
