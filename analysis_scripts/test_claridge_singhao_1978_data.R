@@ -1,5 +1,5 @@
 #' ---
-#' title: Testing data from Claridge and Singhao, 1978
+#' title: Testing data from Claridge and Singhrao, 1978
 #' output:
 #'   html_document:
 #'     toc: true
@@ -25,6 +25,7 @@ get_packages(vector_packages)
 elevational_ranges_species <- "../data/elevational_observations_claridge_singhao_1978.csv"
 elevational_ranges_species_df <- read_csv_data_file(elevational_ranges_species)
 
+#' ### Calculate polynomials
 elevational_ranges_species_df <- calculate_polynomials_elevation(elevational_ranges_species_df)
 
 lin_regs_polynomial <- linear_regression_elevrange_elevation_polynomial(elevational_ranges_species_df)
@@ -34,14 +35,15 @@ nonlin_reg_quadratic <- lin_regs_polynomial[[2]]
 nonlin_reg_cubic <- lin_regs_polynomial[[3]]
 nonlin_reg_quartic <- lin_regs_polynomial[[4]]
 
+#' ### Compare the polynomial models
 compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 elevational_ranges_species_predicted <- cbind(elevational_ranges_species_df, predict(nonlin_reg_quadratic, interval = "confidence"))
 
-###
-#' Get min and max of values on plot ready for predictions
+### Prepare predicted and fitted values
+#' Get min and max of values of plot ready for predictions
 i_all_sp <- seq(min(elevational_ranges_species_predicted$elevational_range_midpoint),
          max(elevational_ranges_species_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
 
@@ -63,7 +65,7 @@ quadratic_term_all_sp <- abs(cf_all_sp[3])
 
 equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp)*italic(E) - .(quadratic_term_all_sp)*italic(E)^2)
 
-#' Create the plot
+#' ## Create the plot
 
 ggplot(data = elevational_ranges_species_predicted,
            aes(x = elevational_range_midpoint, y = elevational_range)) +
