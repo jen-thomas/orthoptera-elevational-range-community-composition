@@ -104,5 +104,5 @@ ggplot(data = elevational_ranges_species_predicted,
 
 check_model_assumptions(lin_reg)
 
-#' The residuals seem to conform more or less to a normal distribution. The scatterplot does not show any
-#' evidence of heteroscedasticity.
+#' The residuals seem to conform more or less to a normal distribution with a slight right skew. The
+#' scatterplot does not show any evidence of heteroscedasticity.
