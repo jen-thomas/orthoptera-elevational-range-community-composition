@@ -7,6 +7,7 @@ def describe_data_file(data_file):
     Return the resource description."""
 
     resource = describe(data_file, type="resource")
+    pprint(resource)
 
     return resource
 
@@ -62,11 +63,44 @@ def observations_schema(resource, schema_json_file):
     resource_to_json(resource, schema_json_file)
 
 
+def sites_schema(resource, schema_json_file):
+    """Add further information to the metadata schema.
+
+    Return the schema in JSON format."""
+
+    resource.schema.get_field("area").title = "Area"
+    resource.schema.get_field("area").description = "Name of study area"
+    resource.schema.get_field("site_name").title = "Site name"
+    resource.schema.get_field("site_name").description = "Name of study site at which insect was captured"
+    resource.schema.get_field("elevational_band_m").title = "Elevational band (m)"
+    resource.schema.get_field("elevational_band_m").description = "Elevational band in which study site was located (m)"
+    resource.schema.get_field("latitude_start_n").title = "Start latitude (N)"
+    resource.schema.get_field("latitude_start_n").description = "Latitude at start of transect (decimal degrees N)"
+    resource.schema.get_field("longitude_start_e").title = "Start longitude (E)"
+    resource.schema.get_field("longitude_start_e").description = "Longitude at start of transect (decimal degrees E)"
+    resource.schema.get_field("elevation_start_m").title = "Start elevation (m)"
+    resource.schema.get_field("elevation_start_m").description = "Elevation at start of transect (m)"
+    resource.schema.get_field("latitude_end_n").title = "End latitude (N)"
+    resource.schema.get_field("latitude_end_n").description = "Latitude at end of transect (decimal degrees N)"
+    resource.schema.get_field("longitude_end_e").title = "End longitude (E)"
+    resource.schema.get_field("longitude_end_e").description = "Longitude at end of transect (decimal degrees E)"
+    resource.schema.get_field("elevation_end_m").title = "End elevation (m)"
+    resource.schema.get_field("elevation_end_m").description = "Elevation at end of transect (m)"
+    resource.schema.get_field("transect_length_m").title = "Transect length (m)"
+    resource.schema.get_field("transect_length_m").description = "Length of survey transect (m)"
+
+    resource_to_json(resource, schema_json_file)
+
+
 def main():
 
     observations_resource = describe_data_file("data/observations.csv")
     observations_schema(observations_resource, "frictionless_data/schema_observations.json")
     validate_data_file("frictionless_data/schema_observations.json")
+
+    sites_resource = describe_data_file("data/sites.csv")
+    sites_schema(sites_resource, "frictionless_data/schema_sites.json")
+    validate_data_file("frictionless_data/schema_sites.json")
 
 
 if __name__ == '__main__':
