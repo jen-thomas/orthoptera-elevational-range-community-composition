@@ -92,6 +92,40 @@ def sites_schema(resource, schema_json_file):
     resource_to_json(resource, schema_json_file)
 
 
+def surveys_schema(resource, schema_json_file):
+    """Add further information to the metadata schema.
+
+    Return the schema in JSON format."""
+
+    resource.schema.get_field("site_name").title = "Site name"
+    resource.schema.get_field("site_name").description = "Name of study site at which insect was captured"
+    resource.schema.get_field("date_cest").title = "Date (CEST)"
+    resource.schema.get_field("date_cest").description = "Date on which insect was captured (CEST)"
+    resource.schema.get_field("start_time_cest").title = "Start time (CEST)"
+    resource.schema.get_field("start_time_cest").description = "Start time of survey (CEST)"
+    resource.schema.get_field("end_time_cest").title = "End time (CEST)"
+    resource.schema.get_field("end_time_cest").description = "End time of survey (CEST)"
+    resource.schema.get_field("method").title = "Capture method"
+    resource.schema.get_field("method").description = "Method by which insect was captured"
+    resource.schema.get_field("method_repeat").title = "Capture method repeat"
+    resource.schema.get_field("method_repeat").description = "Integer determining repeat number of capture method during" \
+                                                             " survey"
+    resource.schema.get_field("cloud_coverage_start").title = "Start cloud coverage"
+    resource.schema.get_field("cloud_coverage_start").description = "Cloud coverage at start of survey"
+    resource.schema.get_field("wind_start").title = "Start wind"
+    resource.schema.get_field("wind_start").description = "Wind at start of survey"
+    resource.schema.get_field("rain_start").title = "Start rain"
+    resource.schema.get_field("rain_start").description = "Rain at start of survey"
+    resource.schema.get_field("cloud_coverage_end").title = "End cloud coverage"
+    resource.schema.get_field("cloud_coverage_end").description = "Cloud coverage at end of survey"
+    resource.schema.get_field("wind_end").title = "End wind"
+    resource.schema.get_field("wind_end").description = "Wind at end of survey"
+    resource.schema.get_field("rain_end").title = "End rain"
+    resource.schema.get_field("rain_end").description = "Rain at end of survey"
+
+    resource_to_json(resource, schema_json_file)
+
+
 def main():
 
     observations_resource = describe_data_file("data/observations.csv")
@@ -101,6 +135,10 @@ def main():
     sites_resource = describe_data_file("data/sites.csv")
     sites_schema(sites_resource, "frictionless_data/schema_sites.json")
     validate_data_file("frictionless_data/schema_sites.json")
+
+    surveys_resource = describe_data_file("data/surveys.csv")
+    surveys_schema(surveys_resource, "frictionless_data/schema_surveys.json")
+    validate_data_file("frictionless_data/schema_surveys.json")
 
 
 if __name__ == '__main__':
