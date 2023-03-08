@@ -126,6 +126,47 @@ def surveys_schema(resource, schema_json_file):
     resource_to_json(resource, schema_json_file)
 
 
+def vegetation_plots_schema(resource, schema_json_file):
+    """Add further information to the metadata schema.
+
+        Return the schema in JSON format."""
+
+    resource.schema.get_field("site_name").title = "Site name"
+    resource.schema.get_field("site_name").description = "Name of study site at which insect was captured"
+    resource.schema.get_field("date_cest").title = "Date (CEST)"
+    resource.schema.get_field("date_cest").description = "Date on which insect was captured (CEST)"
+    resource.schema.get_field("plot_distance_from_start_m").title = "Plot distance from start (m)"
+    resource.schema.get_field("plot_distance_from_start_m").description = "Distance of vegetation survey plot from start" \
+                                                                          " of survey transect (m)"
+    resource.schema.get_field("percentage_vegetation_cover").title = "Percentage vegetation cover"
+    resource.schema.get_field("percentage_vegetation_cover").description = "Percentage of plot covered by vegetation"
+    resource.schema.get_field("percentage_bare_ground").title = "Percentage bare ground"
+    resource.schema.get_field("percentage_bare_ground").description = "Percentage of plot covered by bare ground"
+    resource.schema.get_field("percentage_rock").title = "Percentage rock cover"
+    resource.schema.get_field("percentage_rock").description = "Percentage of plot covered by rock"
+    resource.schema.get_field("height_75percent").title = "Height 75 percent of vegetation (cm)"
+    resource.schema.get_field("height_75percent").description = "Height of 75 percent of vegetation in plot (cm)"
+    resource.schema.get_field("max_height").title = "Maximum height of vegetation (cm)"
+    resource.schema.get_field("max_height").description = "Maximum height of vegetation in plot (cm)"
+    resource.schema.get_field("density_01").title = "Vegetation density point 1"
+    resource.schema.get_field("density_01").description = "Vegetation density at point 1 (number of times vegetation " \
+                                                          "touches stick placed in plot corner)"
+    resource.schema.get_field("density_02").title = "Vegetation density point 2"
+    resource.schema.get_field("density_02").description = "Vegetation density at point 2 (number of times vegetation " \
+                                                          "touches stick placed in plot corner)"
+    resource.schema.get_field("density_03").title = "Vegetation density point 3"
+    resource.schema.get_field("density_03").description = "Vegetation density at point 3 (number of times vegetation " \
+                                                          "touches stick placed in plot corner)"
+    resource.schema.get_field("density_04").title = "Vegetation density point 4"
+    resource.schema.get_field("density_04").description = "Vegetation density at point 4 (number of times vegetation " \
+                                                          "touches stick placed in plot corner)"
+    resource.schema.get_field("density_05").title = "Vegetation density point 5"
+    resource.schema.get_field("density_05").description = "Vegetation density at point 5 (number of times vegetation " \
+                                                          "touches stick placed in middle of plot)"
+
+    resource_to_json(resource, schema_json_file)
+
+
 def main():
 
     observations_resource = describe_data_file("data/observations.csv")
@@ -139,6 +180,10 @@ def main():
     surveys_resource = describe_data_file("data/surveys.csv")
     surveys_schema(surveys_resource, "frictionless_data/schema_surveys.json")
     validate_data_file("frictionless_data/schema_surveys.json")
+
+    vegetation_plots_resource = describe_data_file("data/vegetation_plots.csv")
+    vegetation_plots_schema(vegetation_plots_resource, "frictionless_data/schema_vegetation_plots.json")
+    validate_data_file("frictionless_data/schema_vegetation_plots.json")
 
 
 if __name__ == '__main__':
