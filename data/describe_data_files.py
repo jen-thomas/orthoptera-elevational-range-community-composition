@@ -66,7 +66,7 @@ def validate_schema(resource_schema):
     return report
 
 
-def observations_schema(resource, schema_json_file):
+def describe_observations_resource(resource, schema_json_file):
     """Add further information to the metadata schema.
 
     Return the schema in JSON format."""
@@ -109,7 +109,7 @@ def observations_schema(resource, schema_json_file):
     resource_to_json(resource, schema_json_file)
 
 
-def sites_schema(resource, schema_json_file):
+def describe_sites_resource(resource, schema_json_file):
     """Add further information to the metadata schema.
 
     Return the schema in JSON format."""
@@ -157,7 +157,7 @@ def sites_schema(resource, schema_json_file):
     resource_to_json(resource, schema_json_file)
 
 
-def surveys_schema(resource, schema_json_file):
+def describe_surveys_resource(resource, schema_json_file):
     """Add further information to the metadata schema.
 
     Return the schema in JSON format."""
@@ -203,7 +203,7 @@ def surveys_schema(resource, schema_json_file):
     resource_to_json(resource, schema_json_file)
 
 
-def vegetation_plots_schema(resource, schema_json_file):
+def describe_vegetation_plots_resource(resource, schema_json_file):
     """Add further information to the metadata schema.
 
         Return the schema in JSON format."""
@@ -269,19 +269,19 @@ def main():
 
     # Create resource descriptions and validate
     observations_resource = describe_data_file("observations.csv")
-    observations_schema(observations_resource, "schema_observations.json")
+    describe_observations_resource(observations_resource, "schema_observations.json")
     validate_schema("schema_observations.json")
 
     sites_resource = describe_data_file("sites.csv")
-    sites_schema(sites_resource, "schema_sites.json")
+    describe_sites_resource(sites_resource, "schema_sites.json")
     validate_schema("schema_sites.json")
 
     surveys_resource = describe_data_file("surveys.csv")
-    surveys_schema(surveys_resource, "schema_surveys.json")
+    describe_surveys_resource(surveys_resource, "schema_surveys.json")
     validate_schema("schema_surveys.json")
 
     vegetation_plots_resource = describe_data_file("vegetation_plots.csv")
-    vegetation_plots_schema(vegetation_plots_resource, "schema_vegetation_plots.json")
+    describe_vegetation_plots_resource(vegetation_plots_resource, "schema_vegetation_plots.json")
     validate_schema("schema_vegetation_plots.json")
 
     # Add resource descriptions to package resources
@@ -298,12 +298,6 @@ def main():
     package.get_resource("vegetation_plots").encoding = "utf-8"
 
     pprint(package)
-
-    # print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx")
-    #
-    # package = create_package(["observations.csv", "sites.csv", "surveys.csv", "vegetation_plots.csv"])
-    #
-    # observations_schema(package)
 
 
 if __name__ == '__main__':
