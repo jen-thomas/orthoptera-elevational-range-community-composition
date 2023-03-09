@@ -14,5 +14,5 @@ analysis_outputs/
 data/*csv
 data/*json
 data/dem/
-data/metadata/
+data/worldclim/
 metadata/
