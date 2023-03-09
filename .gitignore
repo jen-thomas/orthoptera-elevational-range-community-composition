@@ -11,5 +11,6 @@ renv/
 .idea/
 analysis_plots/
 analysis_outputs/
-data/
+data/*csv
+data/*json
 metadata/
