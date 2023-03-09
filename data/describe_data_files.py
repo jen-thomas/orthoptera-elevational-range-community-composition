@@ -12,6 +12,32 @@ def create_package(list_of_resources):
     return package
 
 
+def describe_package(package):
+    """Describe package with additional metadata fields.
+
+    Return package."""
+
+    package.name = "orthoptera_pyrenees_2021"
+    package.title = "Orthoptera elevational range, species richness and community composition in the Pyrenees"
+    package.description = "Data and metadata for the article, 'Species richness of Orthoptera declines with " \
+                          "elevation while elevational range of individual species peaks at mid elevation'"
+    package.keywords = ["Orthoptera", "Rapoport's Rule", "species richness", "elevational gradient",
+                        "elevational range", "community composition"]
+    package.licenses = [{"name": "CC BY 4.0",
+                         "path": "https://creativecommons.org/licenses/by/4.0/",
+                         "title": "Creative Commons Attribution 4.0 International (CC BY 4.0)"}]
+    package.profile = "data-package"
+    package.contributors = [{
+        "title": "Jen Thomas",
+        "email": "jen@falciot.net",
+        "path": "https://falciot.net",
+        "role": "author"
+    }]
+    package.version = "1.0.0"
+
+    return package
+
+
 def describe_data_file(data_file):
     """Describe a data file using the frictionless schema.
 
@@ -237,7 +263,9 @@ def vegetation_plots_schema(resource, schema_json_file):
 
 def main():
 
+    # Create and describe package
     package = create_package(["observations.csv", "sites.csv", "surveys.csv", "vegetation_plots.csv"])
+    package = describe_package(package)
 
     # Create resource descriptions and validate
     observations_resource = describe_data_file("observations.csv")
