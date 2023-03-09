@@ -38,6 +38,14 @@ def describe_package(package):
     return package
 
 
+def package_to_json(package, json_package):
+    """Convert the package description to JSON.
+
+    Output into the specified file."""
+
+    package.to_json(json_package)
+
+
 def describe_data_file(data_file):
     """Describe a data file using the frictionless schema.
 
@@ -66,7 +74,7 @@ def validate_schema(resource_schema):
     return report
 
 
-def describe_observations_resource(resource, schema_json_file):
+def describe_observations_resource(resource):
     """Add further information to the metadata schema.
 
     Return the schema in JSON format."""
@@ -106,10 +114,11 @@ def describe_observations_resource(resource, schema_json_file):
     resource.schema.get_field("species").title = "Species"
     resource.schema.get_field("species").description = "Species"
 
-    resource_to_json(resource, schema_json_file)
+    # resource_to_json(resource, schema_json_file)
+    return resource
 
 
-def describe_sites_resource(resource, schema_json_file):
+def describe_sites_resource(resource):
     """Add further information to the metadata schema.
 
     Return the schema in JSON format."""
@@ -154,10 +163,9 @@ def describe_sites_resource(resource, schema_json_file):
     resource.schema.get_field("transect_length_m").constraints["minimum"] = 90
     resource.schema.get_field("transect_length_m").constraints["maximum"] = 110
 
-    resource_to_json(resource, schema_json_file)
+    return resource
 
-
-def describe_surveys_resource(resource, schema_json_file):
+def describe_surveys_resource(resource):
     """Add further information to the metadata schema.
 
     Return the schema in JSON format."""
@@ -200,10 +208,9 @@ def describe_surveys_resource(resource, schema_json_file):
     resource.schema.get_field("rain_end").description = "Rain at end of survey"
     resource.schema.get_field("rain_end").constraints["minimum"] = 0
 
-    resource_to_json(resource, schema_json_file)
+    return resource
 
-
-def describe_vegetation_plots_resource(resource, schema_json_file):
+def describe_vegetation_plots_resource(resource):
     """Add further information to the metadata schema.
 
         Return the schema in JSON format."""
@@ -258,7 +265,7 @@ def describe_vegetation_plots_resource(resource, schema_json_file):
                                                           "touches stick placed in middle of plot)"
     resource.schema.get_field("density_05").constraints["minimum"] = 0
 
-    resource_to_json(resource, schema_json_file)
+    return resource
 
 
 def main():
@@ -269,20 +276,20 @@ def main():
 
     # Create resource descriptions and validate
     observations_resource = describe_data_file("observations.csv")
-    describe_observations_resource(observations_resource, "schema_observations.json")
-    validate_schema("schema_observations.json")
+    observations_resource = describe_observations_resource(observations_resource)
+    validate_schema(observations_resource)
 
     sites_resource = describe_data_file("sites.csv")
-    describe_sites_resource(sites_resource, "schema_sites.json")
-    validate_schema("schema_sites.json")
+    sites_resource = describe_sites_resource(sites_resource)
+    validate_schema(sites_resource)
 
     surveys_resource = describe_data_file("surveys.csv")
-    describe_surveys_resource(surveys_resource, "schema_surveys.json")
-    validate_schema("schema_surveys.json")
+    surveys_resource = describe_surveys_resource(surveys_resource)
+    validate_schema(surveys_resource)
 
     vegetation_plots_resource = describe_data_file("vegetation_plots.csv")
-    describe_vegetation_plots_resource(vegetation_plots_resource, "schema_vegetation_plots.json")
-    validate_schema("schema_vegetation_plots.json")
+    vegetation_plots_resource = describe_vegetation_plots_resource(vegetation_plots_resource)
+    validate_schema(vegetation_plots_resource)
 
     # Add resource descriptions to package resources
     package.get_resource("observations").schema = observations_resource.schema
@@ -297,7 +304,7 @@ def main():
     package.get_resource("vegetation_plots").schema = vegetation_plots_resource.schema
     package.get_resource("vegetation_plots").encoding = "utf-8"
 
-    pprint(package)
+    package_to_json(package, "schema_package.json")
 
 
 if __name__ == '__main__':
