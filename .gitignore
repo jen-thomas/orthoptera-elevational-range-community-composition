@@ -13,4 +13,6 @@ analysis_plots/
 analysis_outputs/
 data/*csv
 data/*json
+data/dem/
+data/metadata/
 metadata/
