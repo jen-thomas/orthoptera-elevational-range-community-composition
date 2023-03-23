@@ -452,7 +452,7 @@ check_collinearity <- function(env_var_df) {
 
   veg_params_to_compare <- env_var_df %>%
     dplyr::select(elevational_band_m, slope, aspect, mean_perc_veg_cover, mean_perc_bare_ground,
-                  mean_per_rock, mean_max_height, mean_height_75percent,
+                  mean_per_rock, mean_max_height_cm, mean_height_75percent_cm,
                   mean_density)
 
   collinearity_comparison <- pairs.panels(veg_params_to_compare, smooth = FALSE, scale = FALSE, density = FALSE, ellipses = FALSE,
@@ -505,9 +505,9 @@ check_collinearity(site_env_var_data)
 #' Test if there is a significant difference between the highly correlated parameters.
 #+ message=FALSE, warning=FALSE
 
-cor_veg_height <- cor.test(site_env_var_data$mean_height_75percent, site_env_var_data$mean_max_height, method = "spearman")
+cor_veg_height <- cor.test(site_env_var_data$mean_height_75percent_cm, site_env_var_data$mean_max_height_cm, method = "spearman")
 cor_slope_vegcover <- cor.test(site_env_var_data$mean_perc_veg_cover, site_env_var_data$slope, method = "spearman")
-cor_vegheight_density <- cor.test(site_env_var_data$mean_height_75percent, site_env_var_data$mean_density, method = "spearman")
+cor_vegheight_density <- cor.test(site_env_var_data$mean_height_75percent_cm, site_env_var_data$mean_density, method = "spearman")
 cor_veg_height
 cor_slope_vegcover
 cor_vegheight_density

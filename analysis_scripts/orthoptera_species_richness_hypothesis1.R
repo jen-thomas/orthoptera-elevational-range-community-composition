@@ -331,7 +331,7 @@ hist(species_richness_tav$species_richness)
 
 glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
@@ -364,7 +364,7 @@ paste0("ratio: ", ratio_dispersion)
 
 glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
@@ -473,7 +473,7 @@ species_richness_tortavmol <- species_richness_sites[species_richness_sites$area
 
 glm_species_richness_full_tortavmol <- glm(species_richness ~ elevational_band_m +
                                         as.factor(area) + slope + as.factor(aspect_cardinal) +
-                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm +
                                         mean_density,
     family = poisson(link = "log"),
     data = species_richness_tortavmol)
@@ -522,7 +522,7 @@ caelifera_species_richness_sites <- left_join(caelifera_species_richness_sites, 
 
 glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m +
                                         as.factor(area) + slope + as.factor(aspect_cardinal) +
-                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm +
                                         mean_density,
     family = poisson(link = "log"),
     data = caelifera_species_richness_sites)
@@ -745,7 +745,7 @@ standard error, Wald's chi-squared and significance level (P < 0.05) for variabl
 #' Drop aspect first
 glm_species_richness_step1 <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
@@ -841,7 +841,7 @@ AICcmodavg::AICc(glm_species_best_dredge, return.K = FALSE, second.ord = TRUE)
 
 glm_species_richness_full_tor <- glm(species_richness ~ elevational_band_m + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = poisson(link = "log"),
     data = species_richness_tor)
 
@@ -870,7 +870,7 @@ AICcmodavg::AICc(glm_species_richness_full_tor_step, return.K = FALSE, second.or
 
 glm_species_richness_full_tav <- glm(species_richness ~ elevational_band_m + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = poisson(link = "log"),
     data = species_richness_tav)
 
@@ -899,7 +899,7 @@ AICcmodavg::AICc(glm_species_richness_full_tav_step, return.K = FALSE, second.or
 
 glm_species_richness_full_mol <- glm(species_richness ~ elevational_band_m + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = poisson(link = "log"),
     data = species_richness_mol)
 

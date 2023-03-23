@@ -51,7 +51,7 @@ create_env_var_matrix <- function(env_var_df) {
 
     #' select only a subset of the parameters to use in the analysis
     env_var_matrix <- dplyr::select(env_var_df, elevational_band_m, sampling_effort_index, slope, aspect_cardinal, area,
-                                  mean_perc_veg_cover, mean_height_75percent, mean_density)
+                                  mean_perc_veg_cover, mean_height_75percent_cm, mean_density)
 
   return(env_var_matrix)
 }
@@ -252,14 +252,14 @@ with(env_var_matrix, {
   print(shapiro.test(resid(aov(sampling_effort_index ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(slope ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_density ~ as.factor(kmeans_fit_clusters)))))
-  print(shapiro.test(resid(aov(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))))
+  print(shapiro.test(resid(aov(mean_height_75percent_cm ~ as.factor(kmeans_fit_clusters)))))
   print(shapiro.test(resid(aov(mean_perc_veg_cover ~ as.factor(kmeans_fit_clusters)))))
 
   print(bartlett.test(elevational_band_m, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(sampling_effort_index, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(slope, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_density, as.factor(kmeans_fit_clusters)))
-  print(bartlett.test(mean_height_75percent, as.factor(kmeans_fit_clusters)))
+  print(bartlett.test(mean_height_75percent_cm, as.factor(kmeans_fit_clusters)))
   print(bartlett.test(mean_perc_veg_cover, as.factor(kmeans_fit_clusters)))
 
   print(summary(aov(elevational_band_m ~ as.factor(kmeans_fit_clusters))))
@@ -274,7 +274,7 @@ with(env_var_matrix, {
 
   #' Vegetation height and sampling effort were not normally distributed so use a non-parametric
   #' Kruskal-Wallis test to test for any difference in this factor between the different clusters.
-  print(kruskal.test(mean_height_75percent ~ as.factor(kmeans_fit_clusters)))
+  print(kruskal.test(mean_height_75percent_cm ~ as.factor(kmeans_fit_clusters)))
   print(kruskal.test(sampling_effort_index ~ as.factor(kmeans_fit_clusters)))
 })
 
@@ -319,7 +319,7 @@ stressplot(species_jaccard_dist_mds_2dim)
 env_data_fit_sites <- envfit(species_jaccard_dist_mds_2dim,
                        choices = 1:2,
                        env_var_matrix[, c("elevational_band_m", "sampling_effort_index", "slope", "aspect_cardinal", "area",
-                                          "mean_perc_veg_cover", "mean_height_75percent",
+                                          "mean_perc_veg_cover", "mean_height_75percent_cm",
                                           "mean_density")],
                        scaling = "sites",
                        permutations = 1000, display = "sites")
@@ -383,7 +383,7 @@ cluster_group_permanova <- adonis2(species_jaccard_dist ~ cluster_group, data = 
 cluster_group_permanova
 
 all_env_vars_permanova <- adonis2(species_jaccard_dist ~ area + elevational_band_m +
-                                  sampling_effort_index +slope + aspect_cardinal + mean_height_75percent +
+                                  sampling_effort_index +slope + aspect_cardinal + mean_height_75percent_cm +
                                   mean_density + mean_perc_veg_cover,
                                   data = env_var_matrix, perm=999)
 all_env_vars_permanova
