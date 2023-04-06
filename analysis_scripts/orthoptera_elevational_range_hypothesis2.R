@@ -346,6 +346,7 @@ check_model_assumptions <- function(model) {
   hist(residuals(model), col="darkgray")
 
   plot(fitted(model), residuals(model))
+
 }
 
 #' Look at the distribution of elevational range, as well as the transformed elevational range

@@ -42,8 +42,8 @@ nonlin_reg_quartic <- lin_regs_polynomial[[4]]
 #' Compare the linear models
 compareLM(lin_reg, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
-#' We can see that the linear model has the lowest AIC, suggesting it is the best model for these data.
-#' This model also has the largest adjusted R-squared.
+#' We can see that the quadratic model has the lowest AIC and largest adjusted R-squared, suggesting it is
+#' the best model for these data.
 #'
 #' Do a direct comparison of the difference between the models using ANOVA.
 #' <br>H<sub>0</sub>: there is no difference between the models.
@@ -52,32 +52,36 @@ compareLM(lin_reg, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 anova(lin_reg, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
-#' The comparison of the models shows that the polynomial models are not significantly better than the 
-#' linear model.
-
-elevational_ranges_species_predicted <- cbind(elevational_ranges_species_df, predict(lin_reg, interval = "confidence"))
+#' The quadratic model is marginally better than the linear model, with a p-value of 0.02 to 2 dp.
 
 ### Prepare predicted and fitted values
-#' Get min and max of values of plot ready for predictions
+
+elevational_ranges_species_predicted <- cbind(elevational_ranges_species_df,
+                                              predict(nonlin_reg_quadratic, interval = "confidence"))
+
+#' Get min and max elevational range midpoint values for plot axes
 i_all_sp <- seq(min(elevational_ranges_species_predicted$elevational_range_midpoint),
          max(elevational_ranges_species_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
 
 #' Calculate the predicted values from the regression so they can be plotted as a line
-predicted_values_all_sp <- predict(lin_reg,
-                            data.frame(elevational_range_midpoint=i_all_sp)) #  fitted values
-intervals_all_sp <-  predict(lin_reg,
-                      data.frame(elevational_range_midpoint=i_all_sp), interval = "confidence")
+predicted_values_all_sp <- predict(nonlin_reg_quadratic,
+                            data.frame(elevational_range_midpoint=i_all_sp,
+                                       elevational_range_midpoint2=i_all_sp*i_all_sp)) #  fitted values
+intervals_all_sp <-  predict(nonlin_reg_quadratic,
+                      data.frame(elevational_range_midpoint=i_all_sp,
+                                 elevational_range_midpoint2=i_all_sp*i_all_sp), interval = "confidence")
 
 #' Put the values into a dataframe
 confidence_bands_all_sp <- data.frame(i_all_sp, intervals_all_sp)
 
 #' Get the coefficients of the equation and put these into text
-cf_all_sp <- signif(coef(lin_reg), 2)
+cf_all_sp <- signif(coef(nonlin_reg_quadratic), 2)
 
 int_term_all_sp <- cf_all_sp[1]
 lin_term_all_sp <- cf_all_sp[2]
+quad_term_all_sp <- cf_all_sp[3]
 
-equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp)*italic(E))
+equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp)*italic(E) - .(quad_term_all_sp)*italic(E))
 
 #' ## Create the plot
 
@@ -102,7 +106,9 @@ ggplot(data = elevational_ranges_species_predicted,
 #'
 #' ### Test model assumptions
 
-check_model_assumptions(lin_reg)
+check_model_assumptions(nonlin_reg_quadratic)
+shapiro.test(residuals(nonlin_reg_quadratic))
+plot(nonlin_reg_quadratic)
 
-#' The residuals seem to conform more or less to a normal distribution with a slight right skew. The
-#' scatterplot does not show any evidence of heteroscedasticity.
+#' There is evidence that the assumption of normally distributed residuals is not met for these data,
+#' therefore non-linear regression is not a suitable method for their analysis.
