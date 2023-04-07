@@ -511,3 +511,5 @@ cor_vegheight_density <- cor.test(site_env_var_data$mean_height_75percent_cm, si
 cor_veg_height
 cor_slope_vegcover
 cor_vegheight_density
+
+# There is a significant correlation between these pairs of parameters. 
