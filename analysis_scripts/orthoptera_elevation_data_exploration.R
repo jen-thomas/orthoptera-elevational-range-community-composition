@@ -512,4 +512,4 @@ cor_veg_height
 cor_slope_vegcover
 cor_vegheight_density
 
-# There is a significant correlation between these pairs of parameters. 
+# There is a significant correlation between these pairs of parameters.
