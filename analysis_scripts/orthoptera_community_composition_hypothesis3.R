@@ -321,17 +321,29 @@ list_vectors <- c("Elevation band", "Sampling effort", "Slope", "Vegetation cove
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
 
 #' Create the plot and add the environmental variables and a legend.
+
+manual_sites <- c("MOL 2400", "TAV 1600", "TOR 1800", "TOR 1600", "TOR 2100")
+
 ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", type = "none",
                             xlim = c(-2.5, 2.8), ylim = c(-2.1, 1.6))
 plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
+
 orditorp(ordination_plot, "sites", # I like this, it looks much better
      col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
-         air = 0.3, cex = 0.7, labels = env_var_matrix_code$short_code_elevation)
+     air = 0.3, cex = 0.7, pch = NA,
+     labels = ifelse(env_var_matrix_code$short_code_elevation %in% manual_sites, "", env_var_matrix_code$short_code_elevation)) # labels = env_var_matrix_code$short_code_elevation
+text(x = -0.25, y = -0.05, labels = "MOL 2400", col = "#009E73", cex = 0.7)
+text(x = 0.6, y = -0.2, labels = "TAV 1600", col = "#CC79A7", cex = 0.7)
+text(x = 1, y = -0.3, labels = "TOR 1800", col = "#009E73", cex = 0.7)
+text(x = 1.8, y = 0.55, labels = "TOR 2100", col = "orange", cex = 0.7)
+text(x = 2, y = 0.45, labels = "TOR 1600", col = "#009E73", cex = 0.7)
+
 legend("topright", legend = sort(unique(env_var_matrix_code$cluster_group)), bty = "n",
             col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73"), pch = 21, cex = 0.8,
 title = "Cluster")
+locator(1)
 
 dev.off()
 
