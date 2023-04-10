@@ -15,9 +15,9 @@ rmarkdown::metadata
 #                   output_dir = "analysis_outputs/")
 # rmarkdown::render("analysis_scripts/orthoptera_species_richness_hypothesis1.R",
 #                   output_dir = "analysis_outputs/")
-rmarkdown::render("analysis_scripts/orthoptera_elevational_range_hypothesis2.R",
-                  output_dir = "analysis_outputs/")
-# rmarkdown::render("analysis_scripts/orthoptera_community_composition_hypothesis3.R",
+# rmarkdown::render("analysis_scripts/orthoptera_elevational_range_hypothesis2.R",
 #                   output_dir = "analysis_outputs/")
+rmarkdown::render("analysis_scripts/orthoptera_community_composition_hypothesis3.R",
+                  output_dir = "analysis_outputs/")
 # rmarkdown::render("analysis_scripts/test_claridge_singhrao_1978_data.R",
 #                   output_dir = "analysis_outputs/")

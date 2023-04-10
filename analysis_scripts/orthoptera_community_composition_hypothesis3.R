@@ -281,7 +281,7 @@ with(env_var_matrix, {
 #' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
 #' that there was any difference between each of the individual environmental variables within each
 #' cluster.
-
+#'
 #' ## NMDS
 #'
 #' Plot the Shepard stress plot to check how many dimensions should be used. Look for where the line
