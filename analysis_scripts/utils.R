@@ -1,11 +1,3 @@
-print_latest_git_commits <- function(file_path) {
-    #' Get and print the latest five commits for a file.
-
-  command <- paste("git log HEAD --pretty='tformat: %ci commit %h: %s'", file_path)
-  this_file_latest_commits <- system(command, intern = TRUE)
-  print(this_file_latest_commits[1:5])
-}
-
 get_packages <- function(vector_packages) {
     #' Install and load packages from a vector of packages that are needed for the code.
 
@@ -25,16 +17,6 @@ read_csv_data_file <- function(file_path) {
   read.csv(file_path, header = TRUE, stringsAsFactors = TRUE)
 }
 
-subset_data_frame <- function(dataframe, vector_columns) {
-  #' Get a subset of a dataframe according to a vector of column names.
-  #'
-  #' Return the subsetted dataframe.
-
-  subsetted_df <- dataframe[, vector_columns]
-
-  return(subsetted_df)
-}
-
 replace_na_with_zero <- function(dataframe, column) {
   #' Replace all NA values in a column with 0 (to be able to do calculations).
   #'
@@ -43,23 +25,6 @@ replace_na_with_zero <- function(dataframe, column) {
   dataframe[[column]] <- replace(dataframe[[column]], is.na(dataframe[[column]]),0)
 
   return(dataframe)
-}
-
-format_theme_ggplot <- function(plot_with_ggplot) {
-  #' Add the following format to the theme of a plot made with ggplot.
-  #'
-  #' Return the plot.
-
-  formatted_plot <- plot_with_ggplot +
-                    theme_bw() +
-                    theme(axis.text = element_text(size = 8),
-                          axis.title = element_text(size = 10),
-                          legend.position = "none",
-                          axis.line = element_line(),
-                          panel.grid = element_blank(),
-                          panel.border = element_blank())
-
-  return(formatted_plot)
 }
 
 format_theme_ggplot_vertical_xaxis_labels <- function(plot_with_ggplot) {
@@ -78,16 +43,4 @@ format_theme_ggplot_vertical_xaxis_labels <- function(plot_with_ggplot) {
                           panel.border = element_blank())
 
   return(formatted_plot)
-}
-
-save_plot <- function(plot_name, filename) {
-  #' Save a specified ggplot to a specific filename.
-  #'
-  #' This function will provide the filepath and concatenate it with the filename.
-
-  filepath <- "../analysis_plots/"
-
-  ggsave(filename, plot_name, path = filepath, device = "png",
-         scale = 1, width = 1000, height = 1000, units = "px", dpi = 300,
-         bg = NULL)
 }
