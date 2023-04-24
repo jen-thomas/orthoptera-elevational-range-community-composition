@@ -56,31 +56,6 @@ get_species_observed_more_than_once <- function(observations_df) {
   return(species_without_singletons)
 }
 
-remove_observations_chorthippus_biguttulus_mollis <- function(observations_df) {
-  #' Some observations could not be separated between Chorthippus biguttulus and Chorthippus mollis. These
-  #' species have been identified at other sites and therefore are not a morphospecies. These observations
-  #' will be removed from the analysis.
-  #'
-  #' Return the observations dataframe without these observations.
-
-  observations_without_chorthippus_biguttulus_mollis <- observations_df[(observations_df$species !=
-    "Chorthippus biguttulus / Chorthippus mollis"), ]
-
-  return(observations_without_chorthippus_biguttulus_mollis)
-}
-
-only_observations_tav_mol <- function(observations_df) {
-  #' Remove observations from Tor, Besan and Bordes de Viros to see if there is any difference in the
-  #' relationship at the more semi-natural sites.
-  #'
-  #' Return dataframe of this subset of observations.
-
-  observations_to_use <- observations_df[(observations_df$area == "La Molinassa" |
-                                          observations_df$area == "Tavascan"), ]
-
-  return(observations_to_use)
-}
-
 #' Get all observations to species only. For this part of the analysis, it is not meaningful to use those
 #' only identified to genus unless this is a morphospecies that can be said to be so across all of the
 #' sites. None of these cases occurred in this study.
@@ -113,7 +88,7 @@ calculate_elevational_range <- function(observations) {
                      # only in one band to have a range of 100m; count the elevational range of the others
                      # as the full potential range they could have been recorded at, which is the max of
                      # the highest band to the min of the lowest band. Because we take the elevational
-                     # band of a site to be the minimum elevation, then we just need to add 100
+                     # band of a site to be the minimum elevation, then we just need to add 100.
                      "elevational_range_midpoint" = min_elevation + elevational_range / 2,
                      "mean_elevation" = mean(elevational_band_m))
 
@@ -122,7 +97,7 @@ calculate_elevational_range <- function(observations) {
 
 plot_elevrange_elevation_species <- function(observations) {
   #' Plot the elevational range against elevation, with each data point coloured by species. Elevation
-  #' here is considered as the midpoint.
+  #' here is considered as the midpoint of the elevational range.
 
     ggplot(observations, aes(x = elevational_range_midpoint, y = elevational_range, colour = species)) +
     geom_point(size = 2) +
@@ -136,8 +111,6 @@ elevational_ranges_species
 par(mfrow = c(1,1))
 plot_elevrange_elevation_species(elevational_ranges_species)
 
-#' This plot isn't particularly useful in itself, it was just helpful to pick out some of the different
-#' species and think about the results a bit more.
 #'
 #' ## Test Rapoport's Rule for elevation
 #'
@@ -152,7 +125,7 @@ plot_elevrange_elevation_species(elevational_ranges_species)
 #' mean elevation of all of the observations of each species. Midpoint is preferred because it is not
 #' biased by potentially more observations at one end of the elevational range.
 #'
-#' The functions below manipulate the data needed for the modelling below.
+#' The functions below, manipulate the data needed for the modelling below.
 
 transform_elevational_range <- function(dataframe) {
   #' Calculate the square-root and log of a parameter to transform it. Add it to a new column in the
@@ -183,15 +156,6 @@ plot_histograms_elevational_range <- function(dataframe) {
   }
 }
 
-plot_elevrange_meanelevation <- function(dataframe) {
-  #' Plot the elevational range as a function of the mean elevation.
-
-  y_param <- dataframe$elevational_range
-  ylab <- "Elevational range (m)"
-
-  plot(y_param ~ mean_elevation, data = dataframe, xlab = "Mean elevation (m a.s.l)", ylab = ylab)
-}
-
 plot_elevrange_midpointelevation <- function(dataframe) {
   #' Plot the elevational range as a function of the measures of elevation.
 
@@ -200,20 +164,6 @@ plot_elevrange_midpointelevation <- function(dataframe) {
 
   plot(jitter(y_param, amount = 20) ~ jitter(elevational_range_midpoint, amount = 20), data = dataframe,
        xlab = "Elevational range midpoint (m a.s.l)", ylab = ylab)
-}
-
-linear_regression_elevrange_elevation <- function(dataframe, elevation_parameter) {
-  #' Do a linear regression of elevational range as a function of elevation. Plot and summarise the
-  #' regression.
-  #'
-  #' Return the regression.
-
-  lin_reg <- lm(dataframe[["elevational_range"]] ~ dataframe[[elevation_parameter]])
-  summary(lin_reg)
-
-  plot(lin_reg)
-
-  return(lin_reg)
 }
 
 calculate_polynomials_elevation <- function(dataframe) {
@@ -294,51 +244,6 @@ plot_quadratic_model <- function(dataframe, model) {
   mtext(equation, side = 3, line = -1)
 }
 
-plot_quadratic_model_predvalues <- function(dataframe, model, filename) {
-  #' Plot the elevational range as a function of elevation (data points) and include the line for the
-  #' predicted values from the quadratic model. Also add the CIs.
-  #'
-  #' Get the parameters from the model output and add the equation of the line to the plot.
-
-  #' Get minimum and maximum values in the dataset
-  i <- seq(min(dataframe$elevational_range_midpoint), max(dataframe$elevational_range_midpoint), len=100) #  x-value limits for line
-
-  #' Calculate the predicted values from the regression so they can be plotted as a line
-  predicted_values <- predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i)) #  fitted values
-  intervals <-  predict(model, data.frame(elevational_range_midpoint=i, elevational_range_midpoint2=i*i), interval = "confidence")
-
-  #' Set up place to save file
-  path <- "../analysis_plots/"
-  filepath <- file.path(path, filename)
-  png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
-
-  plot(x = jitter(dataframe$elevational_range_midpoint, amount = 20),
-       y = jitter(dataframe$elevational_range, amount = 20),
-       pch = c(1, 4)[as.numeric(dataframe$suborder)],
-       xlim = c(1100, 2300), ylim = c(0, 1400),
-       xlab = "Elevational range midpoint (m a.s.l)",
-       ylab = "Elevational range (m)"
-
-  )
-
-  lines(i, predicted_values, lty=1, lwd=1, col="black")
-  lines(i, intervals[ , 3], lty = "dashed", col = "darkgrey")
-  lines(i, intervals[ , 2], lty = "dashed", col = "darkgrey")
-
-  # get the parameter values for the fitted line. Round the coefficients. Plot the equation on the graph.
-  cf <- signif(coef(model), 2)
-
-  int_term <- cf[1]
-  lin_term <- cf[2]
-  quadratic_term <- abs(cf[3])
-
-  equation <- bquote(italic(E[R]) == .(int_term) + .(lin_term)*italic(E) - .(quadratic_term)*italic(E)^2)
-  text(equation, x = 1500, y = 1350, cex = 0.5)
-
-  dev.off()
-
-}
-
 check_model_assumptions <- function(model) {
   #' Plot a histogram of the residuals to check for a normal distribution. Secondly, plot the residuals
   #' against the predicted values, to check for homoscedasticity.
@@ -356,21 +261,14 @@ elevational_ranges_species <- transform_elevational_range(elevational_ranges_spe
 
 plot_histograms_elevational_range(elevational_ranges_species)
 
-#' There is a slight left skew to the data, although it is not strong. Transformations of the elevational
-#' range do not help.
-#'
 #' Plot the relationships between the measures of elevation and the elevational range at which each
 #' species was observed.
 
 par(mfrow = c(1,1))
-#plot_elevrange_meanelevation(elevational_ranges_species)
+
 plot_elevrange_midpointelevation(elevational_ranges_species)
 
-#' From these plots, we can see that the relationship does not appear to be linear.
-#'
-#' There seems to be a non-linear relationship between the elevational range and the mid-point. The
-#' relationship could be quadratic. Test the quadratic, cubic and quartic models. Calculate these
-#' parameters first.
+#' Test the quadratic, cubic and quartic models. Calculate these parameters first.
 
 elevational_ranges_species <- calculate_polynomials_elevation(elevational_ranges_species)
 
@@ -385,9 +283,6 @@ nonlin_reg_quartic <- lin_regs_polynomial[[4]]
 
 compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
-#' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
-#' This model also has the largest adjusted R-squared.
-#'
 #' Do a direct comparison of the difference between the models using ANOVA.
 #' <br>H<sub>0</sub>: there is no difference between the models.
 #' <br>H<sub>1</sub>: there is a difference between the models.
@@ -395,19 +290,14 @@ compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
-#' The comparison of the models shows that the quadratic is significantly better than the linear model,
-#' but that the cubic is not significantly better than quadratic, and the quartic is not significantly
-#' better than the cubic.
-#'
-#' This evidence suggests that the quadratic model should be selected. View the summary of the quadratic
-#' model.
+#' View the summary of the quadratic model.
 
 summary(nonlin_reg_quadratic)
 
 par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic)
 
-#' Get the predicted values for this model
+#' Get the predicted values for this model.
 
 elevational_ranges_species_predicted <- cbind(elevational_ranges_species, predict(nonlin_reg_quadratic, interval = "confidence"))
 
@@ -415,11 +305,6 @@ elevational_ranges_species_predicted <- cbind(elevational_ranges_species, predic
 
 check_model_assumptions(nonlin_reg_quadratic)
 
-#' There appears to be one data point which is skewing the residuals. Including this point, the residuals
-#' do not appear to be distributed normally and there is a trend in the residuals with the
-#' fitted values, suggesting that it violates the assumption of heteroscedasticity. **TODO**: how
-#' sensitive is this model to violation of the assumptions? The data appeared to be bimodal to begin with.
-#' Perhaps this should be corrected?
 #'
 #' ## Test Rapoport's Rule for Caelifera only
 #'
@@ -436,20 +321,10 @@ get_caelifera_observations <- function(observations_df) {
   return(caelifera_observations)
 }
 
-#' Plot elevational range against elevation and colour the points by suborder. Only a small number of
-#' Ensifera are being used in this analysis, so it might be worth considering Caelifera only.
+#' Plot elevational range against elevation and colour the points by suborder.
 
 plot_elevrange_elevation_suborder(elevational_ranges_species)
 
-#' Six Ensifera species were used in the analysis above. There are too few data points to extract a
-#' pattern, or  do a regression. There are notably two species that do not follow the general pattern of
-#' the overall model. These species may have been harder to catch given their life history, and therefore
-#' they may be undersampled. The Ensifera often occurred at elevations which had a higher species richness
-#'  and therefore, it is possible that they were undersampled (there is a reference for this somewhere).
-#' It is also possible that these and some Caelifera species require certain habitats which were not found
-#' in the vicinity of where they were caught, thereby limiting their elevational range compared to what is
-#' suggested by the model.
-#'
 #' For this part of the analysis, consider only Caelifera.
 
 #' Get the Caelifera observations to use.
@@ -468,11 +343,11 @@ par(mfrow = c(1,1))
 plot_histograms_elevational_range(elevational_ranges_caelifera)
 
 #' Plot elevational range against elevation for Caelifera only.
+
 par(mfrow = c(1,1))
 plot_elevrange_midpointelevation(elevational_ranges_caelifera)
 
-#' The relationship between elevation and elevational range again appears to be a quadratic. Run
-#' model for polynomials up to the fourth order and do model selection to choose the most parsimonious
+#' Run model for polynomials up to the fourth order and do model selection to choose the most parsimonious
 #' model.
 
 elevational_ranges_caelifera <- calculate_polynomials_elevation(elevational_ranges_caelifera)
@@ -490,26 +365,18 @@ anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
 
 summary(nonlin_reg_quadratic_caelifera)
 
-#' Get predicted values for this model
+#' Get predicted values for this model.
 
 elevational_ranges_caelifera_predicted <- cbind(elevational_ranges_caelifera, predict(nonlin_reg_quadratic_caelifera, interval = "confidence"))
 
 par(mfrow = c(1,1))
 plot_quadratic_model(elevational_ranges_caelifera, nonlin_reg_quadratic_caelifera)
 
-#' We can see that the quadratic model has the lowest AIC, suggesting it is the best model for these data.
-#' This model also has the largest adjusted R-squared.
-#'
-#' Using ANOVA for a direct comparison between the models, the quadratic model is significantly better
-#' than the linear model and the cubic and quartic models do not show any significant improvement on the
-#' quadratic.
 #'
 #' ### Check models assumptions
 
 check_model_assumptions(nonlin_reg_quadratic_caelifera)
 
-#' It is hard to tell if the assumption of heteroscedasticity is violated or not because there are many
-#' more data points for higher fitted values. The residuals have a left-skewed distribution.
 #'
 #' ## Plots
 #'
@@ -521,20 +388,24 @@ check_model_assumptions(nonlin_reg_quadratic_caelifera)
 
 #' ### All species
 
-#' Get min and max of values on plot ready for predictions
+#' Get min and max of values on plot ready for predictions.
+
 i_all_sp <- seq(min(elevational_ranges_species_predicted$elevational_range_midpoint),
          max(elevational_ranges_species_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
 
-#' Calculate the predicted values from the regression so they can be plotted as a line
+#' Calculate the predicted values from the regression so they can be plotted as a line.
+
 predicted_values_all_sp <- predict(nonlin_reg_quadratic,
                             data.frame(elevational_range_midpoint=i_all_sp, elevational_range_midpoint2=i_all_sp*i_all_sp)) #  fitted values
 intervals_all_sp <-  predict(nonlin_reg_quadratic,
                       data.frame(elevational_range_midpoint=i_all_sp, elevational_range_midpoint2=i_all_sp*i_all_sp), interval = "confidence")
 
-#' Put the values into a dataframe
+#' Put the values into a dataframe.
+
 confidence_bands_all_sp <- data.frame(i_all_sp, intervals_all_sp)
 
-#' Get the coefficients of the equation and put these into text
+#' Get the coefficients of the equation and put these into text.
+
 cf_all_sp <- signif(coef(nonlin_reg_quadratic), 2)
 
 int_term_all_sp <- cf_all_sp[1]
@@ -543,12 +414,14 @@ quadratic_term_all_sp <- abs(cf_all_sp[3])
 
 equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp)*italic(E) - .(quadratic_term_all_sp)*italic(E)^2)
 
-#' Create the output plot file
+#' Create the output plot file.
+
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_elevational_range_model.png")
 png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
-#' Do the plot
+#' Do the plot.
+
 plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicted,
              aes(x = elevational_range_midpoint, y = elevational_range)) +
   geom_jitter(aes(shape = suborder), size = 1.8, show.legend = FALSE, width = 30, height = 20) +
@@ -565,27 +438,31 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
        y = "Elevational range (m)") +
   theme_classic()
 
-#' Plot and save
+#' Plot and save.
+
 plot_elev_range_all_species
 dev.off()
 
 #' ### Only Caelifera
 
-#' Get min and max of values on plot ready for predictions
+#' Get min and max of values on plot ready for predictions.
 
 i_cael <- seq(min(elevational_ranges_caelifera_predicted$elevational_range_midpoint),
          max(elevational_ranges_caelifera_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
 
-#' Calculate the predicted values from the regression so they can be plotted as a line
+#' Calculate the predicted values from the regression so they can be plotted as a line.
+
 predicted_values_cael <- predict(nonlin_reg_quadratic_caelifera,
                             data.frame(elevational_range_midpoint=i_cael, elevational_range_midpoint2=i_cael*i_cael)) #  fitted values
 intervals_cael <-  predict(nonlin_reg_quadratic_caelifera,
                       data.frame(elevational_range_midpoint=i_cael, elevational_range_midpoint2=i_cael*i_cael), interval = "confidence")
 
-#' Put the values into a dataframe
+#' Put the values into a dataframe.
+
 confidence_bands_cael <- data.frame(i_cael, intervals_cael)
 
-#' Get the coefficients of the equation and put these into text
+#' Get the coefficients of the equation and put these into text.
+
 cf_cael <- signif(coef(nonlin_reg_quadratic_caelifera), 2)
 
 int_term_cael <- cf_cael[1]
@@ -594,12 +471,14 @@ quadratic_term_cael <- abs(cf_cael[3])
 
 equation_cael <- bquote(italic(E[R]) == .(int_term_cael) + .(lin_term_cael)*italic(E) - .(quadratic_term_cael)*italic(E)^2)
 
-#' Create the output plot file
+#' Create the output plot file.
+
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_elevational_range_model_caelifera.png")
 png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
-#' Do the plot
+#' Do the plot.
+
 plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicted,
              aes(x = elevational_range_midpoint, y = elevational_range)) +
   geom_jitter(shape = 1, size = 1.8, show.legend = FALSE, width = 30, height = 20) +
@@ -615,7 +494,8 @@ plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicte
        y = "Elevational range (m)") +
   theme_classic()
 
-#' Plot and save
+#' Plot and save.
+
 plot_elev_range_caelifera
 dev.off()
 
@@ -623,7 +503,8 @@ dev.off()
 #'
 #' Ordered by decreasing elevational range midpoint.
 
-#' Create the output plot file
+#' Create the output plot file.
+
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png")
 png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
