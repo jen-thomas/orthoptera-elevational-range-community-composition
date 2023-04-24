@@ -35,7 +35,11 @@ calculate_mean_veg_parameters <- function(vegetation_df) {
                                 "mean_density_05" = mean(density_05),
                       )
 
-  vegetation_averaged_df$mean_density <- rowMeans(vegetation_averaged_df[ ,c("mean_density_01", "mean_density_02", "mean_density_03", "mean_density_04", "mean_density_05")])
+  vegetation_averaged_df$mean_density <- rowMeans(vegetation_averaged_df[ ,c("mean_density_01",
+                                                                             "mean_density_02",
+                                                                             "mean_density_03",
+                                                                             "mean_density_04",
+                                                                             "mean_density_05")])
   return(vegetation_averaged_df)
 }
 
