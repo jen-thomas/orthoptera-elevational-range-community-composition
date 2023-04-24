@@ -5,8 +5,6 @@
 .RData
 .Ruserdata
 
-analysis_scripts/Rplots.pdf
-
 renv/
 .idea/
 analysis_plots/
@@ -14,7 +12,5 @@ analysis_outputs/
 analysis_plots_thesis/
 analysis_outputs_thesis/
 data/*csv
-data/*json
 data/dem/
 data/worldclim/
-metadata/
