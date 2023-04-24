@@ -329,7 +329,7 @@ ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", ty
 plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
-
+0
 orditorp(ordination_plot, "sites", # I like this, it looks much better
      col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
      air = 0.3, cex = 0.7, pch = NA,
