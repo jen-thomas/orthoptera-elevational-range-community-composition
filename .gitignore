@@ -13,4 +13,4 @@ analysis_plots_thesis/
 analysis_outputs_thesis/
 data/*csv
 data/dem/
-data/worldclim/
+metadata/
