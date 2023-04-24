@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tavascan site 09</name>
+  <trkseg>
+  <trkpt lat="42.685714733289124" lon="1.2460998293609618">
+  </trkpt>
+  <trkpt lat="42.68611300490936" lon="1.2471995350570677">
+  </trkpt>
+  <trkpt lat="42.68611300490936" lon="1.2471995350570677">
+  </trkpt>
+  <trkpt lat="42.68611694817996" lon="1.2471968528480528">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

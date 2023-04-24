@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tavascan site 01</name>
+  <trkseg>
+  <trkpt lat="42.722805468" lon="1.242704233">
+    <ele>2216.94</ele>
+    <time>2021-06-30T09:14:53Z</time>
+  </trkpt>
+  <trkpt lat="42.722841175" lon="1.242627287">
+    <ele>2218.38</ele>
+    <time>2021-06-30T09:15:17Z</time>
+  </trkpt>
+  <trkpt lat="42.722866991" lon="1.242572973">
+    <ele>2219.82</ele>
+    <time>2021-06-30T09:15:25Z</time>
+  </trkpt>
+  <trkpt lat="42.722885767" lon="1.242483454">
+    <ele>2218.38</ele>
+    <time>2021-06-30T09:15:33Z</time>
+  </trkpt>
+  <trkpt lat="42.722955421" lon="1.242407681">
+    <ele>2219.82</ele>
+    <time>2021-06-30T09:15:45Z</time>
+  </trkpt>
+  <trkpt lat="42.723048124" lon="1.242327802">
+    <ele>2222.71</ele>
+    <time>2021-06-30T09:15:59Z</time>
+  </trkpt>
+  <trkpt lat="42.723112497" lon="1.242285222">
+    <ele>2223.67</ele>
+    <time>2021-06-30T09:16:14Z</time>
+  </trkpt>
+  <trkpt lat="42.723141415" lon="1.242226884">
+    <ele>2225.59</ele>
+    <time>2021-06-30T09:16:30Z</time>
+  </trkpt>
+  <trkpt lat="42.723166142" lon="1.242141807">
+    <ele>2229.43</ele>
+    <time>2021-06-30T09:16:45Z</time>
+  </trkpt>
+  <trkpt lat="42.723197993" lon="1.242047176">
+    <ele>2230.88</ele>
+    <time>2021-06-30T09:17:01Z</time>
+  </trkpt>
+  <trkpt lat="42.723249374" lon="1.241979115">
+    <ele>2232.32</ele>
+    <time>2021-06-30T09:17:16Z</time>
+  </trkpt>
+  <trkpt lat="42.723276196" lon="1.241879538">
+    <ele>2233.76</ele>
+    <time>2021-06-30T09:17:33Z</time>
+  </trkpt>
+  <trkpt lat="42.723284159" lon="1.241822038">
+    <ele>2234.24</ele>
+    <time>2021-06-30T09:17:48Z</time>
+  </trkpt>
+  <trkpt lat="42.723278459" lon="1.241826229">
+    <ele>2234.24</ele>
+    <time>2021-06-30T09:18:29Z</time>
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

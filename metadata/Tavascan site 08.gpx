@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tavascan site 08</name>
+  <trkseg>
+  <trkpt lat="42.68404678962578" lon="1.2452775993362426">
+  </trkpt>
+  <trkpt lat="42.684113334487066" lon="1.2453419723526">
+  </trkpt>
+  <trkpt lat="42.68418086514513" lon="1.2454707183853149">
+  </trkpt>
+  <trkpt lat="42.68418973777959" lon="1.2456718840614318">
+  </trkpt>
+  <trkpt lat="42.68416114817514" lon="1.2457630791679382">
+  </trkpt>
+  <trkpt lat="42.684184808538376" lon="1.2458220877662658">
+  </trkpt>
+  <trkpt lat="42.684184808538376" lon="1.2459240117088317">
+  </trkpt>
+  <trkpt lat="42.68427353482027" lon="1.2459240117088317">
+  </trkpt>
+  <trkpt lat="42.68439775140204" lon="1.2459454693809509">
+  </trkpt>
+  <trkpt lat="42.68444310025096" lon="1.2461707749382018">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

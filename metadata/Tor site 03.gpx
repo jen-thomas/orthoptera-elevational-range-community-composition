@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tor site 03</name>
+  <trkseg>
+  <trkpt lat="42.54561982862378" lon="1.419174925235367">
+  </trkpt>
+  <trkpt lat="42.545652434075436" lon="1.4190770246063233">
+  </trkpt>
+  <trkpt lat="42.54568800363955" lon="1.4189268209014894">
+  </trkpt>
+  <trkpt lat="42.545721597098144" lon="1.4188141681228639">
+  </trkpt>
+  <trkpt lat="42.54575123837012" lon="1.4187068797622682">
+  </trkpt>
+  <trkpt lat="42.54576507095891" lon="1.4185633815799714">
+  </trkpt>
+  <trkpt lat="42.545777915502896" lon="1.4184064723526002">
+  </trkpt>
+  <trkpt lat="42.545778903544615" lon="1.418273703006363">
+  </trkpt>
+  <trkpt lat="42.54578977200267" lon="1.4182213999305726">
+  </trkpt>
+  <trkpt lat="42.545829293652375" lon="1.4181758023773194">
+  </trkpt>
+  <trkpt lat="42.54584609034592" lon="1.4180416919265748">
+  </trkpt>
+  <trkpt lat="42.54585992291368" lon="1.4179826833282472">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

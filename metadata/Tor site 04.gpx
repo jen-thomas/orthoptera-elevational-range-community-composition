@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tor site 04</name>
+  <trkseg>
+  <trkpt lat="42.55120975979419" lon="1.4162186318077088">
+  </trkpt>
+  <trkpt lat="42.55129373597798" lon="1.4163554244674683">
+  </trkpt>
+  <trkpt lat="42.551393519296525" lon="1.4165391557849885">
+  </trkpt>
+  <trkpt lat="42.55154862770271" lon="1.4168610208667756">
+  </trkpt>
+  <trkpt lat="42.551745229523476" lon="1.417211049143219">
+  </trkpt>
+  <trkpt lat="42.551745229523476" lon="1.417211049143219">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

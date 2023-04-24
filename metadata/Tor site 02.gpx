@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tor site 02</name>
+  <trkseg>
+  <trkpt lat="42.57108532802363" lon="1.3886604923802461">
+  </trkpt>
+  <trkpt lat="42.57115446286254" lon="1.3889018911915865">
+  </trkpt>
+  <trkpt lat="42.57121174595672" lon="1.3890950102406587">
+  </trkpt>
+  <trkpt lat="42.57127100427465" lon="1.389276059349164">
+  </trkpt>
+  <trkpt lat="42.57129767049936" lon="1.3894276041585054">
+  </trkpt>
+  <trkpt lat="42.571315447976154" lon="1.3895483035641756">
+  </trkpt>
+  <trkpt lat="42.571392483650406" lon="1.3898071367341127">
+  </trkpt>
+  <trkpt lat="42.571392483650406" lon="1.3898071367341127">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>La Molinassa site 02</name>
+  <trkseg>
+  <trkpt lat="42.617884005143125" lon="1.4251336733341218">
+  </trkpt>
+  <trkpt lat="42.61787018854538" lon="1.4250223616600037">
+  </trkpt>
+  <trkpt lat="42.61789288724006" lon="1.4249526242256165">
+  </trkpt>
+  <trkpt lat="42.61791657282569" lon="1.4249110499858857">
+  </trkpt>
+  <trkpt lat="42.61792644181703" lon="1.4248708168506623">
+  </trkpt>
+  <trkpt lat="42.61789190034046" lon="1.424842653656006">
+  </trkpt>
+  <trkpt lat="42.61786525404545" lon="1.4248104671478272">
+  </trkpt>
+  <trkpt lat="42.61783268633605" lon="1.424752799654007">
+  </trkpt>
+  <trkpt lat="42.617797157906374" lon="1.424704519891739">
+  </trkpt>
+  <trkpt lat="42.61778136748668" lon="1.4246334413528443">
+  </trkpt>
+  <trkpt lat="42.61777544607826" lon="1.424563703918457">
+  </trkpt>
+  <trkpt lat="42.61776557706297" lon="1.4245167652606965">
+  </trkpt>
+  <trkpt lat="42.61773399620356" lon="1.4244751910209656">
+  </trkpt>
+  <trkpt lat="42.61770340223073" lon="1.4244483689308167">
+  </trkpt>
+  <trkpt lat="42.617688598690094" lon="1.4244054535865784">
+  </trkpt>
+  <trkpt lat="42.61770142842552" lon="1.4243276695251466">
+  </trkpt>
+  <trkpt lat="42.61772017957254" lon="1.4242914597034455">
+  </trkpt>
+  <trkpt lat="42.61776064255475" lon="1.4242673198223115">
+  </trkpt>
+  <trkpt lat="42.61779814480747" lon="1.4242498854637147">
+  </trkpt>
+  <trkpt lat="42.617825778031865" lon="1.4242337922096253">
+  </trkpt>
+  <trkpt lat="42.61786624094547" lon="1.424190876865387">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

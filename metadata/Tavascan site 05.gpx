@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tavascan site 05</name>
+  <trkseg>
+  <trkpt lat="42.71669085597702" lon="1.2392270911045076">
+  </trkpt>
+  <trkpt lat="42.71663272134453" lon="1.239264642030716">
+  </trkpt>
+  <trkpt lat="42.716583454664196" lon="1.2392780530757905">
+  </trkpt>
+  <trkpt lat="42.7165272906009" lon="1.2392726886577607">
+  </trkpt>
+  <trkpt lat="42.716478023836856" lon="1.2393316972560884">
+  </trkpt>
+  <trkpt lat="42.71641693299513" lon="1.239363883764267">
+  </trkpt>
+  <trkpt lat="42.71634697405412" lon="1.2393987524814607">
+  </trkpt>
+  <trkpt lat="42.71630460451628" lon="1.2394014346904756">
+  </trkpt>
+  <trkpt lat="42.71622676273185" lon="1.2394403267211915">
+  </trkpt>
+  <trkpt lat="42.71617355436731" lon="1.2394591021842958">
+  </trkpt>
+  <trkpt lat="42.71609866844364" lon="1.2394765365428926">
+  </trkpt>
+  <trkpt lat="42.71604447462672" lon="1.2394725132293702">
+  </trkpt>
+  <trkpt lat="42.715917365306815" lon="1.2394591021842958">
+  </trkpt>
+  <trkpt lat="42.715992251449286" lon="1.239465807706833">
+  </trkpt>
+  <trkpt lat="42.715992251449286" lon="1.239465807706833">
+  </trkpt>
+  <trkpt lat="42.715992251449286" lon="1.239465807706833">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

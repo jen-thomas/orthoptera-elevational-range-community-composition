@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Besan site 02</name>
+  <trkseg>
+  <trkpt lat="42.53949509044498" lon="1.2720568689491272">
+  </trkpt>
+  <trkpt lat="42.53951188884272" lon="1.2722566935207367">
+  </trkpt>
+  <trkpt lat="42.53950694813797" lon="1.2724310371067047">
+  </trkpt>
+  <trkpt lat="42.53948916159765" lon="1.2725933107521057">
+  </trkpt>
+  <trkpt lat="42.53946445806102" lon="1.2727515610839844">
+  </trkpt>
+  <trkpt lat="42.53944765965052" lon="1.2729084703113556">
+  </trkpt>
+  <trkpt lat="42.53943283751987" lon="1.2730761083747864">
+  </trkpt>
+  <trkpt lat="42.539425920524366" lon="1.2732692274238586">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

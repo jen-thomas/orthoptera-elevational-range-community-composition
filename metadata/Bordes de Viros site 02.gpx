@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Bordes de Viros site 02</name>
+  <trkseg>
+  <trkpt lat="42.53066635695302" lon="1.277613591609955">
+  </trkpt>
+  <trkpt lat="42.53067920460315" lon="1.2776779646263123">
+  </trkpt>
+  <trkpt lat="42.530696005372405" lon="1.2777557486877442">
+  </trkpt>
+  <trkpt lat="42.53073948969539" lon="1.2778160983905793">
+  </trkpt>
+  <trkpt lat="42.53075727872788" lon="1.277887176929474">
+  </trkpt>
+  <trkpt lat="42.53078890366203" lon="1.2779274100646973">
+  </trkpt>
+  <trkpt lat="42.53081262235212" lon="1.2779528910503388">
+  </trkpt>
+  <trkpt lat="42.53085215348228" lon="1.2779850775585175">
+  </trkpt>
+  <trkpt lat="42.53094208671017" lon="1.2780387217388154">
+  </trkpt>
+  <trkpt lat="42.53098260603426" lon="1.2780789548740388">
+  </trkpt>
+  <trkpt lat="42.53105475013162" lon="1.2781191880092622">
+  </trkpt>
+  <trkpt lat="42.53108933973777" lon="1.2781714910850526">
+  </trkpt>
+  <trkpt lat="42.531102187300895" lon="1.2782573217735291">
+  </trkpt>
+  <trkpt lat="42.531080445269446" lon="1.2783270592079163">
+  </trkpt>
+  <trkpt lat="42.531094281108516" lon="1.2784759218082429">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>

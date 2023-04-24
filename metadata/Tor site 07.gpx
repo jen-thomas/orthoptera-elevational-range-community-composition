@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<gpx version="1.0"
+creator="Viking 1.7 -- http://viking.sf.net/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<trk>
+  <name>Tor site 07</name>
+  <trkseg>
+  <trkpt lat="42.56376758970801" lon="1.4143343674417497">
+  </trkpt>
+  <trkpt lat="42.563737956991886" lon="1.4143933760400773">
+  </trkpt>
+  <trkpt lat="42.56374882232276" lon="1.4144778656240464">
+  </trkpt>
+  <trkpt lat="42.563726103901494" lon="1.414539556431389">
+  </trkpt>
+  <trkpt lat="42.563700422197925" lon="1.4146320926424027">
+  </trkpt>
+  <trkpt lat="42.56370338547195" lon="1.4147071944948197">
+  </trkpt>
+  <trkpt lat="42.56366980169138" lon="1.4148118006464006">
+  </trkpt>
+  <trkpt lat="42.563665850657195" lon="1.4148775147672654">
+  </trkpt>
+  <trkpt lat="42.56371918959772" lon="1.41476486198864">
+  </trkpt>
+  <trkpt lat="42.56374289577888" lon="1.4147098767038346">
+  </trkpt>
+  <trkpt lat="42.56377154073576" lon="1.4146736668821336">
+  </trkpt>
+  <trkpt lat="42.563841671436734" lon="1.4146200227018357">
+  </trkpt>
+  <trkpt lat="42.56389402247199" lon="1.4145851539846421">
+  </trkpt>
+  <trkpt lat="42.56395526324994" lon="1.4145744251485826">
+  </trkpt>
+  <trkpt lat="42.56403922228329" lon="1.4145677196260453">
+  </trkpt>
+  <trkpt lat="42.56403922228329" lon="1.4145677196260453">
+  </trkpt>
+  </trkseg>
+</trk>
+</gpx>
