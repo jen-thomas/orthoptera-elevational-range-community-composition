@@ -9,12 +9,14 @@
 
 #' <br>Import functions from other files.
 #+ message=FALSE, warning=FALSE
+
 source("utils.R")
 
 #' ## Set-up
 
 #' Install packages.
 #+ message=FALSE, warning=FALSE
+
 vector_packages <- c("fossil", "stringr", "tidyr", "dplyr")
 get_packages(vector_packages)
 
@@ -74,7 +76,7 @@ join_site_survey <- function(sites_df, surveys_df) {
 
 #' ### Create summaries of observation data
 #' Depending on the analysis, the observations may need to be subsetted to take into account the taxonomic
-#' level which they have been identified.
+#' level to which they have been identified.
 
 import_all_observations <- function(observations_file, sites_file) {
     #' Import all observations and prepare the data frame with the extra metadata from sites.
@@ -171,19 +173,6 @@ count_observations_of_species <- function(observations_df) {
   return(observations_count_species)
 }
 
-count_sites_where_species_observed <- function(observations_df) {
-  #' Count the number of sites at which each species was observed.
-  #'
-  #' Return dataframe of species and number of sites.
-
-  sites_species_observed <- observations_df %>%
-    distinct(species, site_elevation) %>%
-    group_by(species) %>%
-    dplyr::summarise("number_sites" = n())
-
-  return(sites_species_observed)
-}
-
 get_unique_taxa <- function(observations) {
   #' Get the unique taxa observed from the observations.
   #'
@@ -200,15 +189,19 @@ get_unique_taxa <- function(observations) {
 
   observations_genus <- filter(observations_tax_levels, (genus != "") & (species == ""))
   distinct_genus <- distinct(observations_genus)
-  in_genus_not_species <- anti_join(distinct_genus, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  in_genus_not_species <- anti_join(distinct_genus, taxa_df,
+                                    by = c('suborder', 'family', 'subfamily', 'genus'))
   taxa_df <- rbind(taxa_df, in_genus_not_species)
 
-  observations_subfamily <- filter(observations_tax_levels, (subfamily != "") & (genus == "") & (species == ""))
+  observations_subfamily <- filter(observations_tax_levels,
+                                   (subfamily != "") & (genus == "") & (species == ""))
   distinct_subfamily <- distinct(observations_subfamily)
-  in_subfamily_not_taxa <- anti_join(distinct_subfamily, taxa_df, by = c('suborder', 'family', 'subfamily'))
+  in_subfamily_not_taxa <- anti_join(distinct_subfamily, taxa_df,
+                                     by = c('suborder', 'family', 'subfamily'))
   taxa_df <- rbind(taxa_df, in_subfamily_not_taxa)
 
-  observations_family <- filter(observations_tax_levels, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
+  observations_family <- filter(observations_tax_levels,
+                                (family != "") & (subfamily == "") & (genus == "") & (species == ""))
   distinct_family <- distinct(observations_family)
   in_family_not_taxa <- anti_join(distinct_family, taxa_df, by = c('suborder', 'family'))
   taxa_df <- rbind(taxa_df, in_family_not_taxa)
@@ -253,7 +246,8 @@ calculate_sampling_weights <- function(observations) {
   observations_by_method <- observations %>%
     distinct(site_elevation, method, specimen_label) %>%
     group_by(site_elevation) %>%
-    dplyr::summarise("number_observations_by_net" = sum(method == "Net"), "number_observations_by_hand" = sum(method == "Hand"))
+    dplyr::summarise("number_observations_by_net" = sum(method == "Net"),
+                     "number_observations_by_hand" = sum(method == "Hand"))
 
   total_obs_hand <- colSums(observations_by_method[ , "number_observations_by_hand"])
   total_obs_net <- colSums(observations_by_method[ , "number_observations_by_net"])
@@ -263,7 +257,8 @@ calculate_sampling_weights <- function(observations) {
   weighting_net <- total_obs_net / total_obs
 
   sampling_effort <- observations_by_method %>%
-    mutate(sampling_effort_index = (number_observations_by_hand * weighting_hand) + (number_observations_by_net * weighting_net))
+    mutate(sampling_effort_index = (number_observations_by_hand * weighting_hand) +
+      (number_observations_by_net * weighting_net))
 
   return(sampling_effort)
 }
@@ -274,18 +269,6 @@ join_observations <- function(confirmed_observations, finalised_observations) {
   all_observations <- rbind(confirmed_observations, finalised_observations)
 
   return(all_observations)
-}
-
-get_data_into_format_for_ancova<- function(species_richness_conservative, species_richness_notconservative) {
-  #' Put data into dataframe format for comparing two groups.
-  #'
-  #' Return dataframe.
-
-  species_richness_conservative$category <- "conservative"
-  species_richness_notconservative$category <- "notconservative"
-
-  all_species_richness <- rbind(species_richness_conservative, species_richness_notconservative)
-  return(all_species_richness)
 }
 
 get_unique_taxa_site <- function(all_observations) {
@@ -324,18 +307,23 @@ get_unique_taxa_all_sites <- function(unique_taxa_sites) {
   taxa_df <- observations_species
 
   observations_genus <- filter(unique_taxa_sites, (genus != "") & (species == ""))
-  in_genus_not_species <- anti_join(observations_genus, taxa_df, by = c('suborder', 'family', 'subfamily', 'genus'))
+  in_genus_not_species <- anti_join(observations_genus, taxa_df,
+                                    by = c('suborder', 'family', 'subfamily', 'genus'))
   taxa_df <- rbind(taxa_df, in_genus_not_species)
 
   observations_subfamily <- filter(unique_taxa_sites, (subfamily != "") & (genus == "") & (species == ""))
-  in_subfamily_not_taxa <- anti_join(observations_subfamily, taxa_df, by = c('suborder', 'family', 'subfamily'))
+  in_subfamily_not_taxa <- anti_join(observations_subfamily, taxa_df,
+                                     by = c('suborder', 'family', 'subfamily'))
   taxa_df <- rbind(taxa_df, in_subfamily_not_taxa)
 
-  observations_family <- filter(unique_taxa_sites, (family != "") & (subfamily == "") & (genus == "") & (species == ""))
-  in_family_not_taxa <- anti_join(observations_family, taxa_df, by = c('suborder', 'family'))
+  observations_family <- filter(unique_taxa_sites,
+                                (family != "") & (subfamily == "") & (genus == "") & (species == ""))
+  in_family_not_taxa <- anti_join(observations_family, taxa_df,
+                                  by = c('suborder', 'family'))
   taxa_df <- rbind(taxa_df, in_family_not_taxa)
 
-  taxa_df <- taxa_df[!(taxa_df$taxa == "Gomphocerus / Gomphoceridius" | taxa_df$taxa=="Chorthippus biguttulus / Chorthippus mollis"),]
+  taxa_df <- taxa_df[!(taxa_df$taxa == "Gomphocerus / Gomphoceridius" |
+                      taxa_df$taxa=="Chorthippus biguttulus / Chorthippus mollis"),]
 
   return(taxa_df)
 }
@@ -358,8 +346,10 @@ create_short_area_code <- function(dataframe) {
   df_with_combined_code <- df_with_area_code %>%
     mutate(short_code_elevation = paste0(area_short_code, " ", elevational_band_m))
 
-  df_with_combined_code["short_code_elevation"][df_with_combined_code["area"] == "Besan" & df_with_combined_code["elevational_band_m"] == 1100] <- "VFE 1100a"
-  df_with_combined_code["short_code_elevation"][df_with_combined_code["area"] == "Bordes de Viros" & df_with_combined_code["elevational_band_m"] == 1100] <- "VFE 1100b"
+  df_with_combined_code["short_code_elevation"][df_with_combined_code["area"] ==
+                  "Besan" & df_with_combined_code["elevational_band_m"] == 1100] <- "VFE 1100a"
+  df_with_combined_code["short_code_elevation"][df_with_combined_code["area"] ==
+                  "Bordes de Viros" & df_with_combined_code["elevational_band_m"] == 1100] <- "VFE 1100b"
 
   return(df_with_combined_code)
 }
