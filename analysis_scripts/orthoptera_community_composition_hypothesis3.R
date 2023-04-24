@@ -77,7 +77,7 @@ sampling_effort <- calculate_sampling_weights(all_observations_conservative)
 unique_taxa_sites <- get_unique_taxa_site(all_observations_conservative)
 
 #' Get unique taxa across all sites so that higher taxa do not include taxa that may already have been
-#' observed at the same or different sites. Also remove records where the taxa was one of multiple taxa,
+#' observed at the same or different sites. Also, remove records where the taxa was one of multiple taxa,
 #' but only if they have all been observed, or could have been observed at the same or other sites. The
 #' site-species matrix that this produces will therefore be on the conservative side.
 
@@ -107,15 +107,15 @@ vegetation_averaged_df <- prepare_veg_data(sites_file, vegetation_file)
 
 dem_study_areas <- get_dem_data()
 
-#' Plot DEM to get an overview. Only the areas of the DEM files are displayed. Also look at the number of
-#' layers within the raster, the coordinate system and get an overview of the data.
+#' Plot DEM to get an overview. Only the areas covered by the DEM files are displayed. Look at the number
+#' of layers within the raster, the coordinate system and get an overview of the data.
 #+ message=FALSE, warning=FALSE
 
 get_overview_dem(dem_study_areas)
 
 #' Calculate the slope and aspect along each transect.
 #'
-#' Each transect was recorded as a number of points. These transects were imported into R
+#' Each transect was recorded as a number of points. These transects were imported into R,
 #' and using the sp package, were extrapolated into a line. Using the rgeos and terra packages, slope and
 #' aspect values were averaged from the four nearest raster cells, every 2m along the transect. These
 #' values of slope and aspect were then averaged, to get one value for each site.
@@ -133,13 +133,6 @@ site_var_data <- left_join(site_env_var_data, sampling_effort, by = "site_elevat
 
 check_collinearity(site_var_data)
 
-#' Looking at the previous plots we can see that there seems to be some collinearity between the two
-#' measures of vegetation height. Given that the maximum vegetation height can just represent one piece of
-#' vegetation within the plots, the mean 75% height of vegetation in the plot is a more suitable measure
-#' of the vegetation across the plots at a site. As expected, the compositional data representing three
-#' measures of ground cover in terms of percentages, are also correlated. The vegetation ground cover will
-#' be used in this analysis.
-#'
 #' Prepare the matrix of environmental variables to be used in the next part of the analysis. Only include
 #' site elevation, aspect, slope, vegetation height, vegetation ground cover and vegetation density.
 
@@ -154,16 +147,15 @@ env_var_matrix <- create_env_var_matrix(site_var_data)
 species_jaccard_dist <- vegdist(site_species_matrix, method = "jaccard")
 species_jaccard_dist
 
-#' Convert dissimilarity indices to matrix because they cannot be used in the kmeans function as they are.
-#' Now both the upper and lower halves of the matrix will be the same.
+#' Convert dissimilarity indices to a matrix because they cannot be used in the k-means function as they
+#' are. Now, both the upper and lower halves of the matrix will be the same.
 
 species_jaccard_dist_matrix <- as.matrix(species_jaccard_dist)
 species_jaccard_dist_matrix
 
-#'
 #' ## K-means cluster analysis
 
-#' Determine the number of clusters to use for K-means clustering. Firstly, calculate the within group sum
+#' Determine the number of clusters to use for K-means clustering. Firstly, calculate the within-group sum
 #' of squares if we consider up to fifteen clusters. Plot these and look for the step of where the sum of
 #' squares decreases. Code adapted from https://www.statmethods.net/advstats/cluster.html
 
@@ -171,9 +163,6 @@ wss <- (nrow(species_jaccard_dist_matrix) - 1) * sum(apply(species_jaccard_dist_
 for (i in 2:15) wss[i] <- sum(kmeans(species_jaccard_dist_matrix, centers=i)$withinss)
 plot(1:15, wss, type = "b", xlab = "Number of clusters", ylab = "Within groups sum of squares")
 
-#' There is no clear difference in this scree plot to identify the number of clusters to choose. From 5
-#' onwards, there seems to be a slight flattening, so this might be reasonable.
-#'
 #' Use the Silhouette scores to see if 5 sounds like a reasonable number of clusters. Find where the
 #' maximum is reached.
 
@@ -196,24 +185,6 @@ for (name in names(kmeans_fit$cluster)) {
 kmeans_fit_clusters <- kmeans_fit$cluster
 species_jaccard_dist_matrix[order(kmeans_fit_clusters), ]
 kmeans_fit_clusters
-
-#' There seems to be one cluster which includes the low sites at Besan (BES) and les Bordes de Viros
-#' (BOR), a few mid-elevation sites at Tor (where there was quite a lot of grazing and generally human
-#' activity, and strangely, the two highest sites of all the survey sites, at la Molinassa (MOL). Maybe
-#' these high-altitude sites are included because there was only one species recorded at each.
-#'
-#' Another cluster includes the higher elevation sites at Tor which range from 1900-2300 m, and two
-#' mid-high elevation sites from Tavascan (1800-1900).
-#'
-#' One cluster has only two sites at la Molinassa (2100-2200 m) and another has the higher elevation sites
-#' at Tavascan with one at 2300 at La Molinassa. This latter cluster includes sites which were grazed only
-#' sparsely and for a short period during the height of the summer.
-#'
-#' Finally, the last cluster has a mixture of one low-elevation site from Tor, some mid-elevation sites
-#' from Tavascan, which were meadows with long grass. The lower of the two was well-grazed and fairly
-#' damp. There was quite a lot of human activity in this area. It also included three mid-high elevation
-#' sites at La Molinassa.
-#'
 
 #' ### Test for any difference between the clusters in terms of each of the environmental variables.
 
@@ -250,9 +221,6 @@ with(env_var_matrix, {
   print(kruskal.test(sampling_effort_index ~ as.factor(kmeans_fit_clusters)))
 })
 
-#' None of the tests resulted in significant P-values so we were not able to reject the null hypothesis
-#' that there was any difference between each of the individual environmental variables within each
-#' cluster.
 #'
 #' ## NMDS
 #'
@@ -262,9 +230,6 @@ with(env_var_matrix, {
 par(mfrow=c(1,1))
 dimcheckMDS(site_species_matrix, dist = "jaccard")
 
-#' The results of this show there is still quite a change in stress between 2 and 3 dimensions so consider
-#' both. Two dimensions would be preferable for visualisation and the stress is still reasonable.
-#'
 #' The metaMDS function automatically transforms data, runs the NMDS and checks solution robustness
 
 set.seed(10)
@@ -272,7 +237,7 @@ species_jaccard_dist_mds_2dim <- metaMDS(site_species_matrix, k = 2, distance = 
                                          trace = TRUE)
 print("Do NMDS")
 
-#' Get the stress value for 2 dimension
+#' Get the stress value for 2 dimensions.
 
 print(species_jaccard_dist_mds_2dim["stress"])
 
@@ -280,9 +245,6 @@ print(species_jaccard_dist_mds_2dim["stress"])
 
 par(mfrow=c(1,1))
 stressplot(species_jaccard_dist_mds_2dim)
-
-#' There is not a lot of scatter around the line but there are lots of points where the dissimilarity is
-#' 1 (which is where we have lots of zeros in our matrix).
 
 #' Calculate and plot environmental variable correlations with the axes. Display the environmental
 #' variables. Note that even though they are plotted, this does not mean they are significant.
@@ -300,7 +262,7 @@ env_data_fit_sites
 #' ## Plots
 
 #' Do the same plot but for sites with the environmental variables and colour the points by the cluster
-#' group
+#' group.
 #+ message=FALSE, warning=FALSE
 
 #' Method modified from https://www.davidzeleny.net/anadat-r/doku.php/en:ordiagrams_examples
@@ -310,12 +272,14 @@ env_var_matrix_code <- create_short_area_code(env_var_matrix)
 remove_rownames(env_var_matrix_code)
 rownames(env_var_matrix_code) <- env_var_matrix_code$short_code_elevation
 
-#' Create the output plot file
+#' Create the output plot file.
+
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis3_nmds.png")
 png(file = filepath, width = 2000, height = 1900, units = "px", bg = "white", res = 300)
 
 #' Use these vectors to label the environmental variables.
+
 list_vectors <- c("Elevation band", "Sampling effort", "Slope", "Vegetation cover",
                        "Vegetation height", "Vegetation density")
 list_factors <- c("", "", "", "", "", "", "", "", "") # hacky way to avoid printing the study areas
@@ -329,7 +293,7 @@ ordination_plot <- ordiplot(species_jaccard_dist_mds_2dim, display = "sites", ty
 plot(env_data_fit_sites,
      col = "darkgrey", cex = 0.6,
      labels = list(vectors = list_vectors, factors = list_factors))
-0
+
 orditorp(ordination_plot, "sites", # I like this, it looks much better
      col = c("orange", "skyblue", "blue", "#CC79A7", "#009E73")[as.numeric(env_var_matrix_code$cluster_group)],
      air = 0.3, cex = 0.7, pch = NA,
