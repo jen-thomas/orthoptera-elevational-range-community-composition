@@ -1,10 +1,10 @@
 # Investigating the relationship of elevation and Orthoptera species richness, elevational range and community composition. 
 
-This repository contains the code to do the analysis for this project. The analysis was done in `R`, but Python was used to create the Frictionless Data package (described below). 
+This repository contains the code to do the analysis for this project. The analysis was done in `R`. 
 
 ## Project structure
 
-The code structure is a balance between trying to use functions to keep the code organised, and putting it together in a logical order so that when looking at the HTML files, there is not too much moving around within and between scripts. 
+The code structure is a balance between trying to use functions to keep the code organised, and putting it together in a logical order so that when looking at the HTML files, there is no need to jump between them for the analysis of each hypothesis. 
 
 ### Analysis scripts
 
