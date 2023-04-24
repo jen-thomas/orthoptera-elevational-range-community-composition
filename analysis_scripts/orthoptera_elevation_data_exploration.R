@@ -10,6 +10,7 @@
 
 #' <br>Import packages functions from other files.
 #+ message=FALSE, warning=FALSE
+
 source("data_preparation.R")
 source("utils.R")
 source("get_finalised_observations_species_richness_conservative.R")
@@ -134,7 +135,8 @@ unique_confirmed_taxa <- get_unique_taxa(all_observations_conservative)
 nrow(unique_confirmed_taxa)
 
 #' <br>The following taxa were observed
-unique_confirmed_taxa[order(unique_confirmed_taxa$species, unique_confirmed_taxa$genus, unique_confirmed_taxa$subfamily),]
+unique_confirmed_taxa[order(unique_confirmed_taxa$species, unique_confirmed_taxa$genus,
+                            unique_confirmed_taxa$subfamily),]
 
 #' <br>Note that although this summary suggests that 41 taxa were observed, two of the possibilities
 #' listed here have been included separately in the rest of the list, so this number is actually 39. Of
@@ -246,24 +248,12 @@ get_taxa_name <- function(taxa_record) {
   else if ((taxa_record$subfamily != "") & (taxa_record$genus == "") & (taxa_record$species == "")) {
     taxa_name <- taxa_record$subfamily
   }
-  else if ((taxa_record$family != "") & (taxa_record$subfamily == "") & (taxa_record$genus == "") & (taxa_record$species == "")) {
+  else if ((taxa_record$family != "") & (taxa_record$subfamily == "") & (taxa_record$genus == "") &
+    (taxa_record$species == "")) {
     taxa_name <- taxa_record$family
   }
   else {print("XXXXXXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")}
   return(as.character(taxa_name))
-}
-
-get_number_species_site <- function(observations) {
-  #' Get the observations data frame and group it by site and species.
-  #'
-  #' Return the number of species seen at each site.
-
-  number_species_site <- observations %>%
-    distinct(site_elevation, species) %>%
-    group_by(site_elevation, .drop=FALSE) %>%
-    dplyr::summarise("number_species" = n())
-
-  return(number_species_site)
 }
 
 get_species_summary_site <- function(observations) {
@@ -344,8 +334,10 @@ join_site_summary_data <- function(number_visits, number_observations, species_r
   joined_visits_observations_species <- full_join(joined_visits_observations, species_richness,
                                                   by = "site_elevation")
 
-  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "species_richness")
-  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species, "number_observations")
+  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species,
+                                                             "species_richness")
+  joined_visits_observations_species <- replace_na_with_zero(joined_visits_observations_species,
+                                                             "number_observations")
 
 
   return(joined_visits_observations_species)
@@ -378,7 +370,8 @@ get_number_sites_area(site_survey_df)
 
 number_visits_site <- get_number_visits_site(site_survey_df)
 number_observations_site <- get_number_observations_site(all_observations_conservative)
-number_taxa_site <- calculate_species_richness_sites(all_observations_conservative)[c("site_elevation", "species_richness")]
+number_taxa_site <- calculate_species_richness_sites(all_observations_conservative)[c("site_elevation",
+                                                                                      "species_richness")]
 transect_lengths <- get_transect_lengths(site_survey_df)
 
 site_survey_summary <- get_site_survey_summary_data(site_survey_df)
@@ -505,11 +498,12 @@ check_collinearity(site_env_var_data)
 #' Test if there is a significant difference between the highly correlated parameters.
 #+ message=FALSE, warning=FALSE
 
-cor_veg_height <- cor.test(site_env_var_data$mean_height_75percent_cm, site_env_var_data$mean_max_height_cm, method = "spearman")
-cor_slope_vegcover <- cor.test(site_env_var_data$mean_perc_veg_cover, site_env_var_data$slope, method = "spearman")
-cor_vegheight_density <- cor.test(site_env_var_data$mean_height_75percent_cm, site_env_var_data$mean_density, method = "spearman")
+cor_veg_height <- cor.test(site_env_var_data$mean_height_75percent_cm,
+                           site_env_var_data$mean_max_height_cm, method = "spearman")
+cor_slope_vegcover <- cor.test(site_env_var_data$mean_perc_veg_cover,
+                               site_env_var_data$slope, method = "spearman")
+cor_vegheight_density <- cor.test(site_env_var_data$mean_height_75percent_cm,
+                                  site_env_var_data$mean_density, method = "spearman")
 cor_veg_height
 cor_slope_vegcover
 cor_vegheight_density
-
-# There is a significant correlation between these pairs of parameters.
