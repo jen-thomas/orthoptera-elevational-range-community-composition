@@ -31,9 +31,9 @@ The data required to reproduce this analysis can be obtained from the Institut C
 
 ## Running the code
 
-A virtual environment `Renv` encapsulates the packages used within the code. This should be activated before trying to use the analysis code.
+A virtual environment, `renv`, encapsulates the packages and set-up used to run the code. Package details are listed in `renv.lock`. The virtual environment should be activated before running the code.
 
-For practical reasons, data can be found in a separate repository. To run this code, it would make sense to copy the required files to the `data` directory. The required files are: 
+For practical reasons, data can be found in a separate [repository](https://github.com/jen-thomas/orthoptera-elevational-range-community-composition-observation-data/tree/main/data). To run this code, it would make sense to copy the required files to the `data` directory. These are: 
 * [digital elevation model data](#digital-elevation-model-data)
 * the four CSV files from the [data repository](https://github.com/jen-thomas/orthoptera-elevational-range-community-composition-observation-data/tree/main/data)
 
