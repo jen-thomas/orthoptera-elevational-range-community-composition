@@ -1,11 +1,13 @@
-.Rprofile
 .Rproj.user
 .Rhistory
 *.Rproj
 .RData
 .Ruserdata
 
-renv/
+renv/library/
+renv/sandbox/
+renv/staging/
+renv/settings.dcf
 .idea/
 analysis_plots/
 analysis_outputs/
