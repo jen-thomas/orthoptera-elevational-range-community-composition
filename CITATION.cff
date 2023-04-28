@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: OrthopteraCommunityCompositionElevationalRange
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jen
+    family-names: Thomas
+    email: jen@falciot.net
+    orcid: 'https://orcid.org/0000-0002-5986-7026'
+identifiers:
+  - type: other
+    value: >-
+      https://github.com/jen-thomas/orthoptera-elevational-range-community-composition/releases/tag/v0.0.1
+    description: GitHub release of manuscript version
+repository-code: >-
+  https://github.com/jen-thomas/orthoptera-elevational-range-community-composition
+abstract: >-
+  Analysis to investigate the relationship of elevation and
+  Orthoptera species richness, elevational range and
+  community composition.
+keywords:
+  - Orthoptera
+  - Community composition
+  - Elevational range
+  - Species richness
+license: MIT
+version: 1.0.0
+date-released: '2023-04-28'
