@@ -32,6 +32,10 @@ def count_rows(df):
 
 
 def create_distinct_dfs(df, column_name):
+    """Create distinct dataframes for each of the unique values in a specified column.
+
+    Return a dictionary of dataframes."""
+    
     distinct_values = df[column_name].unique()
     distinct_dfs = {}
 
