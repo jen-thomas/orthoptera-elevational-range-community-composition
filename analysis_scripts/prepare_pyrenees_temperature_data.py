@@ -11,12 +11,12 @@ def get_data(file):
     return df
 
 
-def get_summary_stats(df):
+def get_summary_stats(df, field_name):
     """Get summary statistics about dataframe for specific field.
 
     Return summary stats."""
 
-    df_stats = df['VALOR_LECTURA'].describe()
+    df_stats = df[field_name].describe()
 
     return df_stats
 
@@ -43,7 +43,7 @@ def create_distinct_dfs(df, column_name):
 
 def main():
 
-    # Get data and summarise for sites at 2400 m
+    # Get data for sites at 2400 m
     data_file_2400 = "../data/xema/temperatures_catalunya_filtered.csv"
     df_2400 = get_data(data_file_2400)
 
@@ -53,8 +53,23 @@ def main():
     # Get the summary data for each of these met stations
     for value, distinct_df in distinct_dfs_estacions_2400.items():
         print(f"Summary stats for '{value}':")
-        print(get_summary_stats(distinct_df))
+        print(get_summary_stats(distinct_df, 'VALOR_LECTURA'))
         print("--------")
+
+    # Get data for sites at 1900 m
+    data_file_1900a = "../data/meteo_andorra/bordes_de_seturia_temperature_2021.csv"
+    data_file_1900b = "../data/meteo_andorra/seturia_temperature_2021.csv"
+
+    df_1900a = get_data(data_file_1900a)
+    df_1900b = get_data(data_file_1900b)
+
+    # Get the summary data for each of the met stations
+    print(f"Summary stats for Les bordes de Seturia (1910 m):")
+    print(get_summary_stats(df_1900a, 'Temperatura (ºC)'))
+    print("--------")
+
+    print(f"Summary stats for Seturia (1900 m):")
+    print(get_summary_stats(df_1900b, 'Temperatura (ºC)'))
 
 
 if __name__ == '__main__':
