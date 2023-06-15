@@ -35,7 +35,7 @@ def create_distinct_dfs(df, column_name):
     """Create distinct dataframes for each of the unique values in a specified column.
 
     Return a dictionary of dataframes."""
-    
+
     distinct_values = df[column_name].unique()
     distinct_dfs = {}
 
@@ -47,20 +47,20 @@ def create_distinct_dfs(df, column_name):
 
 def main():
 
-    # Get data for sites at 2400 m
-    data_file_2400 = "../data/xema/temperatures_catalunya_filtered.csv"
-    df_2400 = get_data(data_file_2400)
+    # Get data for met stations in Catalunya
+    data_catalunya = "../data/xema/temperatures_catalunya_filtered.csv"
+    df_cat = get_data(data_catalunya)
 
     # Create distinct dataframes for each of the met stations
-    distinct_dfs_estacions_2400 = create_distinct_dfs(df_2400, 'CODI_ESTACIO')
+    distinct_dfs_cat = create_distinct_dfs(df_cat, 'CODI_ESTACIO')
 
     # Get the summary data for each of these met stations
-    for value, distinct_df in distinct_dfs_estacions_2400.items():
+    for value, distinct_df in distinct_dfs_cat.items():
         print(f"Summary stats for '{value}':")
         print(get_summary_stats(distinct_df, 'VALOR_LECTURA'))
         print("--------")
 
-    # Get data for sites at 1900 m
+    # Get data for sites at 1900 m in Andorra
     data_file_1900a = "../data/meteo_andorra/bordes_de_seturia_temperature_2021.csv"
     data_file_1900b = "../data/meteo_andorra/seturia_temperature_2021.csv"
 
