@@ -12,7 +12,7 @@ def get_data(file):
 
 
 def get_summary_stats(df):
-    """Get summary statistics about dataframe.
+    """Get summary statistics about dataframe for specific field.
 
     Return summary stats."""
 
