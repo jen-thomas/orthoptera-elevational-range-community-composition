@@ -47,12 +47,6 @@ def main():
     data_file_2400 = "../data/xema/temperatures_catalunya_filtered.csv"
     df_2400 = get_data(data_file_2400)
 
-    df_stats_2400 = get_summary_stats(df_2400)
-    print(df_stats_2400)
-
-    value_counts_2400 = count_rows(df_2400)
-    print(value_counts_2400)
-
     # Create distinct dataframes for each of the met stations
     distinct_dfs_estacions_2400 = create_distinct_dfs(df_2400, 'CODI_ESTACIO')
 
