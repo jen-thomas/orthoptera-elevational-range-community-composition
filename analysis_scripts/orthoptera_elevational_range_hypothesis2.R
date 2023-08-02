@@ -414,12 +414,6 @@ quadratic_term_all_sp <- abs(cf_all_sp[3])
 
 equation_all_sp <- bquote(italic(E[R]) == .(int_term_all_sp) + .(lin_term_all_sp)*italic(E) - .(quadratic_term_all_sp)*italic(E)^2)
 
-#' Create the output plot file.
-
-path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_elevational_range_model.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
-
 #' Do the plot.
 
 plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicted,
@@ -441,7 +435,23 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
 
 #' Plot and save.
 
+#' Create the output plot PNG file.
+
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis2_elevational_range_model.png")
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+
 plot_elev_range_all_species
+dev.off()
+
+#' Output the plot as PDF as well.
+
+filepath_pdf <- file.path(path, "figure_5a_elevational_range_model.pdf")
+print(filepath_pdf)
+pdf(file = filepath_pdf, width = 7, height = 7)
+
+plot_elev_range_all_species
+
 dev.off()
 
 #' ### Only Caelifera
@@ -472,12 +482,6 @@ quadratic_term_cael <- abs(cf_cael[3])
 
 equation_cael <- bquote(italic(E[R]) == .(int_term_cael) + .(lin_term_cael)*italic(E) - .(quadratic_term_cael)*italic(E)^2)
 
-#' Create the output plot file.
-
-path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_elevational_range_model_caelifera.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
-
 #' Do the plot.
 
 plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicted,
@@ -496,9 +500,25 @@ plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicte
        y = "Elevational range (m)") +
   theme_classic()
 
+#' Create the output plot file.
+
+path <- "../analysis_plots/"
+filepath <- file.path(path, "hypothesis2_elevational_range_model_caelifera.png")
+png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+
 #' Plot and save.
 
 plot_elev_range_caelifera
+dev.off()
+
+#' Output the plot as PDF as well.
+
+filepath_pdf <- file.path(path, "figure_5b_elevational_range_model_caelifera.pdf")
+print(filepath_pdf)
+pdf(file = filepath_pdf, width = 7, height = 7)
+
+plot_elev_range_caelifera
+
 dev.off()
 
 #' ### Elevational range and mean elevation
@@ -510,6 +530,10 @@ dev.off()
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png")
 png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
+
+filepath_pdf <- file.path(path, "figure_4_elevational_range_species.pdf")
+print(filepath_pdf)
+pdf(file = filepath_pdf, width = 7, height = 7)
 
 species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_predicted,
                                         aes(y = reorder(species, elevational_range_midpoint), x = elevational_range_midpoint)) +

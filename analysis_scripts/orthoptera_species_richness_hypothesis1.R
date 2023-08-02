@@ -574,6 +574,11 @@ path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
 print(filepath)
 png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+
+filepath_pdf <- file.path(path, "figure_3_species_richness.pdf")
+print(filepath_pdf)
+pdf(file = filepath_pdf, width = 7, height = 7)
+
 par(mfrow = c(1,1))
 species_richness_elevation_plot2 <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
                                      scale = "response",
