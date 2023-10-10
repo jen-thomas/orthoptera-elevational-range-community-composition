@@ -56,6 +56,19 @@ get_species_observed_more_than_once <- function(observations_df) {
   return(species_without_singletons)
 }
 
+count_adult_nymphs_to_species <- function(observations_df) {
+  #' Count the number of adults and nymphs that have been identified to species.
+  #'
+  #' Return a tibble of these results.
+
+    adults_nymphs <- observations_df %>%
+    #distinct(stage) %>%
+    group_by(stage) %>%
+    dplyr::summarise("number_observations" = n())
+
+    return(adults_nymphs)
+}
+
 #' Get all observations to species only. For this part of the analysis, it is not meaningful to use those
 #' only identified to genus unless this is a morphospecies that can be said to be so across all of the
 #' sites. None of these cases occurred in this study.
@@ -63,6 +76,11 @@ get_species_observed_more_than_once <- function(observations_df) {
 #' All species that were observed only once, will be removed from the analysis.
 
 all_observations_species <- get_observations_to_species(all_observations_conservative)
+
+#' Count how many adults and nymphs have been identified to species.
+
+count_adult_nymphs_to_species(all_observations_species)
+
 species_without_singletons <- get_species_observed_more_than_once(all_observations_species)
 species_for_analysis <- unique(species_without_singletons["species"])
 observations_without_singletons <- get_observations_of_particular_species(all_observations_species,
