@@ -231,7 +231,7 @@ get_observations_of_particular_species <- function(observations, chosen_species)
 
 #' ### Create summaries of species richness data
 
-calculate_sampling_weights <- function(observations) {
+calculate_sampling_effort <- function(observations) {
   #' Calculate sampling effort index. Sum the total number of observations, the total number caught
   #' by net and the total caught by hand. Find the proportion of observations caught by net and by hand,
   #' by dividing each of the totals by the total number of observations.
@@ -262,6 +262,36 @@ calculate_sampling_weights <- function(observations) {
 
   return(sampling_effort)
 }
+
+calculate_sampling_effort_review <- function(observations) {
+  #' Leaving the proportions as overall ratios as calculated previously:
+
+    observations_by_method <- observations %>%
+    distinct(site_elevation, method, specimen_label) %>%
+    group_by(site_elevation) %>%
+    dplyr::summarise("number_observations_by_net" = sum(method == "Net"),
+                     "number_observations_by_hand" = sum(method == "Hand"))
+
+  total_obs_hand <- colSums(observations_by_method[ , "number_observations_by_hand"])
+  total_obs_net <- colSums(observations_by_method[ , "number_observations_by_net"])
+  total_obs <- total_obs_hand + total_obs_net
+
+  weighting_hand <- total_obs_hand / total_obs
+  weighting_net <- total_obs_net / total_obs
+
+  transects_by_method <- observations %>%
+  distinct(site_elevation, date_cest, method) %>%
+  group_by(site_elevation) %>%
+  dplyr::summarise("number_net_transects" = sum(method == "Net"),
+                   "number_hand_transects" = sum(method == "Hand"))
+
+  sampling_effort <- transects_by_method %>%
+    mutate(sampling_effort_index = (number_net_transects * weighting_net) +
+      (number_hand_transects * weighting_hand))
+
+  return(sampling_effort)
+}
+
 
 join_observations <- function(confirmed_observations, finalised_observations) {
   #' Join the dataframes of the confirmed and finalised observations.

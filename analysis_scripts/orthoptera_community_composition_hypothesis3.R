@@ -72,7 +72,7 @@ finalised_observations <- get_finalised_observations(observations_sites_df)
 
 all_observations_conservative <- get_conservative_observations(confirmed_observations,
                                                                finalised_observations)
-sampling_effort <- calculate_sampling_weights(all_observations_conservative)
+sampling_effort <- calculate_sampling_effort(all_observations_conservative)
 
 unique_taxa_sites <- get_unique_taxa_site(all_observations_conservative)
 
