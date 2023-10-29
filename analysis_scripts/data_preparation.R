@@ -288,12 +288,6 @@ calculate_sampling_effort_review <- function(observations) {
     dplyr::summarise("number_observations_by_net" = sum(method == "Net"),
                      "number_observations_by_hand" = sum(method == "Hand"))
 
-    mean_observations_by_method <- observations %>%
-    distinct(site_elevation, method, specimen_label) %>%
-    group_by(site_elevation, method) %>%
-    dplyr::summarise("mean_observations_by_net" = ave(method == "Net"),
-                     "mean_observations_by_hand" = ave(method == "Hand"))
-
   total_obs_hand <- colSums(observations_by_method[ , "number_observations_by_hand"])
   total_obs_net <- colSums(observations_by_method[ , "number_observations_by_net"])
   total_obs <- total_obs_hand + total_obs_net
@@ -312,6 +306,25 @@ calculate_sampling_effort_review <- function(observations) {
       (number_hand_transects * weighting_hand))
 
   return(sampling_effort)
+}
+
+calculate_sampling_effort_review_mean <- function(observations) {
+  #' Leaving the proportions as overall ratios as calculated previously:
+
+  mean_observations_by_method <- observations %>%
+    distinct(site_elevation, method, specimen_label) %>%
+    group_by(site_elevation, method) %>%
+    dplyr::summarise("mean_observations_by_net" = ave(method == "Net"),
+                     "mean_observations_by_hand" = ave(method == "Hand"))
+
+  mean_obs_hand <- colMeans(mean_observations_by_method[ , "number_observations_by_hand"])
+  mean_obs_net <- colMeans(mean_observations_by_method[ , "number_observations_by_net"])
+  total_mean_obs <- mean_obs_hand + mean_obs_net
+
+  weighting_hand_mean <- mean_obs_hand / total_mean_obs
+  weighting_net_mean <- mean_obs_net / total_mean_obs
+
+  return(mean_observations_by_method)
 }
 
 
