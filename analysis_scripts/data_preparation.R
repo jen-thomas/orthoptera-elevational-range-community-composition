@@ -311,20 +311,33 @@ calculate_sampling_effort_review <- function(observations) {
 calculate_sampling_effort_review_mean <- function(observations) {
   #' Leaving the proportions as overall ratios as calculated previously:
 
-  mean_observations_by_method <- observations %>%
-    distinct(site_elevation, method, specimen_label) %>%
-    group_by(site_elevation, method) %>%
-    dplyr::summarise("mean_observations_by_net" = ave(method == "Net"),
-                     "mean_observations_by_hand" = ave(method == "Hand"))
+  total_observations_by_date_method_repeat <- all_observations_conservative %>%
+    distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
+    group_by(site_elevation, date_cest, method, method_repeat) %>%
+    dplyr::summarise("total_obs_net_date_method_repeat" = sum(method == "Net"),
+                     "total_obs_hand_date_method_repeat" = sum(method == "Hand")
+                     #"prop_obs_net" = total_obs_net/(total_obs_hand+total_obs_net), "prop_obs_hand" = total_obs_hand/(total_obs_hand+total_obs_net)
+  )
 
-  mean_obs_hand <- colMeans(mean_observations_by_method[ , "number_observations_by_hand"])
-  mean_obs_net <- colMeans(mean_observations_by_method[ , "number_observations_by_net"])
-  total_mean_obs <- mean_obs_hand + mean_obs_net
+  summary_observations_by_site_method <- total_observations_by_date_method_repeat %>%
+  distinct(site_elevation, method, total_obs_hand_date_method_repeat, total_obs_net_date_method_repeat) %>%
+  group_by(site_elevation, method) %>%
+  dplyr::summarise("total_obs_site_net" = sum(total_obs_net_date_method_repeat),
+                   "total_obs_site_hand" = sum(total_obs_hand_date_method_repeat),
+  "mean_obs_site_net" = mean(total_obs_net_date_method_repeat),
+                   "mean_obs_site_hand" = mean(total_obs_hand_date_method_repeat))
+  #
+  #
+  #
+  #
+  # mean_obs_hand <- colMeans(mean_observations_by_method[ , "number_observations_by_hand"])
+  # mean_obs_net <- colMeans(mean_observations_by_method[ , "number_observations_by_net"])
+  # total_mean_obs <- mean_obs_hand + mean_obs_net
+  #
+  # weighting_hand_mean <- mean_obs_hand / total_mean_obs
+  # weighting_net_mean <- mean_obs_net / total_mean_obs
 
-  weighting_hand_mean <- mean_obs_hand / total_mean_obs
-  weighting_net_mean <- mean_obs_net / total_mean_obs
-
-  return(mean_observations_by_method)
+  return(summary_observations_by_site_method)
 }
 
 
