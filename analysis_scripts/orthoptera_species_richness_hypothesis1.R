@@ -191,6 +191,7 @@ print(corr_test_samplingeffort_elevation_rho)
 coeff_det_samplingeffort_elevation <- calculate_coefficient_of_determination(corr_test_samplingeffort_elevation_rho)
 print(coeff_det_samplingeffort_elevation)
 
+
 #' -----------------REVIEW----------------------
 print("REVIEW VALUES")
 corr_test_samplingeffort_speciesrichness_review <- correlation_test(species_richness_sites_review, "sampling_effort_index",
