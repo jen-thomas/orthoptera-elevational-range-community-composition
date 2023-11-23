@@ -148,9 +148,7 @@ species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
 #' method.
 
 sampling_effort <- calculate_sampling_effort(all_observations_conservative)
-#sum_obs_method <- calculate_sum_obs_method(all_observations_conservative)
-#sampling_effort_review <- calculate_sampling_effort_review(all_observations_conservative)
-sampling_effort_review_mean <- calculate_sampling_effort_review_mean(all_observations_conservative)
+sampling_effort_review <- calculate_sampling_effort_review(all_observations_conservative)
 
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
 species_richness_sites_review <- left_join(species_richness_sites, sampling_effort_review, by = "site_elevation")

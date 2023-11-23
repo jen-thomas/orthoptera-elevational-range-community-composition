@@ -263,53 +263,15 @@ calculate_sampling_effort <- function(observations) {
   return(sampling_effort)
 }
 
-calculate_sum_obs_method <- function(observations) {
-  #   mean_observations_by_method <- observations %>%
-  #   distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
-  #   group_by(site_elevation, date_cest, method, method_repeat) %>%
-  #   dplyr::summarise("sum_observations_by_net" = sum(method == "Net"),
-  #                    "sum_observations_by_hand" = sum(method == "Hand"))
-  #
-  # return(mean_observations_by_method)
-
-  sum_observations_by_method <- observations %>%
-    group_by(site_elevation, date_cest, method) %>%
-    summarize(total_captures = n())
-
-  return(sum_observations_by_method)
-}
 
 calculate_sampling_effort_review <- function(observations) {
-  #' Leaving the proportions as overall ratios as calculated previously:
-
-    observations_by_method <- observations %>%
-    distinct(site_elevation, method, specimen_label) %>%
-    group_by(site_elevation) %>%
-    dplyr::summarise("number_observations_by_net" = sum(method == "Net"),
-                     "number_observations_by_hand" = sum(method == "Hand"))
-
-  total_obs_hand <- colSums(observations_by_method[ , "number_observations_by_hand"])
-  total_obs_net <- colSums(observations_by_method[ , "number_observations_by_net"])
-  total_obs <- total_obs_hand + total_obs_net
-
-  weighting_hand <- total_obs_hand / total_obs
-  weighting_net <- total_obs_net / total_obs
-
-  transects_by_method <- observations %>%
-  distinct(site_elevation, date_cest, method) %>%
-  group_by(site_elevation) %>%
-  dplyr::summarise("number_net_transects" = sum(method == "Net"),
-                   "number_hand_transects" = sum(method == "Hand"))
-
-  sampling_effort <- transects_by_method %>%
-    mutate(sampling_effort_index = (number_net_transects * weighting_net) +
-      (number_hand_transects * weighting_hand))
-
-  return(sampling_effort)
-}
-
-calculate_sampling_effort_review_mean <- function(observations) {
-  #' Leaving the proportions as overall ratios as calculated previously:
+  #' Calculate the number of transects undertaken at each site, by each survey method. Sum up the number
+  #' of observations collected at each site using each survey method. From these two values, calculate the
+  #' mean number of observations collected using each survey method at each site (total observations at
+  #' site by method / number of transects at site by method).
+  #'
+  #' Calculate the sampling effort for each site using
+  #' mean_obs_hand / no_hand_transects + mean_obs_net / no_net_transects
 
   total_transects_site_by_method <- all_observations_conservative %>%
   distinct(site_elevation, date_cest, method, method_repeat) %>%
@@ -327,7 +289,10 @@ calculate_sampling_effort_review_mean <- function(observations) {
                      "site_osbervations_hand" = sum(method == "Hand")
   )
 
-  combined_total_transects_observations_site_by_method <- dplyr::left_join(total_observations_site_by_method, total_transects_site_by_method, by = "site_elevation")
+  combined_total_transects_observations_site_by_method <-
+    dplyr::left_join(total_observations_site_by_method,
+                     total_transects_site_by_method,
+                     by = "site_elevation")
 
   summary_observations_site_method <- combined_total_transects_observations_site_by_method %>%
     mutate("mean_obs_net" = site_osbervations_net/transects_net,
