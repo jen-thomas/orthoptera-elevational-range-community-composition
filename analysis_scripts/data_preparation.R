@@ -297,12 +297,12 @@ calculate_sampling_effort_review <- function(observations) {
   summary_observations_site_method <- combined_total_transects_observations_site_by_method %>%
     mutate("mean_obs_net" = site_osbervations_net/transects_net,
            "mean_obs_hand" = site_osbervations_hand/transects_hand,
-           "sampling_effort_index" = (mean_obs_net/transects_net + mean_obs_hand/transects_hand))
+           "sampling_effort_index_review" = (mean_obs_net/transects_net + mean_obs_hand/transects_hand))
 
   # MOL01 has a sampling effort of NaN because no hand sampling was done here. Therefore, manually adjust
   # this to the correct value.
 
-  summary_observations_site_method$sampling_effort_index[summary_observations_site_method$site_elevation == "2500_MOL01"] <- 1
+  summary_observations_site_method$sampling_effort_index_review[summary_observations_site_method$site_elevation == "2500_MOL01"] <- 1
 
   return(summary_observations_site_method)
 }

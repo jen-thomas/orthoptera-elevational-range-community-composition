@@ -194,7 +194,7 @@ print(coeff_det_samplingeffort_elevation)
 
 #' -----------------REVIEW----------------------
 print("REVIEW VALUES")
-corr_test_samplingeffort_speciesrichness_review <- correlation_test(species_richness_sites_review, "sampling_effort_index",
+corr_test_samplingeffort_speciesrichness_review <- correlation_test(species_richness_sites_review, "sampling_effort_index_review",
                                               "species_richness")
 corr_test_samplingeffort_speciesrichness_review
 
@@ -213,7 +213,7 @@ print(coeff_det_samplingeffort_speciesrichness_review)
 #+ message=FALSE, warning=FALSE
 
 corr_test_samplingeffort_elevation_review <- correlation_test(species_richness_sites_review, "elevational_band_m",
-                                              "sampling_effort_index")
+                                              "sampling_effort_index_review")
 corr_test_samplingeffort_elevation_review
 
 #' Print rho
@@ -225,6 +225,10 @@ print(corr_test_samplingeffort_elevation_rho_review)
 #' <br>and calculate the coefficient of determination (R<sup>2</sup>).
 coeff_det_samplingeffort_elevation_review <- calculate_coefficient_of_determination(corr_test_samplingeffort_elevation_rho_review)
 print(coeff_det_samplingeffort_elevation_review)
+
+#' The values of the correlation tests here are very similar to those before the review changes. P-values
+#' are still significant and the trend is of more or less the same size and in the same direction.
+#' Therefore, this should not drastically change what we do (next check the GLM).
 print("END REVIEW VALUES")
 
 #' ----------------------------------------------
