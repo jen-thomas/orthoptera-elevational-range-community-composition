@@ -147,11 +147,12 @@ species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
 #' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
 #' method.
 
-sampling_effort <- calculate_sampling_effort(all_observations_conservative)
-sampling_effort_review <- calculate_sampling_effort_review(all_observations_conservative)
+# sampling_effort <- calculate_sampling_effort(all_observations_conservative)
+#' Calculate sampling effort according to the method during review. All further analysis will use these
+#' values.
+sampling_effort <- calculate_sampling_effort_review(all_observations_conservative)
 
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
-species_richness_sites_review <- left_join(species_richness_sites, sampling_effort_review, by = "site_elevation")
 
 #' It is likely that the number of species recorded will depend on the number of specimens captured, and
 #' given this varied across sites, it should be accounted for.
@@ -190,7 +191,6 @@ print(corr_test_samplingeffort_elevation_rho)
 #' <br>and calculate the coefficient of determination (R<sup>2</sup>).
 coeff_det_samplingeffort_elevation <- calculate_coefficient_of_determination(corr_test_samplingeffort_elevation_rho)
 print(coeff_det_samplingeffort_elevation)
-
 
 #' Sampling effort will be incorporated into the generalised linear mixed models to see if it affected the
 #' species richness.
