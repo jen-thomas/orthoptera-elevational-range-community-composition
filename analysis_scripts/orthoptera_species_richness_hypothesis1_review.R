@@ -1,5 +1,5 @@
 #' ---
-#' title: Hypothesis 1
+#' title: Hypothesis 1 REVIEW
 #' subtitle: Species richness decreases with elevation.
 #' output:
 #'   html_document:
@@ -257,6 +257,9 @@ Anova(glm_species_richness_full)
 
 AICcmodavg::AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
 
+#' See what it says to drop
+
+drop1(glm_species_richness_full)
 #'
 #' ### Test for overdispersion
 #'
@@ -424,85 +427,6 @@ AICcmodavg::AICc(glm_species_richness_full_tortavmol_step, return.K = FALSE, sec
 #' Define the reduced model for species richness at the main study areas.
 
 glm_species_richness_tortavmol_reduced <- glm_species_richness_full_tortavmol_step
-
-#' ### Test species richness of Caelifera in GLM
-
-#' Calculate the species richness for only Caelifera at each site.
-
-caelifera_observations <- get_caelifera_only(all_observations_conservative)
-
-caelifera_species_richness <- calculate_species_richness_sites(caelifera_observations)
-
-caelifera_species_richness_sites <- left_join(caelifera_species_richness, site_env_var_data,
-                                    by = c("site_elevation", "area", "elevational_band_m"))
-
-caelifera_species_richness_sites <- left_join(caelifera_species_richness_sites, sampling_effort,
-                                              by = "site_elevation")
-
-#' GLM of Caelifera species richness with the set of parameters as used in the full model of overall
-#' species richness.
-
-glm_species_richness_full_caelifera <- glm(species_richness ~ elevational_band_m +
-                                        as.factor(area) + slope + as.factor(aspect_cardinal) +
-                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm +
-                                        mean_density,
-    family = poisson(link = "log"),
-    data = caelifera_species_richness_sites)
-
-#' Summarise the GLM.
-
-summary(glm_species_richness_full_caelifera)
-
-#' Do ANOVA of GLM.
-
-Anova(glm_species_richness_full_caelifera)
-
-#' Get AICC of GLM.
-
-AICcmodavg::AICc(glm_species_richness_full_caelifera, return.K = FALSE, second.ord = TRUE)
-
-#' Do backwards stepwise selection on the GLM to get the reduced model.
-
-glm_species_richness_caelifera_step <- stats::step(glm_species_richness_full_caelifera,
-                                                   direction = "backward")
-
-#' Summarise the reduced GLM.
-
-summary(glm_species_richness_caelifera_step)
-
-#' Do ANOVA of reduced GLM.
-
-car::Anova(glm_species_richness_caelifera_step, type="II", test.statistic = "LR",
-           error.estimate = "deviance")
-
-#' Get AICC of reduced GLM.
-
-AICcmodavg::AICc(glm_species_richness_caelifera_step, return.K = FALSE, second.ord = TRUE)
-
-#' Define the reduced model for Caelifera species richness.
-
-glm_species_richness_caelifera_reduced <- glm_species_richness_caelifera_step
-
-#' Test removing elevation because it is not significant in the reduced model. See if it changes the
-#' predictive power of the model.
-
-glm_species_richness_caelifera_reduced_no_elevation <- glm(species_richness ~ slope +
-                                        sampling_effort_index + mean_perc_veg_cover + mean_density,
-    family = poisson(link = "log"),
-    data = caelifera_species_richness_sites)
-
-#' Model summary.
-
-summary(glm_species_richness_caelifera_reduced_no_elevation)
-
-#' ANOVA.
-
-car::Anova(glm_species_richness_caelifera_reduced_no_elevation, type="II", test.statistic = "LR",
-           error.estimate = "deviance")
-
-#' AICC.
-
-AICcmodavg::AICc(glm_species_richness_caelifera_reduced_no_elevation, return.K = FALSE, second.ord = TRUE)
 
 #'
 #' ## GLM model assessment
