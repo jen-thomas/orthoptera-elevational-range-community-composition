@@ -241,25 +241,92 @@ hist(species_richness_tav$species_richness)
 #'
 #' ### Fit full model
 
+# glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+#                                         as.factor(aspect_cardinal) + sampling_effort_index +
+#                                         mean_perc_veg_cover + mean_max_height_cm + mean_density,
+#     family = poisson(link = "log"),
+#     data = species_richness_sites)
+
+#' try using neg binomial to get over overdispersion problem
+
+# glm_species_richness_full <- glm.nb(species_richness ~ elevational_band_m + as.factor(area) + slope +
+#                                         as.factor(aspect_cardinal) + sampling_effort_index +
+#                                         mean_perc_veg_cover + mean_max_height_cm + mean_density,
+#   data = species_richness_sites)
+
+#' Try fitting full model with the relevant interactions
 glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density +
+                                        elevational_band_m:sampling_effort_index +
+                                        mean_max_height_cm:mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
 summary(glm_species_richness_full)
 
 #' Do ANOVA.
-
 Anova(glm_species_richness_full)
 
 #' Calculate AICC.
-
 AICcmodavg::AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
 
-#' See what it says to drop
+plot(glm_species_richness_full)
 
-drop1(glm_species_richness_full)
+#' Try drop1()
+drop1(glm_species_richness_full) # remove veg cover
+
+remove_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_max_height_cm + mean_density +
+                                        elevational_band_m:sampling_effort_index +
+                                        mean_max_height_cm:mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+drop1(remove_vegcover)
+
+remove_slope <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_max_height_cm + mean_density +
+                                        elevational_band_m:sampling_effort_index +
+                                        mean_max_height_cm:mean_density,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+drop1(remove_slope)
+
+remove_inter_height_density<- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_max_height_cm + mean_density +
+                                        elevational_band_m:sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+drop1(remove_inter_height_density)
+
+remove_density <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_max_height_cm +
+                                        elevational_band_m:sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+drop1(remove_density)
+
+remove_height <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        as.factor(aspect_cardinal) + sampling_effort_index+
+                                        elevational_band_m:sampling_effort_index,
+    family = poisson(link = "log"),
+    data = species_richness_sites)
+
+drop1(remove_height)
+
+summary(remove_height)
+Anova(remove_height)
+
+
+
 #'
 #' ### Test for overdispersion
 #'
@@ -277,12 +344,13 @@ paste0("ratio: ", ratio_dispersion)
 
 glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density +
+                                        elevational_band_m:sampling_effort_index + # corr ~ 0.45
+                                        mean_max_height_cm:mean_density,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
 #' Model summary.
-
 summary(glm_species_richness_full_quasipoisson)
 
 #' Do ANOVA.
@@ -292,29 +360,48 @@ Anova(glm_species_richness_full_quasipoisson)
 #'
 #' Stepwise selection will be done on the model to find the best reduced model.
 #'
-#' To see how the R packages work and to make sure they are consistent with doing it manually, both R's
-#' methods and manual selection will be used. Below is R's backwards stepwise selection. For the other
-#' methods, see the section at the end of this code.
+#' To see how the R packages work and to make sure they are consistent with doing it manually, two
+#' methods will be used:
+#' - R's backwards stepwise selection
+#' - manual selection (See appendix)
 #'
+
 #' #### R's backwards stepwise selection
+Anova(glm_species_richness_full)
 
 glm_species_richness_step_backward <- stats::step(glm_species_richness_full, direction = "backward")
 
-#' Show the summary of the reduced model as found by R's stepwise selection.
+Anova(glm_species_richness_full)
 
+#' Show the summary of the reduced model as found by R's stepwise selection.
 summary(glm_species_richness_step_backward)
 
 #' Generate an ANOVA table for the model.
-
-car::Anova(glm_species_richness_step_backward)
+Anova(glm_species_richness_step_backward)
 
 #' Try ANOVA from the car package, just to see what difference there is.
-
 car::Anova(glm_species_richness_step_backward, type="II", test.statistic = "F")
 
 #' Calculate AICC.
-
 AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.ord = TRUE)
+
+
+#' #### R's backwards stepwise selection
+glm_species_richness_step_both <- stats::step(glm_species_richness_full, direction = "both")
+
+#' Show the summary of the reduced model as found by R's stepwise selection.
+summary(glm_species_richness_step_both)
+
+#' Generate an ANOVA table for the model.
+Anova(glm_species_richness_step_both)
+
+#' Try ANOVA from the car package, just to see what difference there is.
+car::Anova(glm_species_richness_step_both, type="II", test.statistic = "F")
+
+#' Calculate AICC.
+AICcmodavg::AICc(glm_species_richness_step_both, return.K = FALSE, second.ord = TRUE)
+
+
 
 #' #### Define reduced model
 
