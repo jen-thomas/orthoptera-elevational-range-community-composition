@@ -241,19 +241,9 @@ hist(species_richness_tav$species_richness)
 #'
 #' ### Fit full model
 
-# glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
-#                                         as.factor(aspect_cardinal) + sampling_effort_index +
-#                                         mean_perc_veg_cover + mean_max_height_cm + mean_density,
-#     family = poisson(link = "log"),
-#     data = species_richness_sites)
-# This model is overdispersed. Try different methods below to solve this.
-
-#' Try fitting full model with the relevant interactions
 glm_species_richness_full <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm + mean_density +
-                                        elevational_band_m:sampling_effort_index +
-                                        mean_max_height_cm:mean_density,
+                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = poisson(link = "log"),
     data = species_richness_sites)
 
@@ -267,64 +257,6 @@ AICcmodavg::AICc(glm_species_richness_full, return.K = FALSE, second.ord = TRUE)
 
 plot(glm_species_richness_full)
 
-#' Try drop1()
-drop1(glm_species_richness_full) # remove veg cover
-
-remove_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_max_height_cm + mean_density +
-                                        elevational_band_m:sampling_effort_index +
-                                        mean_max_height_cm:mean_density,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-drop1(remove_vegcover)
-
-remove_slope <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_max_height_cm + mean_density +
-                                        elevational_band_m:sampling_effort_index +
-                                        mean_max_height_cm:mean_density,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-drop1(remove_slope)
-
-remove_inter_height_density<- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_max_height_cm + mean_density +
-                                        elevational_band_m:sampling_effort_index,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-drop1(remove_inter_height_density)
-
-remove_density <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_max_height_cm +
-                                        elevational_band_m:sampling_effort_index,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-drop1(remove_density)
-
-remove_height <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        as.factor(aspect_cardinal) + sampling_effort_index+
-                                        elevational_band_m:sampling_effort_index,
-    family = poisson(link = "log"),
-    data = species_richness_sites)
-
-drop1(remove_height)
-
-summary(remove_height)
-Anova(remove_height)
-
-#' Try stepAIC
-
-reduced_model <- stepAIC(glm_species_richness_full, direction = "backward")
-summary(reduced_model)
-Anova(reduced_model)
-
 #'
 #' ### Test for overdispersion
 #'
@@ -337,13 +269,12 @@ paste0("ratio: ", ratio_dispersion)
 
 #' Fit a quasipoisson distribution to double-check that there is no problem with overdispersion. A poisson
 #' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
-#' greater than 1, then we have this problem with the Poisson distribution.
+#' greater than 1, then we have this problem with the Poisson distribution. This model is overdispersed.
+#' Try different methods below to solve this.
 
 glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height_cm + mean_density,
-                                        # elevational_band_m:sampling_effort_index + # corr ~ 0.45
-                                        # mean_max_height_cm:mean_density,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
@@ -351,12 +282,26 @@ summary(glm_species_richness_full_quasipoisson)
 Anova(glm_species_richness_full_quasipoisson)
 anova(glm_species_richness_full_quasipoisson)
 
-# devtools::install_version("AICcmodavg", "2.3.3")
-# AICcmodavg::QAICc(glm_species_richness_full_quasipoisson, return.K = FALSE, second.ord = TRUE)
+#' Given the overdispersion parameter lies between 1 and 15, quasipoisson distribution should be suitable
+#' for this model (there is no need to try a negative binomial instead).
+#'
+#' ### Model selection
+#'
+#' Stepwise selection will be done on the model to find the best reduced model.
+#'
+#' Two methods will be used:
+#' - manual selection
+#' - R's drop1 function
+#' Both of these models are trying to minimise the deviance (for the quasipoisson model, rather than
+#' minimising the AIC which is not valid for use with a quasipoisson distribution).
+#'
+#' The parameters will be considered according to their meaning within the model and for the hypotheses,
+#' their p-value and the improvement they make to the deviance (i.e. those that decrease it by the
+#' largest amount will be retained).
 
-#' Do model reduction
-
-# try removing max veg ht which reduces the deviance by a small amount and has a large p value
+#' #### Manual selection
+#'
+#' Try removing max veg ht which reduces the deviance by a small amount and has a large p value
 glm_species_richness_full_quasipoisson_remove_maxht <- glm(species_richness ~ elevational_band_m +
                                         as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
@@ -368,9 +313,11 @@ summary(glm_species_richness_full_quasipoisson_remove_maxht)
 Anova(glm_species_richness_full_quasipoisson_remove_maxht)
 anova(glm_species_richness_full_quasipoisson_remove_maxht)
 
-anova(glm_species_richness_full_quasipoisson, glm_species_richness_full_quasipoisson_remove_maxht, test = "F")
+#' Compare the reduced model and full model.
+anova(glm_species_richness_full_quasipoisson, glm_species_richness_full_quasipoisson_remove_maxht,
+      test = "F")
 
-# try removing veg density which reduces the deviance by a small amount and has a large p value
+# Try removing veg density which reduces the deviance by a small amount and has a large p value
 glm_species_richness_full_quasipoisson_remove_maxht_density <- glm(species_richness ~ elevational_band_m +
                                         as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
@@ -382,9 +329,11 @@ summary(glm_species_richness_full_quasipoisson_remove_maxht_density)
 Anova(glm_species_richness_full_quasipoisson_remove_maxht_density)
 anova(glm_species_richness_full_quasipoisson_remove_maxht_density)
 
-anova(glm_species_richness_full_quasipoisson_remove_maxht, glm_species_richness_full_quasipoisson_remove_maxht_density, test = "F")
+#' Compare the reduced model with the previous reduction.
+anova(glm_species_richness_full_quasipoisson_remove_maxht,
+      glm_species_richness_full_quasipoisson_remove_maxht_density, test = "F")
 
-# try removing slope which reduces the deviance by a small amount and has a large p value
+#' Try removing slope which reduces the deviance by a small amount and has a large p value
 glm_species_richness_full_quasipoisson_remove_maxht_density_slope <- glm(species_richness ~ elevational_band_m +
                                         as.factor(area) +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
@@ -396,9 +345,11 @@ summary(glm_species_richness_full_quasipoisson_remove_maxht_density_slope)
 Anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope)
 anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope)
 
-anova(glm_species_richness_full_quasipoisson_remove_maxht_density, glm_species_richness_full_quasipoisson_remove_maxht_density_slope, test = "F")
+#' Compare the reduced model with the previous reduction.
+anova(glm_species_richness_full_quasipoisson_remove_maxht_density,
+      glm_species_richness_full_quasipoisson_remove_maxht_density_slope, test = "F")
 
-# try removing veg cover which reduces the deviance by a small amount and has a large p value
+# Try removing veg cover which reduces the deviance by a small amount and has a large p value
 glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover <- glm(species_richness ~ elevational_band_m +
                                         as.factor(area) +
                                         as.factor(aspect_cardinal) + sampling_effort_index,
@@ -409,9 +360,11 @@ summary(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover)
 Anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover)
 anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover)
 
-anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope, glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover, test = "F")
+#' Compare the reduced model with the previous reduction.
+anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope,
+      glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover, test = "F")
 
-# try removing area which reduces the deviance by a small amount and has a large p value
+# Try removing area which reduces the deviance by a small amount and has a large p value
 glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover_area <- glm(species_richness ~
                                         elevational_band_m +
                                         as.factor(aspect_cardinal) + sampling_effort_index,
@@ -422,9 +375,11 @@ summary(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover_
 Anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover_area)
 anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover_area)
 
-anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover, glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover_area, test = "F")
+#' Compare the reduced model with the previous reduction.
+anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover,
+      glm_species_richness_full_quasipoisson_remove_maxht_density_slope_cover_area, test = "F")
 
-# try removing area before veg cover
+# Try removing area before veg cover
 glm_species_richness_full_quasipoisson_remove_maxht_density_slope_area <- glm(species_richness ~ elevational_band_m +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover,
@@ -435,11 +390,15 @@ summary(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_area)
 Anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_area)
 anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope_area)
 
-anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope, glm_species_richness_full_quasipoisson_remove_maxht_density_slope_area, test = "F")
+#' Compare the reduced model with the previous reduction.
+anova(glm_species_richness_full_quasipoisson_remove_maxht_density_slope,
+      glm_species_richness_full_quasipoisson_remove_maxht_density_slope_area, test = "F")
 
-# Try model reduction with drop1
+#' #### Model reduction with drop1
+#'
 drop1(glm_species_richness_full_quasipoisson)
 
+#' Output suggests removing max height would lead to the smallest increase in deviance.
 full_qp_remove_maxht <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover + mean_density,
@@ -449,6 +408,7 @@ Anova(full_qp_remove_maxht)
 
 drop1(full_qp_remove_maxht)
 
+#' Output suggests removing density would lead to the smallest increase in deviance.
 full_qp_remove_maxht_density <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover,
@@ -461,58 +421,9 @@ drop1(full_qp_remove_maxht_density)
 # Stick at this model because there is not a great improvement and the remaining variables are important
 # to capture the variability and explain the hypothesis.
 
-
-
-#' ### Model selection
-#'
-#' Stepwise selection will be done on the model to find the best reduced model.
-#'
-#' To see how the R packages work and to make sure they are consistent with doing it manually, two
-#' methods will be used:
-#' - R's backwards stepwise selection
-#' - manual selection (See appendix)
-#'
-
-#' #### R's backwards stepwise selection
-Anova(glm_species_richness_full)
-
-glm_species_richness_step_backward <- stats::step(glm_species_richness_full, direction = "backward")
-
-Anova(glm_species_richness_full)
-
-#' Show the summary of the reduced model as found by R's stepwise selection.
-summary(glm_species_richness_step_backward)
-
-#' Generate an ANOVA table for the model.
-Anova(glm_species_richness_step_backward)
-
-#' Try ANOVA from the car package, just to see what difference there is.
-car::Anova(glm_species_richness_step_backward, type="II", test.statistic = "F")
-
-#' Calculate AICC.
-AICcmodavg::AICc(glm_species_richness_step_backward, return.K = FALSE, second.ord = TRUE)
-
-
-#' #### R's backwards stepwise selection
-glm_species_richness_step_both <- stats::step(glm_species_richness_full, direction = "both")
-
-#' Show the summary of the reduced model as found by R's stepwise selection.
-summary(glm_species_richness_step_both)
-
-#' Generate an ANOVA table for the model.
-Anova(glm_species_richness_step_both)
-
-#' Try ANOVA from the car package, just to see what difference there is.
-car::Anova(glm_species_richness_step_both, type="II", test.statistic = "F")
-
-#' Calculate AICC.
-AICcmodavg::AICc(glm_species_richness_step_both, return.K = FALSE, second.ord = TRUE)
-
-
-
 #' #### Define reduced model
 
-glm_species_richness_reduced <- glm_species_richness_step_backward
+glm_species_richness_reduced <- full_qp_remove_maxht_density
 
 #' Summary of model.
 
