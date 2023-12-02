@@ -462,22 +462,6 @@ drop1(full_qp_remove_maxht_density)
 # to capture the variability and explain the hypothesis.
 
 
-#' Given the overdispersion, try the full model with a negative binomial distribution. However, given the
-#' overdispersion parameter for the quasipoisson distribution, this is not really needed (it is less than 15).
-#' Try first without interactions.
-
-glm_species_richness_full_nb <- glm.nb(species_richness ~ elevational_band_m + as.factor(area) + slope +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm + mean_density,
-                                        # elevational_band_m:sampling_effort_index +
-                                        # mean_max_height_cm:mean_density,
-    link = "log",
-    data = species_richness_sites)
-
-summary(glm_species_richness_full_nb)
-Anova(glm_species_richness_full_nb)
-AICcmodavg::AICc(glm_species_richness_full_nb, return.K = FALSE, second.ord = TRUE)
-
 
 #' ### Model selection
 #'
