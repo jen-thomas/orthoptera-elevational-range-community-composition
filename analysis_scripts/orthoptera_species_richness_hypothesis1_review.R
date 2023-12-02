@@ -19,7 +19,7 @@ source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
 vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn",
-                     "stats", "knitr", "tab", "xtable")
+                     "stats", "knitr", "tab", "xtable", "MASS")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -325,7 +325,11 @@ drop1(remove_height)
 summary(remove_height)
 Anova(remove_height)
 
+#' Try stepAIC
 
+reduced_model <- stepAIC(glm_species_richness_full, direction = "backward")
+summary(reduced_model)
+Anova(reduced_model)
 
 #'
 #' ### Test for overdispersion
