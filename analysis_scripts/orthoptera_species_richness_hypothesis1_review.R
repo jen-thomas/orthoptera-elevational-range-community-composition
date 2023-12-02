@@ -465,7 +465,7 @@ car::Anova(glm_species_richness_inter_slope_vegcover, type="II", test.statistic 
 
 #'
 #' ### Test species richness from three main study areas (excluding Besan and les Bordes de Viros)
-
+#' TODO check if we still need this section
 #' Calculate the species richness for only the sites in the three main study areas. Leave combined. There
 #' are not enough data to split the data and model each site differently.
 
@@ -526,7 +526,7 @@ glm_species_richness_tortavmol_reduced <- glm_species_richness_full_tortavmol_st
 #'
 #' ### Overall reduced model
 #'
-#' Test the reduced model which was the outcome of the manual stepwise selection.
+#' Test the reduced model which was the outcome of the manual stepwise selection and drop1.
 
 par(mfrow = c(1,2))
 plot(species_richness_sites$species_richness, fitted(glm_species_richness_reduced),
@@ -535,12 +535,13 @@ abline(0,1)
 plot(fitted(glm_species_richness_reduced), residuals(glm_species_richness_reduced, type = "pearson"))
 abline(h = 0)
 
+#' TODO check if this is valid now
 reduced_test <- 1-pchisq(13.92499, 18)
 reduced_test
 
 #'
 #' ### Species richness main study areas reduced model
-
+#' TODO check if this section is still needed
 par(mfrow = c(1,2))
 plot(species_richness_tortavmol$species_richness, fitted(glm_species_richness_tortavmol_reduced),
      xlab = "Observed values", ylab = "Fitted values")
@@ -551,21 +552,6 @@ abline(h = 0)
 
 reduced_test_tortavmol <- 1-pchisq(13.92499, 18)
 reduced_test_tortavmol
-
-#' ### Caelifera reduced model
-#'
-#' Test the reduced model which was the outcome of the manual stepwise selection
-
-par(mfrow = c(1,2))
-plot(caelifera_species_richness_sites$species_richness, fitted(glm_species_richness_caelifera_reduced),
-     xlab = "Observed values", ylab = "Fitted values")
-abline(0,1)
-plot(fitted(glm_species_richness_caelifera_reduced), residuals(glm_species_richness_caelifera_reduced,
-                                                               type = "pearson"))
-abline(h = 0)
-
-reduced_test_caelifera <- 1-pchisq(13.92499, 18)
-reduced_test_caelifera
 
 #'
 #' ## Plots for report
