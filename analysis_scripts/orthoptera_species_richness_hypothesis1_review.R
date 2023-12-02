@@ -462,7 +462,7 @@ summary(glm_species_richness_inter_slope_vegcover)
 #' ANOVA.
 
 car::Anova(glm_species_richness_inter_slope_vegcover, type="II", test.statistic = "LR", error.estimate = "deviance")
-
+anova(glm_species_richness_reduced, glm_species_richness_inter_slope_vegcover, test = "F")
 #'
 #' ### Test species richness from three main study areas (excluding Besan and les Bordes de Viros)
 #' TODO check if we still need this section
@@ -560,7 +560,7 @@ reduced_test_tortavmol
 species_richness_elevation_plot <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
                                      scale = "response",
                                      rug = FALSE,
-                                     line.par = list(col = "black", lwd = 1),
+                                     line.par = list(col = "black", lwd = 0.5),
                                      xlab = "Elevation (m a.s.l)", xlim = c(1000, 2550),
                                      ylab = "Species richness", ylim = c(0, 17))
 
@@ -571,11 +571,11 @@ fitted_glm_values <- data.frame(species_richness_elevation_plot$fit)
 #' Create and save the output plot.
 
 path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis1_sr_elevation_glm.png")
+filepath <- file.path(path, "hypothesis1_sr_elevation_glm_review.png")
 print(filepath)
 png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
-filepath_pdf <- file.path(path, "figure_3_species_richness.pdf")
+filepath_pdf <- file.path(path, "figure_3_species_richness_review.pdf")
 print(filepath_pdf)
 pdf(file = filepath_pdf, width = 7, height = 7)
 
