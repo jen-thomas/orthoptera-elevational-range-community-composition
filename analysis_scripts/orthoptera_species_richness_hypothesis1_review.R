@@ -19,7 +19,7 @@ source("orthoptera_elevation_data_exploration.R")
 source("get_finalised_observations_species_richness_conservative.R")
 
 vector_packages <- c("visreg", "ggplot2", "lmerTest", "dplyr", "car", "lme4", "AICcmodavg", "MuMIn",
-                     "stats", "knitr", "tab", "xtable", "MASS", "devtools")
+                     "stats", "knitr", "tab", "xtable")
 get_packages(vector_packages)
 
 #' ## Investigate effects of elevation on species richness
@@ -433,30 +433,16 @@ summary(glm_species_richness_reduced)
 
 car::Anova(glm_species_richness_reduced, type="II", test.statistic = "LR", error.estimate = "deviance")
 
-#' Log likelihood.
-
-logLik(glm_species_richness_reduced)
-
-#' Calculate AICC.
-
-AICcmodavg::AICc(glm_species_richness_reduced)
-
-#' ### Test for overdispersion on the reduced model
-
-ratio_dispersion_reduced <- summary(glm_species_richness_reduced)$deviance /
-                    summary(glm_species_richness_reduced)$df.residual
-paste0("ratio: ", ratio_dispersion_reduced)
-
 #'
 #' ### Plot the modelled variables
 
 par(mfrow=c(3, 2))
 visreg(glm_species_richness_reduced, xvar = "elevational_band_m")
 visreg(glm_species_richness_reduced, xvar = "area")
+visreg(glm_species_richness_reduced, xvar = "aspect_cardinal")
 visreg(glm_species_richness_reduced, xvar = "slope")
 visreg(glm_species_richness_reduced, xvar = "sampling_effort_index")
 visreg(glm_species_richness_reduced, xvar = "mean_perc_veg_cover")
-visreg(glm_species_richness_reduced, xvar = "mean_density")
 
 #' ### Test interaction slope and vegetation cover
 #'
@@ -464,9 +450,9 @@ visreg(glm_species_richness_reduced, xvar = "mean_density")
 #' given that they are significantly correlated.
 
 glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                                 sampling_effort_index + slope*mean_perc_veg_cover +
-                                                 mean_density,
-    family = poisson(link = "log"),
+                                                 as.factor(aspect_cardinal) + slope + sampling_effort_index +
+                                                 mean_perc_veg_cover + slope*mean_perc_veg_cover,
+    family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
 #' Model summary.
@@ -476,10 +462,6 @@ summary(glm_species_richness_inter_slope_vegcover)
 #' ANOVA.
 
 car::Anova(glm_species_richness_inter_slope_vegcover, type="II", test.statistic = "LR", error.estimate = "deviance")
-
-#' AICC.
-
-AICcmodavg::AICc(glm_species_richness_inter_slope_vegcover, return.K = FALSE, second.ord = TRUE)
 
 #'
 #' ### Test species richness from three main study areas (excluding Besan and les Bordes de Viros)
