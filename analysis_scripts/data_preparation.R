@@ -285,8 +285,8 @@ calculate_sampling_effort_review <- function(observations) {
     total_observations_site_by_method <- all_observations_conservative %>%
     distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
     group_by(site_elevation) %>%
-    dplyr::summarise("site_osbervations_net" = sum(method == "Net"),
-                     "site_osbervations_hand" = sum(method == "Hand")
+    dplyr::summarise("site_observations_net" = sum(method == "Net"),
+                     "site_observations_hand" = sum(method == "Hand")
   )
 
   combined_total_transects_observations_site_by_method <-
@@ -295,14 +295,15 @@ calculate_sampling_effort_review <- function(observations) {
                      by = "site_elevation")
 
   summary_observations_site_method <- combined_total_transects_observations_site_by_method %>%
-    mutate("mean_obs_net" = site_osbervations_net/transects_net,
-           "mean_obs_hand" = site_osbervations_hand/transects_hand,
-           "sampling_effort_index" = (mean_obs_net/transects_net + mean_obs_hand/transects_hand))
+    mutate("mean_obs_net" = site_observations_net/transects_net,
+           "mean_obs_hand" = site_observations_hand/transects_hand,
+           # "sampling_effort_index" = (mean_obs_net/transects_net + mean_obs_hand/transects_hand))
+           "sampling_effort_index" = transects_net + site_observations_hand / mean_obs_net)
 
   # MOL01 has a sampling effort of NaN because no hand sampling was done here. Therefore, manually adjust
   # this to the correct value.
 
-  summary_observations_site_method$sampling_effort_index[summary_observations_site_method$site_elevation == "2500_MOL01"] <- 1
+  # summary_observations_site_method$sampling_effort_index[summary_observations_site_method$site_elevation == "2500_MOL01"] <- 1
 
   return(summary_observations_site_method)
 }
