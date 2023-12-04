@@ -264,23 +264,15 @@ calculate_sampling_effort <- function(observations) {
 }
 
 
-calculate_sampling_effort_review <- function(observations) {
-  #' Calculate the number of transects undertaken at each site, by each survey method. Sum up the number
-  #' of observations collected at each site using each survey method. From these two values, calculate the
-  #' mean number of observations collected using each survey method at each site (total observations at
-  #' site by method / number of transects at site by method).
+calculate_sampling_effort_review <- function(observations, surveys_summary) {
+  #' Calculate the number of observations at each site. Then, calculate the mean number of observations
+  #' collected using each survey method at each site (total observations at site by method / number of
+  #' transects at site by method).
   #'
   #' Calculate the sampling effort for each site using
-  #' mean_obs_hand / no_hand_transects + mean_obs_net / no_net_transects
-
-  total_transects_site_by_method <- all_observations_conservative %>%
-  distinct(site_elevation, date_cest, method, method_repeat) %>%
-  group_by(site_elevation, method) %>%
-  dplyr::summarise(transects_method_repeat = n()) %>%
-  dplyr::summarise(
-    transects_net = sum(ifelse(method == "Net", transects_method_repeat, 0)),
-    transects_hand = sum(ifelse(method == "Hand", transects_method_repeat, 0))
-  )
+  #' number_net_surveys + site_observations_hand/mean_obs_net
+  #' This converts the number of hand transects to the number of net transects that would have caught the
+  #' same number of specimens i.e. SE is estimated as the number of ‘transect_net equivalents’.
 
     total_observations_site_by_method <- all_observations_conservative %>%
     distinct(site_elevation, date_cest, method, method_repeat, specimen_label) %>%
@@ -291,19 +283,13 @@ calculate_sampling_effort_review <- function(observations) {
 
   combined_total_transects_observations_site_by_method <-
     dplyr::left_join(total_observations_site_by_method,
-                     total_transects_site_by_method,
+                     surveys_summary,
                      by = "site_elevation")
 
   summary_observations_site_method <- combined_total_transects_observations_site_by_method %>%
-    mutate("mean_obs_net" = site_observations_net/transects_net,
-           "mean_obs_hand" = site_observations_hand/transects_hand,
-           # "sampling_effort_index" = (mean_obs_net/transects_net + mean_obs_hand/transects_hand))
-           "sampling_effort_index" = transects_net + site_observations_hand / mean_obs_net)
-
-  # MOL01 has a sampling effort of NaN because no hand sampling was done here. Therefore, manually adjust
-  # this to the correct value.
-
-  # summary_observations_site_method$sampling_effort_index[summary_observations_site_method$site_elevation == "2500_MOL01"] <- 1
+    mutate("mean_obs_net" = site_observations_net/number_net_surveys,
+           "mean_obs_hand" = site_observations_hand/number_hand_surveys,
+           "sampling_effort_index" = number_net_surveys + site_observations_hand / mean_obs_net)
 
   return(summary_observations_site_method)
 }
