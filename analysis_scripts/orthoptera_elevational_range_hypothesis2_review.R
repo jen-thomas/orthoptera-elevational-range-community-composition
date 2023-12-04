@@ -108,7 +108,7 @@ calculate_elevational_range <- function(observations) {
                      # the highest band to the min of the lowest band. Because we take the elevational
                      # band of a site to be the minimum elevation, then we just need to add 100.
                      "elevational_range_midpoint" = min_elevation + elevational_range / 2,
-                     "mean_elevation" = mean(elevational_band_m))
+                     "mean_elevation_stevens" = mean(elevational_band_m))
 
   return(elevational_ranges_species)
 }
@@ -144,6 +144,9 @@ plot_elevrange_elevation_species(elevational_ranges_species)
 #' biased by potentially more observations at one end of the elevational range.
 #'
 #' The functions below, manipulate the data needed for the modelling below.
+#'
+#' ### Rohde's method with midpoint (original submission)
+#'
 
 transform_elevational_range <- function(dataframe) {
   #' Calculate the square-root and log of a parameter to transform it. Add it to a new column in the
@@ -175,7 +178,7 @@ plot_histograms_elevational_range <- function(dataframe) {
 }
 
 plot_elevrange_midpointelevation <- function(dataframe) {
-  #' Plot the elevational range as a function of the measures of elevation.
+  #' Plot the elevational range as a function of the measures of elevation (midpoint) - Rohde's method.
 
   y_param <- dataframe$elevational_range
   ylab <- "Elevational range (m)"
@@ -322,6 +325,106 @@ elevational_ranges_species_predicted <- cbind(elevational_ranges_species, predic
 #' ### Check model assumptions
 
 check_model_assumptions(nonlin_reg_quadratic)
+
+#'
+#' ### Steven's method (for review)
+#'
+
+plot_elevrange_meanelevation <- function(dataframe) {
+  #' Plot the elevational range as a function of the measure of elevation (mean - Steven's method).
+
+  y_param <- dataframe$elevational_range
+  ylab <- "Elevational range (m)"
+
+  plot(jitter(y_param, amount = 20) ~ jitter(mean_elevation_stevens, amount = 20), data = dataframe,
+       xlab = "Mean elevational range (m a.s.l)", ylab = ylab)
+}
+
+calculate_polynomials_meanelevation <- function(dataframe) {
+  #' Calculate the square, cube and fourth degree of the measure of elevation (mean). Add to dataframe as
+  #' new columns.
+  #'
+  #' Return dataframe.
+
+  parameter <- dataframe$mean_elevation_stevens
+
+  dataframe$mean_elevation_stevens2 <- parameter^2
+  dataframe$mean_elevation_stevens3 <- parameter^3
+  dataframe$mean_elevation_stevens4 <- parameter^4
+
+  return(dataframe)
+}
+
+linear_regression_elevrange_meanelevation_polynomial <- function(dataframe) {
+  #' Do linear regressions of elevational range as a function of elevation. The measure of elevation will
+  #' be a polynomial of varying order as specified in each regression.
+  #'
+  #' Return a list of the regressions.
+
+  lin_regs_polynomial <- list()
+
+  lin_reg <- lm(elevational_range ~ mean_elevation_stevens, data = dataframe)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(lin_reg))
+
+  nonlin_reg_quadratic <- lm(elevational_range ~ mean_elevation_stevens + mean_elevation_stevens2, data = dataframe)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quadratic))
+
+  nonlin_reg_cubic <- lm(elevational_range ~ mean_elevation_stevens + mean_elevation_stevens2 + mean_elevation_stevens3,
+                       data = dataframe)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_cubic))
+
+  nonlin_reg_quartic <- lm(elevational_range ~ mean_elevation_stevens + mean_elevation_stevens2 + mean_elevation_stevens3 +
+                         mean_elevation_stevens4, data = dataframe)
+  lin_regs_polynomial <- append(lin_regs_polynomial, list(nonlin_reg_quartic))
+
+  return(lin_regs_polynomial)
+}
+
+#' Plot the relationships between the measures of elevation and the elevational range at which each
+#' species was observed.
+
+par(mfrow = c(1,1))
+
+plot_elevrange_meanelevation(elevational_ranges_species)
+
+#' Test the quadratic, cubic and quartic models. Calculate these parameters first.
+
+elevational_ranges_species <- calculate_polynomials_meanelevation(elevational_ranges_species)
+
+lin_regs_polynomial_meanelev <- linear_regression_elevrange_meanelevation_polynomial(elevational_ranges_species)
+
+lin_reg_meanelev <- lin_regs_polynomial_meanelev[[1]]
+nonlin_reg_quadratic_meanelev <- lin_regs_polynomial_meanelev[[2]]
+nonlin_reg_cubic_meanelev <- lin_regs_polynomial_meanelev[[3]]
+nonlin_reg_quartic_meanelev <- lin_regs_polynomial_meanelev[[4]]
+
+#' Compare the models to look at the AIC and adjusted R-squared.
+
+compareLM(lin_reg_meanelev, nonlin_reg_quadratic_meanelev, nonlin_reg_cubic_meanelev, nonlin_reg_quartic_meanelev)
+
+#' Do a direct comparison of the difference between the models using ANOVA.
+#' <br>H<sub>0</sub>: there is no difference between the models.
+#' <br>H<sub>1</sub>: there is a difference between the models.
+#+ message=FALSE, warning=FALSE
+
+anova(lin_reg_meanelev, nonlin_reg_quadratic_meanelev, nonlin_reg_cubic_meanelev, nonlin_reg_quartic_meanelev)
+
+#' As with Rohde's method, the quadratic model is the best fit to the data.
+#' View the summary of the quadratic model.
+
+summary(nonlin_reg_quadratic_meanelev)
+
+par(mfrow = c(1,1))
+plot_quadratic_model(elevational_ranges_species, nonlin_reg_quadratic_meanelev)
+
+#' Get the predicted values for this model.
+
+elevational_ranges_species_predicted_meanelev <- cbind(elevational_ranges_species, predict(nonlin_reg_quadratic_meanelev, interval = "confidence"))
+
+#' ### Check model assumptions
+
+check_model_assumptions(nonlin_reg_quadratic_meanelev)
+
 
 #'
 #' ## Test Rapoport's Rule for Caelifera only
