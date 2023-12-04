@@ -175,8 +175,11 @@ print(corr_test_samplingeffort_speciesrichness_rho)
 coeff_det_samplingeffort_speciesrichnessn <- calculate_coefficient_of_determination(corr_test_samplingeffort_speciesrichness_rho)
 print(coeff_det_samplingeffort_speciesrichnessn)
 
-#' and elevation and sampling effort.
+#' Calculate the correlation between elevation and sampling effort.
 #+ message=FALSE, warning=FALSE
+
+plot(sampling_effort_index ~ elevational_band_m, data = species_richness_sites,
+       xlab = "Elevation band (m a.s.l)", ylab = "SE")
 
 corr_test_samplingeffort_elevation <- correlation_test(species_richness_sites, "elevational_band_m",
                                               "sampling_effort_index")
@@ -452,12 +455,11 @@ Anova(full_qp_remove_density_aspect_area)
 
 drop1(full_qp_remove_density_aspect_area)
 
-# Stick at this model because there is not a great improvement and the remaining variables are important
-# to capture the variability and explain the hypothesis.
+# Slope does not improve the model so leave it out.
 
 #' #### Define reduced model
 
-glm_species_richness_reduced <- full_qp_remove_density_aspect_area
+glm_species_richness_reduced <- full_qp_remove_slope_density_aspect_area
 
 #' Summary of model.
 
@@ -470,36 +472,15 @@ car::Anova(glm_species_richness_reduced, type="II", test.statistic = "LR", error
 #'
 #' ### Plot the modelled variables
 
-par(mfrow=c(3, 2))
+par(mfrow=c(2, 2))
 visreg(glm_species_richness_reduced, xvar = "elevational_band_m")
-visreg(glm_species_richness_reduced, xvar = "slope")
 visreg(glm_species_richness_reduced, xvar = "sampling_effort_index")
 visreg(glm_species_richness_reduced, xvar = "mean_perc_veg_cover")
 visreg(glm_species_richness_reduced, xvar = "mean_max_height_cm")
 
-
-#' ### Test interaction slope and vegetation cover
-#'
-#' Test an interaction between slope and vegetation cover rather than as an addition to the reduced model,
-#' given that they are significantly correlated.
-
-glm_species_richness_inter_slope_vegcover <- glm(species_richness ~ elevational_band_m + slope +
-                                        sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm + slope*mean_perc_veg_cover,
-    family = quasipoisson(link = "log"),
-    data = species_richness_sites)
-
-#' Model summary.
-
-summary(glm_species_richness_inter_slope_vegcover)
-
-#' ANOVA.
-
-car::Anova(glm_species_richness_inter_slope_vegcover, type="II", test.statistic = "LR", error.estimate = "deviance")
-anova(glm_species_richness_reduced, glm_species_richness_inter_slope_vegcover, test = "F")
 #'
 #' ### Test species richness from three main study areas (excluding Besan and les Bordes de Viros)
-#' TODO check if we still need this section
+
 #' Calculate the species richness for only the sites in the three main study areas. Leave combined. There
 #' are not enough data to split the data and model each site differently.
 
@@ -523,8 +504,59 @@ summary(glm_species_richness_full_tortavmol)
 #' Do ANOVA of GLM.
 
 Anova(glm_species_richness_full_tortavmol)
+anova(glm_species_richness_full_tortavmol)
 
-#' TODO this model should still be reduced
+#' Manually reduce the model
+
+#' Remove the slope which has a large p value and only leads to a small increase in deviance
+glm_species_richness_full_tortavmol_remove_slope <- glm(species_richness ~ elevational_band_m + as.factor(area) +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height_cm,
+    family = quasipoisson(link = "log"),
+    data = species_richness_tortavmol)
+
+summary(glm_species_richness_full_tortavmol_remove_slope)
+Anova(glm_species_richness_full_tortavmol_remove_slope)
+anova(glm_species_richness_full_tortavmol_remove_slope)
+
+#' Remove the area which has a large p value and only leads to a small increase in deviance
+glm_species_richness_full_tortavmol_remove_slope_area <- glm(species_richness ~ elevational_band_m +
+                                        as.factor(aspect_cardinal) + sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height_cm,
+    family = quasipoisson(link = "log"),
+    data = species_richness_tortavmol)
+
+summary(glm_species_richness_full_tortavmol_remove_slope_area)
+Anova(glm_species_richness_full_tortavmol_remove_slope_area)
+anova(glm_species_richness_full_tortavmol_remove_slope_area)
+
+#' Remove the aspect which has a large p value and only leads to a small increase in deviance
+glm_species_richness_full_tortavmol_remove_slope_area_aspect <- glm(species_richness ~ elevational_band_m +
+                                        sampling_effort_index +
+                                        mean_perc_veg_cover + mean_max_height_cm,
+    family = quasipoisson(link = "log"),
+    data = species_richness_tortavmol)
+
+summary(glm_species_richness_full_tortavmol_remove_slope_area_aspect)
+Anova(glm_species_richness_full_tortavmol_remove_slope_area_aspect)
+anova(glm_species_richness_full_tortavmol_remove_slope_area_aspect)
+
+#' Try adding slope back in
+glm_species_richness_full_tortavmol_remove_area_aspect <- glm(species_richness ~ elevational_band_m +
+                                        sampling_effort_index + slope +
+                                        mean_perc_veg_cover + mean_max_height_cm,
+    family = quasipoisson(link = "log"),
+    data = species_richness_tortavmol)
+
+summary(glm_species_richness_full_tortavmol_remove_area_aspect)
+Anova(glm_species_richness_full_tortavmol_remove_area_aspect)
+anova(glm_species_richness_full_tortavmol_remove_area_aspect)
+
+#' Slope did not improve the model fit, so leave it out. Retain this as the reduced model which is the
+#' same as the reduced model for the full set of data. The parameter estimates are also very similar,
+#' so this shows that the data from the sites in other study areas are not affecting the model greatly.
+
+glm_species_richness_reduced_tortavmol <- glm_species_richness_full_tortavmol_remove_slope_area_aspect
 
 #'
 #' ## GLM model assessment
@@ -552,14 +584,16 @@ reduced_test
 
 #'
 #' ### Species richness main study areas reduced model
-#' TODO check if this section is still needed
+
 par(mfrow = c(1,2))
-plot(species_richness_tortavmol$species_richness, fitted(glm_species_richness_tortavmol_reduced),
+plot(species_richness_tortavmol$species_richness, fitted(glm_species_richness_reduced_tortavmol),
      xlab = "Observed values", ylab = "Fitted values")
 abline(0,1)
-plot(fitted(glm_species_richness_tortavmol_reduced), residuals(glm_species_richness_tortavmol_reduced,
+plot(fitted(glm_species_richness_reduced_tortavmol), residuals(glm_species_richness_reduced_tortavmol,
                                                                type = "pearson"))
 abline(h = 0)
+
+#' TODO check if this is valid now
 
 reduced_test_tortavmol <- 1-pchisq(13.92499, 18)
 reduced_test_tortavmol
