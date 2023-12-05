@@ -147,11 +147,11 @@ species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
 #' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
 #' method.
 
-# sampling_effort <- calculate_sampling_effort(all_observations_conservative)
 #' Calculate sampling effort according to the method during review. All further analysis will use these
 #' values.
 sampling_effort <- calculate_sampling_effort_review(all_observations_conservative, site_survey_summary)
-
+min(sampling_effort$sampling_effort_index)
+max(sampling_effort$sampling_effort_index)
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
 
 #' It is likely that the number of species recorded will depend on the number of specimens captured, and
@@ -480,7 +480,8 @@ visreg(glm_species_richness_reduced, xvar = "mean_max_height_cm")
 
 #'
 #' ### Test species richness from three main study areas (excluding Besan and les Bordes de Viros)
-
+#' TODO don't think this section is necessary any more given that study area is not a predictor in the
+#' reduced model.
 #' Calculate the species richness for only the sites in the three main study areas. Leave combined. There
 #' are not enough data to split the data and model each site differently.
 
@@ -578,13 +579,12 @@ abline(0,1)
 plot(fitted(glm_species_richness_reduced), residuals(glm_species_richness_reduced, type = "pearson"))
 abline(h = 0)
 
-#' TODO check if this is valid now
-reduced_test <- 1-pchisq(13.92499, 18)
+reduced_test <- 1-pchisq(30.321, 23) # from residual deviance in the model output
 reduced_test
 
 #'
 #' ### Species richness main study areas reduced model
-
+#' TODO this section is also not likely needed now
 par(mfrow = c(1,2))
 plot(species_richness_tortavmol$species_richness, fitted(glm_species_richness_reduced_tortavmol),
      xlab = "Observed values", ylab = "Fitted values")
@@ -620,9 +620,9 @@ filepath <- file.path(path, "hypothesis1_sr_elevation_glm_review.png")
 print(filepath)
 png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
-filepath_pdf <- file.path(path, "figure_3_species_richness_review.pdf")
-print(filepath_pdf)
-pdf(file = filepath_pdf, width = 7, height = 7)
+# filepath_pdf <- file.path(path, "figure_2_species_richness_review.pdf")
+# print(filepath_pdf)
+# pdf(file = filepath_pdf, width = 7, height = 7)
 
 par(mfrow = c(1,1))
 species_richness_elevation_plot2 <- visreg(glm_species_richness_reduced, xvar = "elevational_band_m",
