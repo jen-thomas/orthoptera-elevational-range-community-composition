@@ -62,7 +62,6 @@ count_adult_nymphs_to_species <- function(observations_df) {
   #' Return a tibble of these results.
 
     adults_nymphs <- observations_df %>%
-    #distinct(stage) %>%
     group_by(stage) %>%
     dplyr::summarise("number_observations" = n())
 
@@ -332,8 +331,7 @@ check_model_assumptions(nonlin_reg_quadratic)
 #' Plot the elevational ranges from all observations that are used in the main results (this excludes
 #' the singletons). Filled circles are Caelifera; crosses are Ensifera. The first plot shows the
 #' relationship between elevational range of all species with midpoint. The second plot shows the
-#' relationship between elevational range with midpoint elevation for Caelifera only. Lines show the
-#' best-fitted regression for each set of species.
+#' relationship between elevational range with midpoint elevation. Lines show the best-fitted regression.
 
 #' ### All species
 
@@ -384,27 +382,17 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
 
 #' Plot and save.
 
-#' Create the output plot PNG file.
+#' Create the output plot TIFF file.
 
 path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_elevational_range_model.tiff")
 
 tiff(file = filepath, width = 1000, height = 1000, bg = "white", units = "px", res = 300)
-#png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
 plot_elev_range_all_species
 dev.off()
 
-#' Output the plot as PDF as well.
-
-filepath_pdf <- file.path(path, "figure_4_elevational_range_model.pdf")
-print(filepath_pdf)
-pdf(file = filepath_pdf, width = 7, height = 7)
-
-plot_elev_range_all_species
-
-dev.off()
-
+#'
 #' ### Elevational range and mean elevation
 #'
 #' Ordered by decreasing elevational range midpoint.
@@ -415,11 +403,6 @@ path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.tiff")
 
 tiff(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
-#png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
-
-# filepath_pdf <- file.path(path, "figure_3_elevational_range_species.pdf")
-# print(filepath_pdf)
-# pdf(file = filepath_pdf, width = 7, height = 7)
 
 species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_predicted,
                                         aes(y = reorder(species, elevational_range_midpoint), x = elevational_range_midpoint)) +
