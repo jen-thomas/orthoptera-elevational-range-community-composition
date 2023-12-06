@@ -549,7 +549,7 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
   geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = upr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
   annotate("text", label = equation_all_sp, x = 2000, y = 1600, cex = 3) +
-  annotate("text", label = "(a)", x = 1200, y = 1600, cex = 4) +
+  # annotate("text", label = "(a)", x = 1200, y = 1600, cex = 4) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
