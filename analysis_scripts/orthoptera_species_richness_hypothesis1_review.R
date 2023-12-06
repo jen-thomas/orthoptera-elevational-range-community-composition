@@ -1,5 +1,5 @@
 #' ---
-#' title: Hypothesis 1 REVIEW
+#' title: Hypothesis 1
 #' subtitle: Species richness decreases with elevation.
 #' output:
 #'   html_document:
@@ -137,18 +137,19 @@ species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
 
 #' ### Account for the effects of sampling effort
 #'
-#' Due to logistical reasons and poor weather, the sampling effort varied a lot across the sampling sites.
+#' Due to poor weather, the sampling effort varied across the sampling sites.
 #' Additionally, both and hand and net sampling were used. In order to account for the difference in
 #' sampling effort across the sites, an index of sampling effort was calculated.
 #'
-#' First, the proportion of all specimens captured by hand ($prop_{hand}$) and by net ($prop_{net}$)
-#' was calculated. Secondly, the index for sampling effort was calculated for each site according
-#' to the following equation: $$weighting = obs_{hand} * prop_{hand} + obs_{net} * prop_{net}$$ where
-#' $obs_{hand}$ and $obs_{net}$ were the number of specimens captured at the site by each sampling
-#' method.
+#' We calculated the number of surveys undertaken by net ($surveys_{NET}$), the mean number of
+#' specimens caught in a net transect sample ($mean_obs_{NET}$), and the total number of specimens caught
+#' in hand transect samples at each site ($total_obs_{HAND}).
+#'
+#' We calculated SE for each site using the equation,
+#' $SE = surveys_{NET} + total_obs_{HAND} / mean_obs_{NET}$
+#'
 
-#' Calculate sampling effort according to the method during review. All further analysis will use these
-#' values.
+#' Calculate sampling effort. All further analysis will use these values.
 sampling_effort <- calculate_sampling_effort_review(all_observations_conservative, site_survey_summary)
 min(sampling_effort$sampling_effort_index)
 max(sampling_effort$sampling_effort_index)
@@ -224,19 +225,10 @@ plot_elevation_species_richness(species_richness_sites)
 #'
 #' ## Generalised linear model
 #'
-#' Look at the distribution of the species richness including all sites and separately in each study area.
+#' Look at the distribution of the species richness across all sites.
 
 par(mfrow=c(1,1))
 hist(species_richness_sites$species_richness)
-
-species_richness_tor <- species_richness_sites[species_richness_sites$area == "Tor",]
-species_richness_mol <- species_richness_sites[species_richness_sites$area == "La Molinassa",]
-species_richness_tav <- species_richness_sites[species_richness_sites$area == "Tavascan",]
-
-par(mfrow=c(2,2))
-hist(species_richness_tor$species_richness)
-hist(species_richness_mol$species_richness)
-hist(species_richness_tav$species_richness)
 
 #' Fit a GLM to the data using species richness as the response variable and the environmental variables
 #' as predictor variables. It looks as though a Poisson distribution might be the best distrbution to use
@@ -273,7 +265,6 @@ paste0("ratio: ", ratio_dispersion)
 #' Fit a quasipoisson distribution to double-check that there is no problem with overdispersion. A poisson
 #' distribution assumes that the overdispersion is 1, so if the overdispersion from the quasipoisson is
 #' greater than 1, then we have this problem with the Poisson distribution. This model is overdispersed.
-#' Try different methods below to solve this.
 
 glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
@@ -303,10 +294,11 @@ anova(glm_species_richness_full_quasipoisson)
 #' largest amount will be retained).
 
 #' #### Manual selection new model with new data
+#'
 #' Try removing veg density which reduces the deviance by a small amount and has a large p value
-glm_species_richness_full_quasipoisson_remove_density <- glm(species_richness ~ elevational_band_m + as.factor(area) + slope +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm,
+glm_species_richness_full_quasipoisson_remove_density <- glm(species_richness ~ elevational_band_m +
+                                        as.factor(area) + slope + as.factor(aspect_cardinal) +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
@@ -319,9 +311,9 @@ anova(glm_species_richness_full_quasipoisson, glm_species_richness_full_quasipoi
       test = "F")
 
 #' Try removing slope which reduces the deviance by a small amount and has a large p value
-glm_species_richness_full_quasipoisson_remove_density_slope <- glm(species_richness ~ elevational_band_m + as.factor(area) +
-                                        as.factor(aspect_cardinal) + sampling_effort_index +
-                                        mean_perc_veg_cover + mean_max_height_cm,
+glm_species_richness_full_quasipoisson_remove_density_slope <- glm(species_richness ~ elevational_band_m +
+                                        as.factor(area) + as.factor(aspect_cardinal) +
+                                        sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
@@ -330,11 +322,13 @@ Anova(glm_species_richness_full_quasipoisson_remove_density_slope)
 anova(glm_species_richness_full_quasipoisson_remove_density_slope)
 
 #' Compare the reduced model and full model.
-anova(glm_species_richness_full_quasipoisson_remove_density, glm_species_richness_full_quasipoisson_remove_density_slope,
+anova(glm_species_richness_full_quasipoisson_remove_density,
+      glm_species_richness_full_quasipoisson_remove_density_slope,
       test = "F")
 
 #' Try removing aspect which reduces the deviance by a small amount and has a large p value
-glm_species_richness_full_quasipoisson_remove_density_slope_aspect <- glm(species_richness ~ elevational_band_m +
+glm_species_richness_full_quasipoisson_remove_density_slope_aspect <- glm(species_richness ~
+                                        elevational_band_m +
                                         as.factor(area) + sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
@@ -345,11 +339,13 @@ Anova(glm_species_richness_full_quasipoisson_remove_density_slope_aspect)
 anova(glm_species_richness_full_quasipoisson_remove_density_slope_aspect)
 
 #' Compare the reduced model and full model.
-anova(glm_species_richness_full_quasipoisson_remove_density_slope, glm_species_richness_full_quasipoisson_remove_density_slope_aspect,
+anova(glm_species_richness_full_quasipoisson_remove_density_slope,
+      glm_species_richness_full_quasipoisson_remove_density_slope_aspect,
       test = "F")
 
-#' Try removing area which reduces the deviance by a small amount and has a large p value
-glm_species_richness_full_quasipoisson_remove_density_slope_area <- glm(species_richness ~ elevational_band_m +
+#' Try removing area instead of aspect which reduces the deviance by a small amount and has a large p value
+glm_species_richness_full_quasipoisson_remove_density_slope_area <- glm(species_richness ~
+                                        elevational_band_m +
                                         as.factor(aspect_cardinal) + sampling_effort_index +
                                         mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
@@ -360,13 +356,15 @@ Anova(glm_species_richness_full_quasipoisson_remove_density_slope_area)
 anova(glm_species_richness_full_quasipoisson_remove_density_slope_area)
 
 #' Compare the reduced model and full model.
-anova(glm_species_richness_full_quasipoisson_remove_density_slope, glm_species_richness_full_quasipoisson_remove_density_slope_area,
+anova(glm_species_richness_full_quasipoisson_remove_density_slope,
+      glm_species_richness_full_quasipoisson_remove_density_slope_area,
       test = "F")
 
 #' This has made elevation become very significant. Try removing the aspect as well.
 
 #' Try removing aspect which reduces the deviance by a small amount and has a large p value
-glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect <- glm(species_richness ~ elevational_band_m +
+glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect <- glm(species_richness ~
+                                        elevational_band_m +
                                         sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
@@ -376,12 +374,14 @@ Anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect)
 anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect)
 
 #' Compare the reduced model and full model.
-anova(glm_species_richness_full_quasipoisson_remove_density_slope_area, glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect,
+anova(glm_species_richness_full_quasipoisson_remove_density_slope_area,
+      glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect,
       test = "F")
 
 #' Try adding slope back in
-glm_species_richness_full_quasipoisson_remove_density_area_aspect <- glm(species_richness ~ elevational_band_m +
-                                        slope + sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
+glm_species_richness_full_quasipoisson_remove_density_area_aspect <- glm(species_richness ~
+                                        elevational_band_m + slope + sampling_effort_index +
+                                          mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
 
@@ -390,7 +390,8 @@ Anova(glm_species_richness_full_quasipoisson_remove_density_area_aspect)
 anova(glm_species_richness_full_quasipoisson_remove_density_area_aspect)
 
 #' Compare the reduced model and full model.
-anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect, glm_species_richness_full_quasipoisson_remove_density_area_aspect,
+anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect,
+      glm_species_richness_full_quasipoisson_remove_density_area_aspect,
       test = "F")
 
 #' Adding slope did not improve the model so leave it out of the reduced model
