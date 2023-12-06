@@ -231,40 +231,7 @@ get_observations_of_particular_species <- function(observations, chosen_species)
 
 #' ### Create summaries of species richness data
 
-calculate_sampling_effort <- function(observations) {
-  #' Calculate sampling effort index. Sum the total number of observations, the total number caught
-  #' by net and the total caught by hand. Find the proportion of observations caught by net and by hand,
-  #' by dividing each of the totals by the total number of observations.
-  #'
-  #' For each site, multiply the number of specimens caught by hand, by the proportion of the total caught
-  #' by hand. Do the same for those caught by net.
-  #'
-  #' This will result in an index for each site, which takes into account the number of
-  #' observations and how they were caught, which is a proxy for the number of surveys done because
-  #' generally, a higher number of individuals sampled will result in a higher number of species observed.
-
-  observations_by_method <- observations %>%
-    distinct(site_elevation, method, specimen_label) %>%
-    group_by(site_elevation) %>%
-    dplyr::summarise("number_observations_by_net" = sum(method == "Net"),
-                     "number_observations_by_hand" = sum(method == "Hand"))
-
-  total_obs_hand <- colSums(observations_by_method[ , "number_observations_by_hand"])
-  total_obs_net <- colSums(observations_by_method[ , "number_observations_by_net"])
-  total_obs <- total_obs_hand + total_obs_net
-
-  weighting_hand <- total_obs_hand / total_obs
-  weighting_net <- total_obs_net / total_obs
-
-  sampling_effort <- observations_by_method %>%
-    mutate(sampling_effort_index = (number_observations_by_hand * weighting_hand) +
-      (number_observations_by_net * weighting_net))
-
-  return(sampling_effort)
-}
-
-
-calculate_sampling_effort_review <- function(observations, surveys_summary) {
+calculate_sampling_effort <- function(observations, surveys_summary) {
   #' Calculate the number of observations at each site. Then, calculate the mean number of observations
   #' collected using each survey method at each site (total observations at site by method / number of
   #' transects at site by method).
@@ -293,7 +260,6 @@ calculate_sampling_effort_review <- function(observations, surveys_summary) {
 
   return(summary_observations_site_method)
 }
-
 
 join_observations <- function(confirmed_observations, finalised_observations) {
   #' Join the dataframes of the confirmed and finalised observations.

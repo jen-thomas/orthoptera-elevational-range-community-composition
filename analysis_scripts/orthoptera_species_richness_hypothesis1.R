@@ -150,7 +150,8 @@ species_richness_sites <- left_join(species_richness_sites, site_env_var_data,
 #'
 
 #' Calculate sampling effort. All further analysis will use these values.
-sampling_effort <- calculate_sampling_effort_review(all_observations_conservative, site_survey_summary)
+
+sampling_effort <- calculate_sampling_effort(all_observations_conservative, site_survey_summary)
 min(sampling_effort$sampling_effort_index)
 max(sampling_effort$sampling_effort_index)
 species_richness_sites <- left_join(species_richness_sites, sampling_effort, by = "site_elevation")
