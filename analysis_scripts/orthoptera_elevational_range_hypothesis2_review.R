@@ -387,8 +387,10 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
 #' Create the output plot PNG file.
 
 path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_elevational_range_model.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+filepath <- file.path(path, "hypothesis2_elevational_range_model.tiff")
+
+tiff(file = filepath, width = 1000, height = 1000, bg = "white", units = "px", res = 300)
+#png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
 plot_elev_range_all_species
 dev.off()
@@ -410,12 +412,14 @@ dev.off()
 #' Create the output plot file.
 
 path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png")
-png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
+filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.tiff")
 
-filepath_pdf <- file.path(path, "figure_3_elevational_range_species.pdf")
-print(filepath_pdf)
-pdf(file = filepath_pdf, width = 7, height = 7)
+tiff(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
+#png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
+
+# filepath_pdf <- file.path(path, "figure_3_elevational_range_species.pdf")
+# print(filepath_pdf)
+# pdf(file = filepath_pdf, width = 7, height = 7)
 
 species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_predicted,
                                         aes(y = reorder(species, elevational_range_midpoint), x = elevational_range_midpoint)) +
