@@ -62,7 +62,6 @@ count_adult_nymphs_to_species <- function(observations_df) {
   #' Return a tibble of these results.
 
     adults_nymphs <- observations_df %>%
-    #distinct(stage) %>%
     group_by(stage) %>%
     dplyr::summarise("number_observations" = n())
 
@@ -108,7 +107,7 @@ calculate_elevational_range <- function(observations) {
                      # the highest band to the min of the lowest band. Because we take the elevational
                      # band of a site to be the minimum elevation, then we just need to add 100.
                      "elevational_range_midpoint" = min_elevation + elevational_range / 2,
-                     "mean_elevation" = mean(elevational_band_m))
+                     "mean_elevation_stevens" = mean(elevational_band_m))
 
   return(elevational_ranges_species)
 }
@@ -144,6 +143,9 @@ plot_elevrange_elevation_species(elevational_ranges_species)
 #' biased by potentially more observations at one end of the elevational range.
 #'
 #' The functions below, manipulate the data needed for the modelling below.
+#'
+#' ### Rohde's method with midpoint (original submission)
+#'
 
 transform_elevational_range <- function(dataframe) {
   #' Calculate the square-root and log of a parameter to transform it. Add it to a new column in the
@@ -175,7 +177,7 @@ plot_histograms_elevational_range <- function(dataframe) {
 }
 
 plot_elevrange_midpointelevation <- function(dataframe) {
-  #' Plot the elevational range as a function of the measures of elevation.
+  #' Plot the elevational range as a function of the measures of elevation (midpoint) - Rohde's method.
 
   y_param <- dataframe$elevational_range
   ylab <- "Elevational range (m)"
@@ -324,85 +326,12 @@ elevational_ranges_species_predicted <- cbind(elevational_ranges_species, predic
 check_model_assumptions(nonlin_reg_quadratic)
 
 #'
-#' ## Test Rapoport's Rule for Caelifera only
-#'
-#' The functions below prepare the data and run the models for Caelifera only.
-
-get_caelifera_observations <- function(observations_df) {
-  #' Subset the observations of Caelifera only from those that have been identified to use in this
-  #' analysis.
-  #'
-  #' Return the dataframe of Caelifera.
-
-  caelifera_observations <- filter(observations_df, suborder == "Caelifera")
-
-  return(caelifera_observations)
-}
-
-#' Plot elevational range against elevation and colour the points by suborder.
-
-plot_elevrange_elevation_suborder(elevational_ranges_species)
-
-#' For this part of the analysis, consider only Caelifera.
-
-#' Get the Caelifera observations to use.
-
-caelifera_observations_to_use <- get_caelifera_observations(observations_without_singletons)
-
-#' Calculate the elevational ranges (and elevation-related parameters).
-#+ message=FALSE, warning=FALSE
-
-elevational_ranges_caelifera <- calculate_elevational_range(caelifera_observations_to_use)
-
-#' Check the distribution of the Caelifera species elevational range with elevation.
-
-transform_elevational_range(elevational_ranges_caelifera)
-par(mfrow = c(1,1))
-plot_histograms_elevational_range(elevational_ranges_caelifera)
-
-#' Plot elevational range against elevation for Caelifera only.
-
-par(mfrow = c(1,1))
-plot_elevrange_midpointelevation(elevational_ranges_caelifera)
-
-#' Run model for polynomials up to the fourth order and do model selection to choose the most parsimonious
-#' model.
-
-elevational_ranges_caelifera <- calculate_polynomials_elevation(elevational_ranges_caelifera)
-
-lin_regs_polynomial_caelifera <- linear_regression_elevrange_elevation_polynomial(elevational_ranges_caelifera)
-
-lin_reg_caelifera <- lin_regs_polynomial_caelifera[[1]]
-nonlin_reg_quadratic_caelifera <- lin_regs_polynomial_caelifera[[2]]
-nonlin_reg_cubic_caelifera <- lin_regs_polynomial_caelifera[[3]]
-nonlin_reg_quartic_caelifera <- lin_regs_polynomial_caelifera[[4]]
-
-compareLM(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
-
-anova(lin_reg_, nonlin_reg_quadratic, nonlin_reg_cubic, nonlin_reg_quartic)
-
-summary(nonlin_reg_quadratic_caelifera)
-
-#' Get predicted values for this model.
-
-elevational_ranges_caelifera_predicted <- cbind(elevational_ranges_caelifera, predict(nonlin_reg_quadratic_caelifera, interval = "confidence"))
-
-par(mfrow = c(1,1))
-plot_quadratic_model(elevational_ranges_caelifera, nonlin_reg_quadratic_caelifera)
-
-#'
-#' ### Check models assumptions
-
-check_model_assumptions(nonlin_reg_quadratic_caelifera)
-
-#'
 #' ## Plots
 #'
 #' Plot the elevational ranges from all observations that are used in the main results (this excludes
 #' the singletons). Filled circles are Caelifera; crosses are Ensifera. The first plot shows the
 #' relationship between elevational range of all species with midpoint. The second plot shows the
-#' relationship between elevational range with midpoint elevation for Caelifera only. Lines show the
-#' best-fitted regression for each set of species.
+#' relationship between elevational range with midpoint elevation. Lines show the best-fitted regression.
 
 #' ### All species
 
@@ -446,99 +375,24 @@ plot_elev_range_all_species <- ggplot(data = elevational_ranges_species_predicte
   geom_line(data = confidence_bands_all_sp, aes(x = i_all_sp, y = upr),
             lwd=0.5, col="darkgrey", linetype = "dashed") +
   annotate("text", label = equation_all_sp, x = 2000, y = 1600, cex = 3) +
-  annotate("text", label = "(a)", x = 1200, y = 1600, cex = 4) +
+  # annotate("text", label = "(a)", x = 1200, y = 1600, cex = 4) +
   labs(x = "Elevational range midpoint (m a.s.l)",
        y = "Elevational range (m)") +
   theme_classic()
 
 #' Plot and save.
 
-#' Create the output plot PNG file.
+#' Create the output plot TIFF file.
 
 path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_elevational_range_model.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
+filepath <- file.path(path, "hypothesis2_elevational_range_model.tiff")
+
+tiff(file = filepath, width = 1000, height = 1000, bg = "white", units = "px", res = 300)
 
 plot_elev_range_all_species
 dev.off()
 
-#' Output the plot as PDF as well.
-
-filepath_pdf <- file.path(path, "figure_5a_elevational_range_model.pdf")
-print(filepath_pdf)
-pdf(file = filepath_pdf, width = 7, height = 7)
-
-plot_elev_range_all_species
-
-dev.off()
-
-#' ### Only Caelifera
-
-#' Get min and max of values on plot ready for predictions.
-
-i_cael <- seq(min(elevational_ranges_caelifera_predicted$elevational_range_midpoint),
-         max(elevational_ranges_caelifera_predicted$elevational_range_midpoint), len=100) #  x-value limits for line
-
-#' Calculate the predicted values from the regression so they can be plotted as a line.
-
-predicted_values_cael <- predict(nonlin_reg_quadratic_caelifera,
-                            data.frame(elevational_range_midpoint=i_cael, elevational_range_midpoint2=i_cael*i_cael)) #  fitted values
-intervals_cael <-  predict(nonlin_reg_quadratic_caelifera,
-                      data.frame(elevational_range_midpoint=i_cael, elevational_range_midpoint2=i_cael*i_cael), interval = "confidence")
-
-#' Put the values into a dataframe.
-
-confidence_bands_cael <- data.frame(i_cael, intervals_cael)
-
-#' Get the coefficients of the equation and put these into text.
-
-cf_cael <- signif(coef(nonlin_reg_quadratic_caelifera), 2)
-
-int_term_cael <- cf_cael[1]
-lin_term_cael <- cf_cael[2]
-quadratic_term_cael <- abs(cf_cael[3])
-
-equation_cael <- bquote(italic(E[R]) == .(int_term_cael) + .(lin_term_cael)*italic(E) - .(quadratic_term_cael)*italic(E)^2)
-
-#' Do the plot.
-
-plot_elev_range_caelifera <- ggplot(data = elevational_ranges_caelifera_predicted,
-             aes(x = elevational_range_midpoint, y = elevational_range)) +
-  geom_jitter(shape = 1, size = 1.8, show.legend = FALSE, width = 30, height = 20) +
-  ylim(0, 1600) +
-  xlim(1000, 2501) +
-  geom_line(data = confidence_bands_cael, aes(x = i_cael, y = fit), lty=1, lwd=0.5, col="black") +
-  geom_line(data = confidence_bands_cael, aes(x = i_cael, y = lwr),
-            lwd=0.5, col="darkgrey", linetype = "dashed") +
-  geom_line(data = confidence_bands_cael, aes(x = i_cael, y = upr),
-            lwd=0.5, col="darkgrey", linetype = "dashed") +
-  annotate("text", label = equation_cael, x = 2000, y = 1600, cex = 3) +
-  annotate("text", label = "(b)", x = 1200, y = 1600, cex = 4) +
-  labs(x = "Elevational range midpoint (m a.s.l)",
-       y = "Elevational range (m)") +
-  theme_classic()
-
-#' Create the output plot file.
-
-path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_elevational_range_model_caelifera.png")
-png(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
-
-#' Plot and save.
-
-plot_elev_range_caelifera
-dev.off()
-
-#' Output the plot as PDF as well.
-
-filepath_pdf <- file.path(path, "figure_5b_elevational_range_model_caelifera.pdf")
-print(filepath_pdf)
-pdf(file = filepath_pdf, width = 7, height = 7)
-
-plot_elev_range_caelifera
-
-dev.off()
-
+#'
 #' ### Elevational range and mean elevation
 #'
 #' Ordered by decreasing elevational range midpoint.
@@ -546,12 +400,9 @@ dev.off()
 #' Create the output plot file.
 
 path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png")
-png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
+filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.tiff")
 
-filepath_pdf <- file.path(path, "figure_4_elevational_range_species.pdf")
-print(filepath_pdf)
-pdf(file = filepath_pdf, width = 7, height = 7)
+tiff(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
 
 species_elevationalrange_plot_vertical <- ggplot(elevational_ranges_species_predicted,
                                         aes(y = reorder(species, elevational_range_midpoint), x = elevational_range_midpoint)) +
