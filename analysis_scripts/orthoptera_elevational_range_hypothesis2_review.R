@@ -395,7 +395,7 @@ dev.off()
 
 #' Output the plot as PDF as well.
 
-filepath_pdf <- file.path(path, "figure_5a_elevational_range_model.pdf")
+filepath_pdf <- file.path(path, "figure_4_elevational_range_model.pdf")
 print(filepath_pdf)
 pdf(file = filepath_pdf, width = 7, height = 7)
 
@@ -413,7 +413,7 @@ path <- "../analysis_plots/"
 filepath <- file.path(path, "hypothesis2_species_elevational_range_vertical.png")
 png(file = filepath, width = 1400, height = 1400, units = "px", bg = "white", res = 300)
 
-filepath_pdf <- file.path(path, "figure_4_elevational_range_species.pdf")
+filepath_pdf <- file.path(path, "figure_3_elevational_range_species.pdf")
 print(filepath_pdf)
 pdf(file = filepath_pdf, width = 7, height = 7)
 
