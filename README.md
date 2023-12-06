@@ -1,6 +1,6 @@
 # Investigating the relationship of elevation and Orthoptera species richness, elevational range and community composition. 
 
-This repository contains the code to do the analysis for this project. The analysis was done in `R`. 
+This repository contains the code to do the analysis for this project. The analysis for the associated publication was done in `R` (version 4.2.2) using Debian (bookworm).
 
 ## Project structure
 
@@ -15,7 +15,6 @@ Contents of `analysis_scripts`:
 * `get_finalised_observations_species_richness_conservative.R`: read the details about finalised observations in the file. This code creates the set of observations that are used for the rest of the analysis.
 * `get_physical_site_data.R`: digital elevation models were used to get data for topography parameters at each of the study sites.
 * `get_temperature_data.sh`: temperature data from automatic weather stations in Catalunya (XEMA) and Andorra (Meteo Andorra) were used to compile summary temperature data to describe the conditions at different elevations. This data was used in the manuscript introduction, rather than in the analysis.
-* `orthoptera_community_composition_hypothesis3.R`: analysis of community composition using `vegan`. Non-hierarchical K-means cluster analysis and NMDS with ordination.
 * `orthoptera elevation_data_exploration.R`: initial investigations of the data to summarise visits to sites, number of surveys and number of taxa found.
 * `orthoptera_elevational_range_hypothesis2.R`: nonlinear regressions used to analyse the relationship between elevational range over an elevational gradient (Rapoport's elevational rule).
 * `orthoptera_species_richness_hypothesis1.R`: generalised linear models used to find the important predictors of species richness along the elevational gradient.
