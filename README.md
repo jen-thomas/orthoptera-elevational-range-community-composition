@@ -1,4 +1,4 @@
-# Investigating the relationship of elevation and Orthoptera species richness, elevational range and community composition. 
+# Investigating the relationship of elevational range and Orthoptera species richness along an elevational gradient in the Pyrenees. 
 
 This repository contains the code to do the analysis for this project. The analysis for the associated publication was done in `R` (version 4.2.2) using Debian (bookworm).
 
@@ -24,7 +24,7 @@ Contents of `analysis_scripts`:
 
 ### Data
 
-The directory `data` was used as the source of all of the data files that are used in the analysis. The data created as part of this project is now held in another [repository](https://github.com/jen-thomas/orthoptera-elevational-range-community-composition-observation-data), and data produced by other sources (digital elevation models and temperature) is not made available here for licensing and practical (data set size) reasons. 
+The directory `data` was used as the source of all of the data files that are used in the analysis. The data created as part of this project is now held in another [repository](https://github.com/jen-thomas/orthoptera-elevational-range-community-composition-observation-data), and data produced by other sources (digital elevation models and temperature) is not made available here for licensing and practical (data set size) reasons. The published (and citable) version is available at [https://doi.org/zenodo.7763502](https://doi.org/zenodo.7763502).
 
 #### Digital elevation model data
 
@@ -46,4 +46,4 @@ Running the script, `generate_analysis_output.R`, will create HTML files from ea
 
 Alternatively, each of the `R` scripts can be run individually.
 
-The virtual environment, `venv`, should be activated before running the Python code. The packages listed in `requirements.txt` should be installed. This code is only required to summarise the temperature data. Before running the code, the data should be downloaded from the repositories described above, for the meterological stations that are required. Paths in the code will need to be adjusted accordingly. The then bash script should be used to reduce the size of the data that are analysed in Python. 
+The virtual environment, `venv`, should be activated before running the Python code. The packages listed in `requirements.txt` should be installed. This code is only required to summarise the temperature data. Before running the code, the data should be downloaded from the repositories described above, for the meteorological stations that are required. Paths in the code will need to be adjusted accordingly. The then bash script should be used to reduce the size of the data that are analysed in Python. 
