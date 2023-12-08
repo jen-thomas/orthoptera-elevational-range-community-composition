@@ -521,7 +521,7 @@ fitted_glm_values <- data.frame(species_richness_elevation_plot$fit)
 #' Create and save the output plot.
 
 path <- "../analysis_plots/"
-filepath <- file.path(path, "hypothesis1_sr_elevation_glm_review.tiff")
+filepath <- file.path(path, "hypothesis1_sr_elevation_glm.tiff")
 tiff(file = filepath, width = 1000, height = 1000, units = "px", bg = "white", res = 300)
 
 par(mfrow = c(1,1))
