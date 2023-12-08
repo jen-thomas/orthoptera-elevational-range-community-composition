@@ -12,7 +12,7 @@ authors:
 identifiers:
   - type: other
     value: >-
-      https://github.com/jen-thomas/orthoptera-elevational-range-community-composition/releases/tag/v2.0.0
+      https://github.com/jen-thomas/orthoptera-elevational-range-community-composition/releases/tag/v2.0.1
     description: GitHub release of manuscript version
 repository-code: >-
   https://github.com/jen-thomas/orthoptera-elevational-range-community-composition
@@ -26,5 +26,5 @@ keywords:
   - Elevational gradient
 license: MIT
 commit: a4c433a32a8680cbb83b45d69b70ef6e459bdb7d
-version: 2.0.0
+version: 2.0.1
 date-released: '2023-12-08'
