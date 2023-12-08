@@ -46,4 +46,4 @@ Running the script, `generate_analysis_output.R`, will create HTML files from ea
 
 Alternatively, each of the `R` scripts can be run individually.
 
-The virtual environment, `venv`, should be activated before running the Python code. The packages listed in `requirements.txt` should be installed. This code is only required to summarise the temperature data. Before running the code, the data should be downloaded from the repositories described above, for the meteorological stations that are required. Paths in the code will need to be adjusted accordingly. The then bash script should be used to reduce the size of the data that are analysed in Python. 
+The virtual environment, `venv`, should be activated before running the Python code. This code is only required to summarise the temperature data. Before running the code, the data should be downloaded from the repositories described above, for the meteorological stations that are required. Paths in the code will need to be adjusted accordingly. The then bash script should be used to reduce the size of the data that are analysed in Python. 
