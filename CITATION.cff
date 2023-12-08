@@ -12,20 +12,19 @@ authors:
 identifiers:
   - type: other
     value: >-
-      https://github.com/jen-thomas/orthoptera-elevational-range-community-composition/releases/tag/v1.0.0
+      https://github.com/jen-thomas/orthoptera-elevational-range-community-composition/releases/tag/v2.0.0
     description: GitHub release of manuscript version
 repository-code: >-
   https://github.com/jen-thomas/orthoptera-elevational-range-community-composition
 abstract: >-
   Analysis to investigate the relationship of elevation and
-  Orthoptera species richness, elevational range and
-  community composition.
+  Orthoptera species richness along an elevational gradient in the Pyrenees
 keywords:
   - Orthoptera
-  - Community composition
   - Elevational range
   - Species richness
+  - Elevational gradient
 license: MIT
 commit: a4c433a32a8680cbb83b45d69b70ef6e459bdb7d
-version: 1.0.0
-date-released: '2023-04-28'
+version: 2.0.0
+date-released: '2023-12-08'
