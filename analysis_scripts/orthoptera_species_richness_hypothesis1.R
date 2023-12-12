@@ -272,10 +272,11 @@ glm_species_richness_full_quasipoisson <- glm(species_richness ~ elevational_ban
                                         mean_perc_veg_cover + mean_max_height_cm + mean_density,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
+print("glm_species_richness_full_quasipoisson")
 
-summary(glm_species_richness_full_quasipoisson)
-Anova(glm_species_richness_full_quasipoisson)
-anova(glm_species_richness_full_quasipoisson)
+summary(glm_species_richness_full_quasipoisson, test = "F")
+Anova(glm_species_richness_full_quasipoisson, test = "F")
+anova(glm_species_richness_full_quasipoisson, test = "F")
 
 #' Given the overdispersion parameter lies between 1 and 15, quasipoisson distribution should be suitable
 #' for this model (there is no need to try a negative binomial instead).
@@ -302,10 +303,10 @@ glm_species_richness_full_quasipoisson_remove_density <- glm(species_richness ~ 
                                         sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoisson_remove_density)
-Anova(glm_species_richness_full_quasipoisson_remove_density)
-anova(glm_species_richness_full_quasipoisson_remove_density)
+print("glm_species_richness_full_quasipoisson_remove_density")
+summary(glm_species_richness_full_quasipoisson_remove_density, test = "F")
+Anova(glm_species_richness_full_quasipoisson_remove_density, test = "F")
+anova(glm_species_richness_full_quasipoisson_remove_density, test = "F")
 
 #' Compare the reduced model and full model.
 anova(glm_species_richness_full_quasipoisson, glm_species_richness_full_quasipoisson_remove_density,
@@ -317,10 +318,10 @@ glm_species_richness_full_quasipoisson_remove_density_slope <- glm(species_richn
                                         sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoisson_remove_density_slope)
-Anova(glm_species_richness_full_quasipoisson_remove_density_slope)
-anova(glm_species_richness_full_quasipoisson_remove_density_slope)
+print("glm_species_richness_full_quasipoisson_remove_density_slope")
+summary(glm_species_richness_full_quasipoisson_remove_density_slope, test = "F")
+Anova(glm_species_richness_full_quasipoisson_remove_density_slope, test = "F")
+anova(glm_species_richness_full_quasipoisson_remove_density_slope, test = "F")
 
 #' Compare the reduced model and full model.
 anova(glm_species_richness_full_quasipoisson_remove_density,
@@ -334,10 +335,10 @@ glm_species_richness_full_quasipoisson_remove_density_slope_aspect <- glm(specie
                                         mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoisson_remove_density_slope_aspect)
-Anova(glm_species_richness_full_quasipoisson_remove_density_slope_aspect)
-anova(glm_species_richness_full_quasipoisson_remove_density_slope_aspect)
+print("glm_species_richness_full_quasipoisson_remove_density_slope_aspect")
+summary(glm_species_richness_full_quasipoisson_remove_density_slope_aspect, test = "F")
+Anova(glm_species_richness_full_quasipoisson_remove_density_slope_aspect, test = "F")
+anova(glm_species_richness_full_quasipoisson_remove_density_slope_aspect, test = "F")
 
 #' Compare the reduced model and full model.
 anova(glm_species_richness_full_quasipoisson_remove_density_slope,
@@ -351,10 +352,10 @@ glm_species_richness_full_quasipoisson_remove_density_slope_area <- glm(species_
                                         mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoisson_remove_density_slope_area)
-Anova(glm_species_richness_full_quasipoisson_remove_density_slope_area)
-anova(glm_species_richness_full_quasipoisson_remove_density_slope_area)
+print("glm_species_richness_full_quasipoisson_remove_density_slope_area")
+summary(glm_species_richness_full_quasipoisson_remove_density_slope_area, test = "F")
+Anova(glm_species_richness_full_quasipoisson_remove_density_slope_area, test = "F")
+anova(glm_species_richness_full_quasipoisson_remove_density_slope_area, test = "F")
 
 #' Compare the reduced model and full model.
 anova(glm_species_richness_full_quasipoisson_remove_density_slope,
@@ -369,10 +370,10 @@ glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect <- glm(s
                                         sampling_effort_index + mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect)
-Anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect)
-anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect)
+print("glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect")
+summary(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect, test = "F")
+Anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect, test = "F")
+anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect, test = "F")
 
 #' Compare the reduced model and full model.
 anova(glm_species_richness_full_quasipoisson_remove_density_slope_area,
@@ -385,10 +386,10 @@ glm_species_richness_full_quasipoisson_remove_density_area_aspect <- glm(species
                                           mean_perc_veg_cover + mean_max_height_cm,
     family = quasipoisson(link = "log"),
     data = species_richness_sites)
-
-summary(glm_species_richness_full_quasipoisson_remove_density_area_aspect)
-Anova(glm_species_richness_full_quasipoisson_remove_density_area_aspect)
-anova(glm_species_richness_full_quasipoisson_remove_density_area_aspect)
+print("glm_species_richness_full_quasipoisson_remove_density_area_aspect")
+summary(glm_species_richness_full_quasipoisson_remove_density_area_aspect, test = "F")
+Anova(glm_species_richness_full_quasipoisson_remove_density_area_aspect, test = "F")
+anova(glm_species_richness_full_quasipoisson_remove_density_area_aspect, test = "F")
 
 #' Compare the reduced model and full model.
 anova(glm_species_richness_full_quasipoisson_remove_density_slope_area_aspect,
